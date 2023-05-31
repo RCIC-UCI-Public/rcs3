@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "s3.amazonaws.com"
+            },
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-inventory/*"
+            ],
+            "Condition": {
+                "ArnLike": {
+                    "aws:SourceArn": "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket"
+                },
+                "StringEquals": {
+                    "aws:SourceAccount": "xxxuciawsacctxxx",
+                    "s3:x-amz-acl": "bucket-owner-full-control"
+                }
+            }
+        }
+    ]
+}
