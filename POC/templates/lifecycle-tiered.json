@@ -1,0 +1,24 @@
+{
+    "Rules": [
+        {
+            "Filter": {
+                "ObjectSizeGreaterThan": 131072
+            }, 
+            "Status": "Enabled", 
+            "Transitions": [
+                {
+                    "Days": 7, 
+                    "StorageClass": "GLACIER"
+                }
+            ], 
+            "NoncurrentVersionTransitions": [
+                {
+                    "NoncurrentDays": 7, 
+                    "StorageClass": "GLACIER"
+                }
+            ], 
+            "ID": "Tiered-Storage"
+        }
+    ]
+}
+
