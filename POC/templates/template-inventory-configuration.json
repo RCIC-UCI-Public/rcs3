@@ -1,13 +1,13 @@
 {
     "Destination": {
         "S3BucketDestination": {
-            "AccountId": "xxxuciawsaccountxxx",
+            "AccountId": "xxxuciawsacctxxx",
             "Bucket": "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket",
             "Format": "CSV"
         }
     },
     "IsEnabled": true,
-    "Id": "xxxuserxxx-xxxhostxxx-daily-inventory",
+    "Id": "xxxuserxxx-xxxhostxxx-daily",
     "IncludedObjectVersions": "Current",
     "OptionalFields": [
         "Size",
