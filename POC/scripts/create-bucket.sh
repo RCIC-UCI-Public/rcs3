@@ -44,7 +44,7 @@ $AWS s3api put-bucket-versioning --bucket $bucketname --versioning-configuration
 $AWS s3api put-public-access-block --bucket $bucketname --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 
 
-cat $TEMPLATES_DIR/template-policy.json | \
+cat $TEMPLATES_DIR/template-policy2.json | \
 sed s/xxxuserxxx/$user/ | \
 sed s/xxxhostxxx/$host/ > $user-$host-policy.json
 
