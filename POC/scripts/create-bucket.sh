@@ -1,4 +1,8 @@
 #! /bin/sh
+MYDIR=$(dirname $(realpath $0))
+CONFIG_DIR=$MYDIR/../config 
+TEMPLATES_DIR=$MYDIR/../templates
+
 
 if [ $# -ne 2 ] ; then
     echo $0 user host
@@ -11,11 +15,20 @@ host=$2
 uciawsacct=774954368688
 awsprofile=774954368688_AWSAdministratorAccess
 
+# AWS cli and common options
+AWSCLI=/usr/bin/aws
+AWS="$AWSCLI --profile $awsprofile"
+## USE the aws-admin config file in the config directory
+export AWS_CONFIG_FILE=$CONFIG_DIR/aws-admin
+
+#echo $AWS_CONFIG_FILE
+#echo $AWS
+
 bucketname=$user-$host-uci-bkup-bucket
 #aws --profile $awsprofile s3api create-bucket --bucket $bucketname --object-lock-enabled-for-bucket --region us-west-2 --create-bucket-configuration LocationConstraint=us-west-2
-aws --profile $awsprofile s3api create-bucket --bucket $bucketname --region us-west-2 --create-bucket-configuration LocationConstraint=us-west-2
+$AWS s3api create-bucket --bucket $bucketname --region us-west-2 --create-bucket-configuration LocationConstraint=us-west-2
 
-aws --profile $awsprofile s3api put-bucket-encryption --bucket $bucketname --server-side-encryption-configuration '{
+$AWS s3api put-bucket-encryption --bucket $bucketname --server-side-encryption-configuration '{
     "Rules": [
         {
             "ApplyServerSideEncryptionByDefault": {
@@ -26,19 +39,19 @@ aws --profile $awsprofile s3api put-bucket-encryption --bucket $bucketname --ser
 }'
 
 # redundant with object locking
-aws --profile $awsprofile s3api put-bucket-versioning --bucket $bucketname --versioning-configuration Status=Enabled
+$AWS s3api put-bucket-versioning --bucket $bucketname --versioning-configuration Status=Enabled
 
-aws --profile $awsprofile s3api put-public-access-block --bucket $bucketname --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+$AWS s3api put-public-access-block --bucket $bucketname --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 
 
-cat template-policy.json | \
+cat $TEMPLATES_DIR/template-policy.json | \
 sed s/xxxuserxxx/$user/ | \
 sed s/xxxhostxxx/$host/ > $user-$host-policy.json
 
-aws --profile $awsprofile iam create-policy --policy-name $user-$host-uci-bkup-policy  --policy-document file://$user-$host-policy.json
+$AWS iam create-policy --policy-name $user-$host-uci-bkup-policy  --policy-document file://$user-$host-policy.json
 
-aws --profile $awsprofile iam create-user --user-name $user-$host-sa
+$AWS iam create-user --user-name $user-$host-sa
 
-aws --profile $awsprofile iam attach-user-policy --user-name $user-$host-sa --policy-arn arn:aws:iam::${uciawsacct}:policy/$user-$host-uci-bkup-policy
+$AWS iam attach-user-policy --user-name $user-$host-sa --policy-arn arn:aws:iam::${uciawsacct}:policy/$user-$host-uci-bkup-policy
 
-aws --profile $awsprofile iam create-access-key --user-name $user-$host-sa | tee credentials.$user-$host
+$AWS iam create-access-key --user-name $user-$host-sa | tee credentials.$user-$host

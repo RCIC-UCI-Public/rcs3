@@ -1,0 +1,3 @@
+copy aws-admin.in to aws-admin
+aws-admin is used for authentication in aws cli for administrative actions
+aws-admin is also in .git-ignore to help stave off accidental check-ins of credentials

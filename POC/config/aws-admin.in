@@ -1,0 +1,13 @@
+[default]
+output = json
+region = us-west-2
+aws_access_key_id = xxxx
+aws_secret_access_key = xxxx
+### From the Admin Website, Can drop in the command-line credentials here
+## Don't forget to add the word "profile"
+## e.g.
+## 
+## [profile nnnnnnnnn_AWSAdministratorAccess]
+## aws_access_key_id=UniqueUnicorn
+## aws_secret_access_key=SuperSecretAccessKey
+## aws_session_token=LongSessionToken
