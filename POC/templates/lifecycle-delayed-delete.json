@@ -1,0 +1,18 @@
+{
+    "Rules": [
+        {
+            "Status": "Enabled", 
+            "NoncurrentVersionExpiration": {
+                "NoncurrentDays": 90
+            }, 
+            "Filter": {}, 
+            "Expiration": {
+                "ExpiredObjectDeleteMarker": true
+            }, 
+            "AbortIncompleteMultipartUpload": {
+                "DaysAfterInitiation": 3
+            }, 
+            "ID": "Delayed-Delete"
+        }
+    ]
+}
