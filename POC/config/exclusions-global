@@ -1,0 +1,20 @@
+(?i)^.*(\.class|-journal|\.Win386\.SWP|PM_HIBER\.BIN|SAVE2DSK\.BIN|SYSTEM\.DAT|TOSHIBER\.DAT|Thumbs\.db|USER\.DAT|\.bck|\.bkf|\.cdt|\.hdd|\.hds|\.icloud|\.ini|\.lrprev|\.manifest|\.mum|\.nib|\.nvram|\.ost|\.part|\.pvm|\.pvs|\.rbf|\.tibx?|\.tmp|\.upd|\.avhdx|\.vdi|\.vfd|\.vhd|\.vhdx|\.vmc|\.vmdk|\.vmem|\.vmsd|\.vmsn|\.vmss|\.vmtm|\.vmwarevm|\.vmx|\.vmxf|\.vsv|\.vud|\.xva|\.qcow2?|iso|pkg|raw|memory\.dmp|/Lightroom.*Previews\.lrdata|\.sparsebundle|\.sparseimage|/(cookies|permissions)\.sqlite(-.{3})?|\.crdownload)$
+(?i)^.*(/Apple.*/Installer Cache/|/Cache/|/Cookies/|/Music/Subscription/|/Plex Media Server/|/Steam/|/Temp/|/\.dropbox\.cache/|/\.git/|/iPod Photo Cache/|/node_modules/|/tmp/|/tsm_images/|\.Trash|\.hdd/|\.pvm/|\.cprestoretmp|\.nvm|\.npm|/\.gradle/).*
+(?i)^.*(\.kgdb|\.db|\.srd|-shm|-wal|-lock|\.musicdb|\.tvdb|\.pid)$
+(?i)^.*\.photoslibrary/(private/|resources/|database/).*$
+(?i)^.*/(.*\.?leveldb)/.*$
+win:(?i)^.*(/I386|/System Volume Information/|/Temporary Internet Files/|/Windows Update Setup Files/|\$RECYCLE\.BIN/|/NTUSER|/Safari/Library/Caches/|/Windows Defender/|/cygwin(64)?/(bin|dev|etc|lib|sbin|tmp|var|usr)/|UsrClass\.dat).*
+win:^.*(/Local Settings/Temp|/Local.*/History/|/LocalService/|/MSOCache|/NetHood/|/NetworkService/).*
+win:(?i)^.*(/pagefile\.sys|\.etl|\.mui)$
+win:(?i)^.:/(Recovery/|boot/|ESD/|Recycler/|Dell/|Intel/|Oracle/|PerfLogs/|Program Files( \(x86\))?/|ProgramData/(?!$|CrashPlan/$|CrashPlan/user_settings/)|Users/All Users/|Users/[^/]+/AppData/|Users/[^/]+/Apple/MobileSync/|Windows(\.old)?/|\$WINDOWS.~(BT|WS)/|\$SysReset/|\$GetCurrent/|_RESTORE/|_SMSTaskSequence/|safeboot/|swsetup/).*
+win:(?i)^.:/(Config\.Msi|HIBERFIL\.SYS|HIBRN8\.DAT|autoexec\.bat|boot\.ini|bootmgr|bootnxt|bootsect\.bak|config\.sys|io\.sys|msdos\.sys|ntdetect\.com|ntldr|swapfile\.sys)$
+mac:(?i)^.*(/iTunes/Album Artwork/Cache/|/Network Trash Folder/|/Photos Library.*/Thumbnails/|/backups\.backupdb/|/iP.* Software Updates/|/iPhoto Library.*/Thumbnails/|/iPhoto Library/iPod Photo Cache|/migratedphotolibrary/Thumbnails/|\.imovielibrary/.*/Analysis Files/|\.imovielibrary/.*/Render Files/).*
+mac:^.*(/Trash/|/\.fcpcache/|MobileBackups/|\.Spotlight-.*/|\.fseventsd|\.hotfiles\.btree|/bin/|/home/|/sbin/|/cores/|/private/|/var/).*
+mac:(?i)^.*(\.imovielibrary/\.lock)$
+mac:(?i)^.*(\.DS_Store|\.plist|\.strings)$
+mac:(?i)^/(usr/|opt/|etc/|var/|Users/((?!XCode).)*/Applications/|Users/Shared/|dev/|Library/(?!($|Application Support/$|Application Support/CrashPlan/$|Application Support/CrashPlan/print_job_data/.*))|proc/|/Users/.*/.vscode/extensions/).*
+mac:^/(Applications/|Desktop DB|Desktop DF|Network/|Previous Systems|System/|Users/.*/\.cisco/vpn/log/|Users/.*/\.dropbox/|Users/[^/]+/Library/|\.DocumentRevisions-V100/|\.PKInstallSandboxManager-SystemSoftware|\.adobeTemp/|\.vol/|afs/|automount/|lost\+found/|net/).*
+linux:(?i)^/(usr/(?!($|local/$|local/crashplan/$|local/crashplan/print_job_data/.*))|opt/|etc/|dev/|home/[^/]+/\.config/google-chrome/|home/[^/]+/\.mozilla/|sbin/).*
+linux:^/(cdrom/|dev/fd/|devices/|dvdrom/|initrd/|kernel/|lost\+found/|proc/|run/|selinux/|srv/|sys/|system/|var/(:?run|lock|spool|tmp|cache)/|proc/).*
+linux:^/lib/modules/.*/volatile/\.mounted
+
