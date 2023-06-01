@@ -50,6 +50,10 @@ sed s/xxxhostxxx/$host/ > $outputs/$user-$host-inv-cfg.json
 
 aws --profile $awsprofile s3api put-bucket-inventory-configuration --bucket $user-$host-uci-bkup-bucket --id $user-$host-daily --inventory-configuration file://$outputs/$user-$host-inv-cfg.json
 
+# put the lifecycle policy into the bucket for storage transititions and permanent deletions
+
+aws --profile $awsprofile s3api put-bucket-lifecycle-configuration --bucket $user-$host-uci-bkup-bucket --lifecycle-configuration file://$templates/lifecycle-all.json
+
 # create service account access policy
 cat $templates/template-policy2.json | \
 sed s/xxxuciawsacctxxx/$uciawsacct/ | \
