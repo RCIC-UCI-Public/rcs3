@@ -5,6 +5,9 @@ if [ $# -ne 2 ] ; then
     exit 0
 fi
 
+outputs="outputs"
+templates="templates"
+
 user=$1
 host=$2
 # RCIC AWS account
@@ -33,30 +36,30 @@ do
 done
 
 # put bucket policy for inventory bucket
-cat template-inventory-permissions.json | \
+cat $templates/template-inventory-permissions.json | \
 sed s/xxxuserxxx/$user/ | \
-sed s/xxxhostxxx/$host/ > $user-$host-inv-perm.json
+sed s/xxxhostxxx/$host/ > $outputs/$user-$host-inv-perm.json
 
-aws --profile $awsprofile s3api put-bucket-policy --bucket $user-$host-uci-inventory --policy file://$user-$host-inv-perm.json
+aws --profile $awsprofile s3api put-bucket-policy --bucket $user-$host-uci-inventory --policy file://$outputs/$user-$host-inv-perm.json
 
 # put inventory configuration on the primary bucket
-cat template-inventory-configuration.json | \
+cat $templates/template-inventory-configuration.json | \
 sed s/xxxuciawsacctxxx/$uciawsacct/ | \
 sed s/xxxuserxxx/$user/ | \
-sed s/xxxhostxxx/$host/ > $user-$host-inv-cfg.json
+sed s/xxxhostxxx/$host/ > $outputs/$user-$host-inv-cfg.json
 
-aws --profile $awsprofile s3api put-bucket-inventory-configuration --bucket $user-$host-uci-bkup-bucket --id 1 --inventory-configuration file://$user-$host-inv-cfg.json
+aws --profile $awsprofile s3api put-bucket-inventory-configuration --bucket $user-$host-uci-bkup-bucket --id $user-$host-daily --inventory-configuration file://$outputs/$user-$host-inv-cfg.json
 
 # create service account access policy
-cat template-policy2.json | \
+cat $templates/template-policy2.json | \
 sed s/xxxuciawsacctxxx/$uciawsacct/ | \
 sed s/xxxuserxxx/$user/ | \
-sed s/xxxhostxxx/$host/ > $user-$host-policy.json
+sed s/xxxhostxxx/$host/ > $outputs/$user-$host-policy.json
 
-aws --profile $awsprofile iam create-policy --policy-name $user-$host-uci-bkup-policy  --policy-document file://$user-$host-policy.json
+aws --profile $awsprofile iam create-policy --policy-name $user-$host-uci-bkup-policy  --policy-document file://$outputs/$user-$host-policy.json
 
 aws --profile $awsprofile iam create-user --user-name $user-$host-sa
 
 aws --profile $awsprofile iam attach-user-policy --user-name $user-$host-sa --policy-arn arn:aws:iam::${uciawsacct}:policy/$user-$host-uci-bkup-policy
 
-aws --profile $awsprofile iam create-access-key --user-name $user-$host-sa | tee credentials.$user-$host
+aws --profile $awsprofile iam create-access-key --user-name $user-$host-sa | tee $outputs/$user-$host.credentials
