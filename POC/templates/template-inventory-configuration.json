@@ -2,7 +2,7 @@
     "Destination": {
         "S3BucketDestination": {
             "AccountId": "xxxuciawsacctxxx",
-            "Bucket": "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket",
+            "Bucket": "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-inventory",
             "Format": "CSV"
         }
     },
