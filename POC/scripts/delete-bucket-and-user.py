@@ -2,9 +2,14 @@
 
 import argparse
 import boto3
+import sys
+import yaml
+
+sys.path.append( "scripts" )
+from commonfunctions import delete_user_keys
 
 
-usage="Delete S3 bucket and IAM user, detach policies delete access keys"
+usage="Delete S3 bucket and IAM user, detach policies, delete access keys"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -12,12 +17,14 @@ p.add_argument( "host",
         help="hostname" )
 args = p.parse_args()
 
+with open( "config/aws-settings.yaml", "r" ) as f:
+    aws = yaml.safe_load( f )
+
 #print( args.user, args.host )
 acctname = args.user +  "-" + args.host + "-sa"
 primarybucket = args.user + "-" + args.host + "-uci-bkup-bucket"
 inventorybucket = args.user + "-" + args.host + "-uci-inventory"
-profile="774954368688_AWSAdministratorAccess"
-session = boto3.Session( profile_name=profile )
+session = boto3.Session( profile_name=aws[ "profile" ] )
 
 # s3 bucket cleanup
 s3_client = session.client( "s3" )
@@ -43,9 +50,7 @@ try:
         iam_client.detach_user_policy( UserName=acctname, PolicyArn=policyarn )
         iam_client.delete_policy( PolicyArn=policyarn )
     
-    for keys in userkeys[ "AccessKeyMetadata" ]:
-        #print( keys[ "AccessKeyId" ] )
-        iam_client.delete_access_key( UserName=acctname, AccessKeyId=keys[ "AccessKeyId" ] )
+    delete_user_keys( iam_client, acctname )
     
     iam_client.delete_user( UserName=acctname )
 except iam_client.exceptions.NoSuchEntityException:
