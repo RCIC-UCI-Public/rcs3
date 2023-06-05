@@ -29,6 +29,10 @@ def generate(jobs,top_up,endpoint,dryrun=False,threads=2):
               files=jobs['files']
            except:
               files=None
+           try:
+              threads=jobs['threads']
+           except:
+              pass
            write_rclone(endpoint, top_up, jobs['name'],path,subdirs,files,excludes,threads,dryrun)
 
 
@@ -44,8 +48,8 @@ def write_rclone(endpoint,top_up,jobname,path,subdirs,files,exclude,threads,dryr
     else:
        sync="sync"
 
-    logfilter="--log-file %s --filter %s" % (log_file, filter_file)
-    cmd="rclone %s --log-level INFO %s %s %s %s:%s/%s" % (sync,rc_global,logfilter,path,endpoint,jobname,path)
+    logfilter="--log-file %s --filter-from %s" % (log_file, filter_file)
+    cmd="rclone %s --log-level INFO %s %s %s %s:%s%s" % (sync,rc_global,logfilter,path,endpoint,jobname,path)
     print(cmd)
 
 def write_filter(file,subdirs,files,exclude):
