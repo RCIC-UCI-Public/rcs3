@@ -1,0 +1,25 @@
+## This is a sample jobs.yaml the defines four backup jobs on a single path
+## Job names must be distinct (not checked, yet)
+## Path is commmon to the jobs relative to the path
+---
+srcpaths:
+- path: /volume1/cncm
+  exclude_global:
+    - .DS_Store
+  jobs:
+    - name: backup-1
+      subdirectories:
+        - Lab/DataImages
+
+    - name: backup-2
+      subdirectories:
+        - Lab/Pan_public
+
+    - name: backup-3
+      subdirectories:
+        - Lab/DataImages2
+
+    - name: backup-4
+      subdirectories:
+        - Lab/twophoton2
+
