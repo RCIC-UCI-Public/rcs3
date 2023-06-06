@@ -14,6 +14,10 @@ import time
 
 
 def generate(jobs,top_up,endpoint,dryrun=False,threads=2):
+    """ returns a dictionary of
+         jobname: (cmd, filter)  """
+
+    alljobs = dict()
     with open( jobs, "r" ) as f:
         jobdefs = yaml.safe_load( f )
     
@@ -33,45 +37,52 @@ def generate(jobs,top_up,endpoint,dryrun=False,threads=2):
               threads=jobs['threads']
            except:
               pass
-           write_rclone(endpoint, top_up, jobs['name'],path,subdirs,files,excludes,threads,dryrun)
+
+           jobname = jobs['name']
+           (cmd,rcfilter) = write_rclone(endpoint, top_up, jobname, path,subdirs,files,excludes,threads,dryrun)
+           alljobs[jobname] = (cmd,rcfilter)
+
+    return alljobs
 
 
 def write_rclone(endpoint,top_up,jobname,path,subdirs,files,exclude,threads,dryrun):
-    rc_global =  "--metadata --links --multi-thread-streams %d" % threads
+   
+    """ Create the rclone command 
+       return (cmd,filter)
+              cmd  - list suitable to send to subprocess without resorting to shell=True
+              filter - list of lines for the actual filter command """
+    rc_global =  ["--metadata", "--links", "--multi-thread-streams", "%d" % threads]
     if dryrun:
-        rc_global += " --dry-run"
-    filter_file= "/tmp/%s.filter" % jobname
-    log_file = "/tmp/%s.log" % jobname
-    write_filter(filter_file,subdirs,files,exclude)
+        rc_global.extend([" --dry-run"])
+    rc_filter = write_filter(subdirs,files,exclude)
     if top_up is not None:
-       sync="copy --max-age %s --no-traverse" %top_up
+       sync=["copy", "--max-age", "%s" % top_up, "--no-traverse"]
     else:
-       sync="sync"
+       sync=["sync"]
 
-    logfilter="--log-file %s --filter-from %s" % (log_file, filter_file)
-    cmd="rclone %s --log-level INFO %s %s %s %s:%s%s" % (sync,rc_global,logfilter,path,endpoint,jobname,path)
-    print(cmd)
+    loglevel=["--log-level", "INFO"]
+    cmd=["rclone"]
+    cmd.extend(sync)
+    cmd.extend(loglevel)
+    cmd.extend([path])
+    cmd.extend(["%s:%s%s" % (endpoint,jobname,path)])
+    
+    return (cmd,rc_filter)
 
-def write_filter(file,subdirs,files,exclude):
-    with open(file,"w") as f:
-       if subdirs is not None:
-           for d in subdirs:
-               f.write("+ %s/**\n" % d)
-
-       if files is not None:
-           for fi in files:
-               f.write("+ %s\n" % fi)
-       
-       if exclude is not None:
-           for e in exclude:
-               f.write("- %s\n" % e)
-       f.write("- **\n")
-    f.close()
-
-       
-
-
-        
+def write_filter(subdirs,files,exclude):
+    """ return list of strings suitable for writing an rclone filter file """
+    rval=[]
+    if exclude is not None:
+        for e in exclude:
+            rval.extend(["- %s\n" % e])
+    if subdirs is not None:
+        for d in subdirs:
+            rval.extend(["+ %s/**\n" % d])
+    if files is not None:
+        for fi in files:
+            rval.extend(["+ %s\n" % fi])
+    
+    return rval 
 ## *****************************
 ## main routine
 ## *****************************
@@ -102,7 +113,19 @@ def main(argv):
     if not os.path.isfile(args.jobsfile):
        sys.stderr.write("jobs yaml file %s does not exist\n" % args.jobsfile)
        sys.exit(-1)
-    generate(args.jobsfile,args.top_up,args.endpoint,args.dryrun)
+    alljobs = generate(args.jobsfile,args.top_up,args.endpoint,args.dryrun)
+    for job in alljobs.keys():
+        (cmd1,rcfilter) = alljobs[job]
+        # insert logfile and filter-from into command
+        cmd=cmd1[:2]
+        cmd.extend(["--logfile", "/tmp/%s.log" % job, "--filter-from", "/tmp/%s.filter" % job])
+        cmd.extend(cmd1[2:])
+
+        # write the filter file
+        with open("/tmp/%s.log" % job, "w") as f:
+            f.writelines(rcfilter)
+        f.close()
+        print(" ".join(cmd))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
