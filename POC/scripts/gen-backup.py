@@ -121,7 +121,7 @@ def main(argv):
         (cmd1,rcfilter) = alljobs[job]
         # insert logfile and filter-from into command
         cmd=cmd1[:2]
-        cmd.extend(["--logfile", "/tmp/%s.log" % job, "--filter-from", "/tmp/%s.filter" % job])
+        cmd.extend(["--log-file", "/tmp/%s.log" % job, "--filter-from", "/tmp/%s.filter" % job])
         cmd.extend(cmd1[2:])
 
         # write the filter file
