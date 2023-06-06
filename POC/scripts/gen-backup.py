@@ -122,7 +122,7 @@ def main(argv):
         cmd.extend(cmd1[2:])
 
         # write the filter file
-        with open("/tmp/%s.log" % job, "w") as f:
+        with open("/tmp/%s.filter" % job, "w") as f:
             f.writelines(rcfilter)
         f.close()
         print(" ".join(cmd))
