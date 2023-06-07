@@ -12,80 +12,160 @@ import argparse
 import pdb
 import time
 
+class backupJob(object):
+    def __init__(self,name,path):
+        self._name = str(name)
+        self._path = path
+        self._excludes = list()
+        self._includedirs = list()
+        self._includefiles = list()
+        self._filters = list()
+        self._logfile = "/tmp/%s.log" % name
+        self._filterfile = "/tmp/%s.filter" % name
+        self._threads = 2
+        self._cmd = list()
 
-def generate(jobs,top_up,endpoint,dryrun=False,threads=2):
-    """ returns a dictionary of
-         jobname: (cmd, filter)  """
+    ## Standard Setters and Getters for various components of a backup job object
+    @property
+    def name(self):
+        return self._name
 
-    alljobs = dict()
-    with open( jobs, "r" ) as f:
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def filters(self):
+        return self._filters
+
+    @property
+    def logfile(self):
+        return self._logfile
+        
+    @logfile.setter
+    def logfile(self,value):
+        self._logfile = value 
+
+    @property
+    def filterfile(self):
+        return self._filterfile
+
+    @filterfile.setter
+    def filterfile(self,value):
+        self._filterfile = value 
+
+    @property
+    def excludes(self):
+        return self._excludes
+
+    @excludes.setter
+    def excludes(self,value):
+        self._excludes = value 
+
+    @property
+    def includedirs(self):
+        return self._includedirs
+
+    @includedirs.setter
+    def includedirs(self,value):
+        self._includedirs = value 
+
+    @property
+    def includefiles(self):
+        return self._includefiles
+
+    @includefiles.setter
+    def includefiles(self,value):
+        self._includefiles = value 
+
+    @property
+    def threads(self):
+        return self._threads
+
+    @threads.setter
+    def threads(self,value):
+        self._threads = value 
+
+    @property
+    def cmd(self):
+        return self._cmd
+        
+    def __str__(self):
+        return " ".join(self._cmd) 
+
+    ##### Methods ######
+    def construct_cmd(self,endpoint,loglevel="INFO",top_up=None,dryrun=False,threads=None):
+        """ construct the rclone command for this backupJob"""
+        if threads is not None:
+           tcount = threads
+        else:
+           tcount = self._threads
+        rc_global =  ["--metadata", "--links", "--multi-thread-streams", "%d" % tcount]
+        if dryrun:
+            rc_global.extend(["--dry-run"])
+        self._build_filters()
+        if top_up is not None:
+           sync=["copy", "--max-age", "%s" % top_up, "--no-traverse"]
+        else:
+           sync=["sync"]
+        logarg=["--log-level", loglevel]
+        filefilter = ["--log-file", self._logfile, "--filter-from", self._filterfile]
+        
+        # build the command in pieces
+        self._cmd=["rclone"]
+        self._cmd.extend(sync)
+        self._cmd.extend(logarg)
+        self._cmd.extend(filefilter)
+        self._cmd.extend(rc_global)
+        self._cmd.extend([self._path])
+        self._cmd.extend(["%s:%s%s" % (endpoint,self._name,self._path)])
+
+    def _build_filters(self):
+        self._filters=list()
+        for e in self._excludes:
+            self._filters.extend(["- %s\n" % e])
+        for d in self._includedirs:
+            self._filters.extend(["+ %s/**\n" % d])
+        for fi in self._includefiles:
+            self._filters.extend(["+ %s\n" % fi])
+        # catchall to exclude anything else not explicitly included or excluded above
+        self._filters.extend(["- **\n"])
+
+def generate(jobsfile):
+    """ returns a list of backupJobs objects """ 
+
+    alljobs = [] 
+    with open( jobsfile, "r" ) as f:
         jobdefs = yaml.safe_load( f )
     
     for paths in jobdefs['srcpaths']:
         path=paths['path']
         excludes=paths['exclude_global']
         for jobs in paths['jobs']:
+           bupJob = backupJob(jobs['name'],path)
+           alljobs.extend([bupJob])
+
            try:
-              subdirs=jobs['subdirectories']
+              bupJob.includedirs = jobs['subdirectories']
            except:
-              subdirs=None
+              pass
            try:
-              files=jobs['files']
+              bupJob.includefiles=jobs['files']
            except:
-              files=None
+              pass
            try:
-              threads=jobs['threads']
+              bupJob.threads=jobs['threads']
+           except:
+              pass
+           try:
+              bupJob.excludes=excludes
+              bupJob.excludes=excludes+jobs['exclude']
            except:
               pass
 
-           jobname = jobs['name']
-           (cmd,rcfilter) = write_rclone(endpoint, top_up, jobname, path,subdirs,files,excludes,threads,dryrun)
-           alljobs[jobname] = (cmd,rcfilter)
-
-    return alljobs
+    return alljobs 
 
 
-def write_rclone(endpoint,top_up,jobname,path,subdirs,files,exclude,threads,dryrun):
-   
-    """ Create the rclone command 
-       return (cmd,filter)
-              cmd  - list suitable to send to subprocess without resorting to shell=True
-              filter - list of lines for the actual filter command """
-    rc_global =  ["--metadata", "--links", "--multi-thread-streams", "%d" % threads]
-    if dryrun:
-        rc_global.extend(["--dry-run"])
-    rc_filter = write_filter(subdirs,files,exclude)
-    if top_up is not None:
-       sync=["copy", "--max-age", "%s" % top_up, "--no-traverse"]
-    else:
-       sync=["sync"]
-
-    loglevel=["--log-level", "INFO"]
-    cmd=["rclone"]
-    cmd.extend(sync)
-    cmd.extend(loglevel)
-    cmd.extend(rc_global)
-    cmd.extend([path])
-    cmd.extend(["%s:%s%s" % (endpoint,jobname,path)])
-    
-    return (cmd,rc_filter)
-
-def write_filter(subdirs,files,exclude):
-    """ return list of strings suitable for writing an rclone filter file """
-    rval=[]
-    if exclude is not None:
-        for e in exclude:
-            rval.extend(["- %s\n" % e])
-    if subdirs is not None:
-        for d in subdirs:
-            rval.extend(["+ %s/**\n" % d])
-    if files is not None:
-        for fi in files:
-            rval.extend(["+ %s\n" % fi])
-    # catchall to exclude anything else not explicitly included or excluded above
-    rval.extend(["- **\n"])
-
-    return rval 
 ## *****************************
 ## main routine
 ## *****************************
@@ -116,19 +196,16 @@ def main(argv):
     if not os.path.isfile(args.jobsfile):
        sys.stderr.write("jobs yaml file %s does not exist\n" % args.jobsfile)
        sys.exit(-1)
-    alljobs = generate(args.jobsfile,args.top_up,args.endpoint,dryrun=args.dryrun)
-    for job in alljobs.keys():
-        (cmd1,rcfilter) = alljobs[job]
-        # insert logfile and filter-from into command
-        cmd=cmd1[:2]
-        cmd.extend(["--log-file", "/tmp/%s.log" % job, "--filter-from", "/tmp/%s.filter" % job])
-        cmd.extend(cmd1[2:])
-
+    # alljobs = generate(args.jobsfile,args.top_up,args.endpoint,dryrun=args.dryrun)
+    alljobs = generate(args.jobsfile)
+    for job in alljobs:
+        # Construct the jobs command, includes building the filters
+        job.construct_cmd(args.endpoint,top_up=args.top_up,dryrun=args.dryrun)
         # write the filter file
-        with open("/tmp/%s.filter" % job, "w") as f:
-            f.writelines(rcfilter)
-        f.close()
-        print(" ".join(cmd))
+        with open("/tmp/%s.filter" % job.name, "w") as f:
+            f.writelines(job.filters)
+            f.close()
+        print(job)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
