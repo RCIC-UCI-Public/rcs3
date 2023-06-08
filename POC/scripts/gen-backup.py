@@ -182,30 +182,44 @@ def main(argv):
     helpendpoint = "Override the default backup rclone endpoint( s3-backup )\n"
 
     ## Define command-line parser
-    parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter,allow_abbrev=True)
     # optional arguments
     parser.add_argument("-T", "--top-up", dest="top_up", default=None, help=helptopup)
     parser.add_argument("-J", "--jobs", dest="jobsfile", default="jobs.yaml", help=helpjobsfile)
     parser.add_argument("-E", "--endpoint",   dest="endpoint",   default="s3-backup", help=helpendpoint)
-    parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true', help=helpendpoint)
+    parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
+    parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
+    parser.add_argument('command', metavar='command',choices=['list','run','detail'], nargs=1,
+              help='list | detail | run  ')
 
     # Parse the arguments
     args = parser.parse_args()
-    
+    command = args.command[0]    
+
     # Check for existence of args.jobsfile
     if not os.path.isfile(args.jobsfile):
        sys.stderr.write("jobs yaml file %s does not exist\n" % args.jobsfile)
        sys.exit(-1)
-    # alljobs = generate(args.jobsfile,args.top_up,args.endpoint,dryrun=args.dryrun)
+    # Build the jobs
     alljobs = generate(args.jobsfile)
     for job in alljobs:
-        # Construct the jobs command, includes building the filters
-        job.construct_cmd(args.endpoint,top_up=args.top_up,dryrun=args.dryrun)
-        # write the filter file
-        with open("/tmp/%s.filter" % job.name, "w") as f:
-            f.writelines(job.filters)
-            f.close()
-        print(job)
+        if args.threads is not None:
+            job.threads = int(args.threads)
+        job.construct_cmd(args.endpoint,dryrun=args.dryrun,top_up=args.top_up) 
 
+    if command == 'list' or command == 'detail':
+        for job in alljobs:
+            print (job.name,job.path)
+            if command == 'detail':
+                print("== filter contents (output to: %s) ==" % job.filterfile)
+                sys.stdout.writelines(job.filters)
+                print("== command ==")
+                print(job)
+                print("=============")
+    elif command == 'run':
+        for job in alljobs:
+            with open(job.filterfile,"w") as f:
+                 f.writelines(job.filters)
+            print(job) 
 if __name__ == "__main__":
     main(sys.argv[1:])
