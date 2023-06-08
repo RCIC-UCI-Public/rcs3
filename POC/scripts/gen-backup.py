@@ -111,9 +111,18 @@ class backupJob(object):
         logarg=["--log-level", loglevel]
         filefilter = ["--log-file", self._logfile, "--filter-from", self._filterfile]
         
+        # config files
+        # get realpath to this script
+        scriptdir=os.path.realpath(os.path.dirname(__file__))
+        configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
+        rclone_config=os.path.join(configdir,"rclone.conf")
+        credentials=os.path.join(configdir,"credentials")
+        confcred = ["--config", rclone_config, "--s3-shared-credentials-file",credentials]
+ 
         # build the command in pieces
         self._cmd=["rclone"]
         self._cmd.extend(sync)
+        self._cmd.extend(confcred)
         self._cmd.extend(logarg)
         self._cmd.extend(filefilter)
         self._cmd.extend(rc_global)
@@ -171,6 +180,7 @@ def generate(jobsfile):
 ## *****************************
 
 def main(argv):
+
     # descriptionand help lines for the usage  help
     description = "This file reads a jobs.yaml file to generate rclone commands for syncing data"
 
