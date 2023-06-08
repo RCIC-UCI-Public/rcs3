@@ -177,18 +177,20 @@ def main(argv):
     helptopup = "If set, generates a 'top-up' copy command of recently modified files within the specified time period\n"
     helptopup += "Example: --top-up=24h.  Will copy files modified locally within the last 24 hours\n"
 
-    helpjobsfile = "Override the default jobs.yaml file. Example: --jobs=testjobs.yaml\n"
+    helpjobsfile = "Override the default jobs.yaml file. Example: --yaml=testjobs.yaml\n"
 
     helpendpoint = "Override the default backup rclone endpoint( s3-backup )\n"
 
+    helpjob = "comma-separated list of job names to run, list, etc. \n"
     ## Define command-line parser
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter,allow_abbrev=True)
     # optional arguments
     parser.add_argument("-T", "--top-up", dest="top_up", default=None, help=helptopup)
-    parser.add_argument("-J", "--jobs", dest="jobsfile", default="jobs.yaml", help=helpjobsfile)
+    parser.add_argument("-Y", "--yaml", dest="jobsfile", default="jobs.yaml", help=helpjobsfile)
     parser.add_argument("-E", "--endpoint",   dest="endpoint",   default="s3-backup", help=helpendpoint)
     parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
+    parser.add_argument("-j", "--jobs",   dest="joblist",  default=None,help=helpjob)
     parser.add_argument('command', metavar='command',choices=['list','run','detail'], nargs=1,
               help='list | detail | run  ')
 
@@ -202,6 +204,12 @@ def main(argv):
        sys.exit(-1)
     # Build the jobs
     alljobs = generate(args.jobsfile)
+    # Filter the jobs based on optional jobslist argument
+    if args.joblist != None:
+        jobnames = args.joblist.split(",")
+        filteredjobs = filter( lambda x: True if x.name in jobnames else False, alljobs)
+        alljobs=list(filteredjobs) 
+
     for job in alljobs:
         if args.threads is not None:
             job.threads = int(args.threads)
