@@ -100,7 +100,7 @@ class backupJob(object):
            tcount = threads
         else:
            tcount = self._threads
-        rc_global =  ["--metadata", "--links", "--multi-thread-streams", "%d" % tcount]
+        rc_global =  ["--metadata", "--links", "--transfers", "%d" % tcount]
         if dryrun:
             rc_global.extend(["--dry-run"])
         self._build_filters()
@@ -181,13 +181,17 @@ def generate(jobsfile):
 
 def main(argv):
 
+    scriptdir=os.path.realpath(os.path.dirname(__file__))
+    configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
+    jobdefault=os.path.join(configdir,"jobs.yaml")
+
     # descriptionand help lines for the usage  help
     description = "This file reads a jobs.yaml file to generate rclone commands for syncing data"
 
     helptopup = "If set, generates a 'top-up' copy command of recently modified files within the specified time period\n"
     helptopup += "Example: --top-up=24h.  Will copy files modified locally within the last 24 hours\n"
 
-    helpjobsfile = "Override the default jobs.yaml file. Example: --yaml=testjobs.yaml\n"
+    helpjobsfile = "Override the default jobs file (%s). Example: --yaml=testjobs.yaml\n" % jobdefault
 
     helpendpoint = "Override the default backup rclone endpoint( s3-backup )\n"
 
@@ -196,7 +200,7 @@ def main(argv):
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter,allow_abbrev=True)
     # optional arguments
     parser.add_argument("-T", "--top-up", dest="top_up", default=None, help=helptopup)
-    parser.add_argument("-Y", "--yaml", dest="jobsfile", default="jobs.yaml", help=helpjobsfile)
+    parser.add_argument("-Y", "--yaml", dest="jobsfile", default=jobdefault, help=helpjobsfile)
     parser.add_argument("-E", "--endpoint",   dest="endpoint",   default="s3-backup", help=helpendpoint)
     parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
