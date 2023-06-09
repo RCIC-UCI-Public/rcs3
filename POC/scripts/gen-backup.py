@@ -11,6 +11,41 @@ import io
 import argparse
 import pdb
 import time
+import subprocess
+from multiprocessing import Pool
+
+class runBackup(object):
+   
+    def run_backup(job):
+        print("=== %s started at %s" % (job.name,datetime.datetime.now()))
+        # Write the filter file for the job
+        with open(job.filterfile,"w") as f:
+            f.writelines(job.filters)
+        process = subprocess.Popen(job.cmd)
+        process.wait()
+        return job.name
+
+    def __init__(self,alljobs,parallel=2):
+        self._lockfile = "/var/lock/gen-backup.lock"
+        self._alljobs = alljobs
+        self._parallel = parallel
+
+    def run_jobs(self):
+        try:
+              lckfile = os.open(self._lockfile, os.O_CREAT | os.O_EXCL)
+        except:
+              print ("could not create lockfile %s in exclusive mode. Another backup running?" % self._lockfile)
+              exit(-1)
+               
+        with Pool(self._parallel) as pool:
+            try:
+                for finished in pool.imap_unordered(runBackup.run_backup, self._alljobs):
+                    print("=== %s completed at %s" % (finished,datetime.datetime.now()))
+                print("All tasks completed.")
+            except:
+                pass
+            os.close(lckfile)
+            os.unlink(self._lockfile)
 
 class backupJob(object):
     def __init__(self,name,path):
@@ -149,7 +184,10 @@ def generate(jobsfile):
     
     for paths in jobdefs['srcpaths']:
         path=paths['path']
-        excludes=paths['exclude_global']
+        try:
+            excludes=paths['exclude_global']
+        except:
+            excludes=list()
         for jobs in paths['jobs']:
            bupJob = backupJob(jobs['name'],path)
            alljobs.extend([bupJob])
@@ -205,6 +243,7 @@ def main(argv):
     parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
     parser.add_argument("-j", "--jobs",   dest="joblist",  default=None,help=helpjob)
+    parser.add_argument("-p", "--parallel",   dest="parallel",  default=2,help="how many backup jobs to run in parallel (2)")
     parser.add_argument('command', metavar='command',choices=['list','run','detail'], nargs=1,
               help='list | detail | run  ')
 
@@ -239,9 +278,8 @@ def main(argv):
                 print(job)
                 print("=============")
     elif command == 'run':
-        for job in alljobs:
-            with open(job.filterfile,"w") as f:
-                 f.writelines(job.filters)
-            print(job) 
+        runner = runBackup(alljobs,parallel=int(args.parallel))
+        runner.run_jobs()
+
 if __name__ == "__main__":
     main(sys.argv[1:])
