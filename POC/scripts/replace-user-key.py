@@ -3,6 +3,7 @@
 import argparse
 import boto3
 import json
+import os
 import sys
 import yaml
 
@@ -21,7 +22,11 @@ args = p.parse_args()
 #print( args.user, args.host )
 with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
-#print( aws[ "profile" ] )
+
+# override location of .aws/config
+if "configfile" in aws:
+    os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
+
 acctname = args.user +  "-" + args.host + "-sa"
 keyfile = aws[ "outputdir" ] + args.user + "-" + args.host + ".credentials"
 session = boto3.Session( profile_name=aws[ "profile" ] )

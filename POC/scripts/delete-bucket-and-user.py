@@ -2,6 +2,7 @@
 
 import argparse
 import boto3
+import os
 import sys
 import yaml
 
@@ -19,6 +20,10 @@ args = p.parse_args()
 
 with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
+
+# override location of .aws/config
+if "configfile" in aws:
+    os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
 #print( args.user, args.host )
 acctname = args.user +  "-" + args.host + "-sa"
