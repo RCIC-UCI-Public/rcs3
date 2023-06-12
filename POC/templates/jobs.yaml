@@ -23,3 +23,22 @@ srcpaths:
       subdirectories:
         - Lab/twophoton2
 
+    - name: backup-5
+      subdirectories:
+        - Lab/Xiaoxiao_public
+        - Lab/Qiao_public
+        - Lab/Kevin_public
+
+    - name: backup-6
+      subdirectories:
+        - Lab/Wenhao
+        - Lab/Jasmine_public
+        - Lab/Xulab_data_backup
+        - Lab/Max_public
+        - Lab/2p data
+        - Lab/Nicole_public
+        - Lab/miniscope
+        - Lab/Bereket_public
+        - Lab/Hai_Zhang_public
+
+
