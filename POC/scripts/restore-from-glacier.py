@@ -6,16 +6,21 @@ import os
 import sys
 import yaml
 
-#sys.path.append( "scripts" )
-#from commonfunctions import delete_user_keys
 
-
-usage="Delete S3 bucket and IAM user, detach policies, delete access keys"
+usage="Submit S3 batch operation to restore objects from Glacier"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
 p.add_argument( "host",
         help="hostname" )
+p.add_argument( "csv",
+        help="csv object in related S3 report bucket" )
+p.add_argument( "--bucket",
+        help="override default bucket ARN" )
+p.add_argument( "--useversionid", action="store_true",
+        help="versionid in csv file, not implemented" )
+p.add_argument( "--useinventorymanifest", action="store_true",
+        help="use AWS S3 generated inventory manifest, not implemented" )
 args = p.parse_args()
 
 with open( "config/aws-settings.yaml", "r" ) as f:
@@ -25,10 +30,7 @@ with open( "config/aws-settings.yaml", "r" ) as f:
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
-#print( args.user, args.host )
-acctname = args.user +  "-" + args.host + "-sa"
-primarybucket = args.user + "-" + args.host + "-uci-bkup-bucket"
-inventorybucket = args.user + "-" + args.host + "-uci-inventory"
+# bucket to read csv file from and write report output to
 reportbucket = args.user + "-" + args.host + "-uci-report"
 
 op_dict = {
@@ -48,14 +50,21 @@ rep_dict = {
 }
 print( rep_dict )
 
+s3 = session.client( "s3" )
+# retrieve ETag
+if "bucket" in args:
+    bucketarn = args[ "bucket" ]
+else:
+    bucketarn = "arn:aws:s3:::" + reportbucket
+response = s3.head_object( Bucket=bucketarn, Key=aws[ "csv" ] )
 man_dict = {
     "Spec": {
         "Format": "S3BatchOperations_CSV_20180820",
         "Fields": [ "Bucket", "Key" ]
     },
     "Location": {
-        "ObjectArn": "arn:aws:s3:::" + inventorybucket + "/myrestore.csv",
-        "ETag": "7d815a1cad7c4496122b7c02eff7a1ae"
+        "ObjectArn": bucketarn + aws[ "csv" ],
+        "ETag": response[ "ETag" ]
     }
 }
 print( man_dict )
@@ -65,7 +74,7 @@ session = boto3.Session( profile_name=aws[ "profile" ] )
 s3c = session.client( "s3control" )
 
 response = s3c.create_job( 
-    AccountId="774954368688",
+    AccountId=aws[ "accountid" ],
     Operation=op_dict,
     Report=rep_dict,
     Manifest=man_dict,
