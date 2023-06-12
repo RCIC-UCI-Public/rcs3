@@ -1,5 +1,4 @@
 profile: "774954368688_AWSAdministratorAccess"
+accountid: "774954368688"
 outputdir: "outputs/"
-# overrides "AWS_CONFIG_FILE" environment variable if set
-# should contain access credentials for the above profile
 configfile: "config/aws-admin"
