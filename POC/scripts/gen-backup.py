@@ -58,6 +58,7 @@ class backupJob(object):
         self._logfile = "/tmp/%s.log" % name
         self._filterfile = "/tmp/%s.filter" % name
         self._threads = 2
+        self._checkers = 32
         self._cmd = list()
 
     ## Standard Setters and Getters for various components of a backup job object
@@ -122,6 +123,14 @@ class backupJob(object):
         self._threads = value 
 
     @property
+    def checkers(self):
+        return self._checkers
+
+    @checkers.setter
+    def checkers(self,value):
+        self._checkers = value 
+
+    @property
     def cmd(self):
         return self._cmd
         
@@ -129,13 +138,18 @@ class backupJob(object):
         return " ".join(self._cmd) 
 
     ##### Methods ######
-    def construct_cmd(self,endpoint,loglevel="INFO",top_up=None,dryrun=False,threads=None):
+    def construct_cmd(self,endpoint,loglevel="INFO",top_up=None,dryrun=False,threads=None,checkers=None):
         """ construct the rclone command for this backupJob"""
         if threads is not None:
            tcount = threads
         else:
            tcount = self._threads
-        rc_global =  ["--metadata", "--links", "--transfers", "%d" % tcount]
+        if checkers is not None:
+           chkcount = checkers
+        else:
+           chkcount = self._checkers
+
+        rc_global =  ["--metadata", "--links", "--transfers", "%d" % tcount, "--checkers" , "%d" % chkcount]
         if dryrun:
             rc_global.extend(["--dry-run"])
         self._build_filters()
@@ -205,6 +219,10 @@ def generate(jobsfile):
            except:
               pass
            try:
+              bupJob.checkers=jobs['checkers']
+           except:
+              pass
+           try:
               bupJob.excludes=excludes
               bupJob.excludes=excludes+jobs['exclude']
            except:
@@ -244,6 +262,7 @@ def main(argv):
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
     parser.add_argument("-j", "--jobs",   dest="joblist",  default=None,help=helpjob)
     parser.add_argument("-p", "--parallel",   dest="parallel",  default=2,help="how many backup jobs to run in parallel (2)")
+    parser.add_argument("-K", "--checkers",  dest="checkers", default=32,help="how many checkers to run in parallel (32)")
     parser.add_argument('command', metavar='command',choices=['list','run','detail'], nargs=1,
               help='list | detail | run  ')
 
@@ -266,6 +285,8 @@ def main(argv):
     for job in alljobs:
         if args.threads is not None:
             job.threads = int(args.threads)
+        if args.checkers is not None:
+            job.checkers = int(args.checkers)
         job.construct_cmd(args.endpoint,dryrun=args.dryrun,top_up=args.top_up) 
 
     if command == 'list' or command == 'detail':
