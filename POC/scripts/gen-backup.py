@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Generate rclone synchronization command lines based on yaml-formatted jobs files 
-
+# Author: Philip Papadopoulos (ppapadop@uci.edu)
+# (C) UC Regents 2023
 import yaml 
 import re
 import sys
@@ -252,6 +253,8 @@ def main(argv):
     helpendpoint = "Override the default backup rclone endpoint( s3-backup )\n"
 
     helpjob = "comma-separated list of job names to run, list, etc. \n"
+    helpsyncjob = "comma separated list of sync jobs to run. Cannot set both jobs and syncjobs"
+    helptopupjob = "comma separated list of top-up jobs to run. Cannot set both jobs and topupjobs"
     ## Define command-line parser
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter,allow_abbrev=True)
     # optional arguments
@@ -261,6 +264,8 @@ def main(argv):
     parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
     parser.add_argument("-j", "--jobs",   dest="joblist",  default=None,help=helpjob)
+    parser.add_argument("--sync-jobs",   dest="syncjobs",  default=None,help=helpsyncjob)
+    parser.add_argument("--topup-jobs",   dest="topupjobs",  default=None,help=helptopupjob)
     parser.add_argument("-p", "--parallel",   dest="parallel",  default=2,help="how many backup jobs to run in parallel (2)")
     parser.add_argument("-K", "--checkers",  dest="checkers", default=32,help="how many checkers to run in parallel (32)")
     parser.add_argument('command', metavar='command',choices=['list','run','detail'], nargs=1,
@@ -274,20 +279,44 @@ def main(argv):
     if not os.path.isfile(args.jobsfile):
        sys.stderr.write("jobs yaml file %s does not exist\n" % args.jobsfile)
        sys.exit(-1)
+
+    # validate the if syncjoblist is non-empty or topupjoblist is non-empty that joblist is non-empty
+
+    if (args.syncjobs is not None or args.topupjobs is not None) and args.joblist is not None:
+       sys.stderr.write("cannot simultaneously specify --jobs and sync/topup jobs\n")
+       sys.exit(-1)
+
     # Build the jobs
     alljobs = generate(args.jobsfile)
     # Filter the jobs based on optional jobslist argument
+    syncjobs = []
+    topupjobs = []
+    if args.syncjobs != None:
+        syncjobnames = args.syncjobs.split(",")
+        syncjobs = list(filter( lambda x: True if x.name in syncjobnames else False, alljobs))
+
+    if args.topupjobs != None:
+        topupjobnames = args.topupjobs.split(",")
+        topupjobs = list(filter( lambda x: True if x.name in topupjobnames else False, alljobs))
+
+    # Handle non-empty jobslist or a combination of sync/topupjobs 
     if args.joblist != None:
         jobnames = args.joblist.split(",")
         filteredjobs = filter( lambda x: True if x.name in jobnames else False, alljobs)
         alljobs=list(filteredjobs) 
+    elif args.syncjobs != None or args.topupjobs != None:
+        alljobs = [ x for x in syncjobs ]
+        alljobs.extend(topupjobs)
 
     for job in alljobs:
         if args.threads is not None:
             job.threads = int(args.threads)
         if args.checkers is not None:
             job.checkers = int(args.checkers)
-        job.construct_cmd(args.endpoint,dryrun=args.dryrun,top_up=args.top_up) 
+        if job in syncjobs:
+           job.construct_cmd(args.endpoint,dryrun=args.dryrun)
+        else:
+           job.construct_cmd(args.endpoint,dryrun=args.dryrun,top_up=args.top_up) 
 
     if command == 'list' or command == 'detail':
         for job in alljobs:
