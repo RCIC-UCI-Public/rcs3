@@ -1,0 +1,44 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:CreateJob",
+                "s3:DeleteObject",
+                "s3:PutObject",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": [
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket",
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket/*"
+            ],
+            "Condition": {
+                "Bool": {"aws:ViaAWSService": "false"},
+                "IpAddress": {
+                    "aws:SourceIp": [
+                        "128.200.0.0/16",
+                        "128.195.0.0/16",
+                        "192.5.19.0/24"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:CreateJob",
+                "s3:DeleteObject",
+                "s3:PutObject",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": [
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket",
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket/*"
+            ],
+            "Condition": {
+                "Bool": {"aws:ViaAWSService": "true"}
+            }
+        }
+    ]
+}
