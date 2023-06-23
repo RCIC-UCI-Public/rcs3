@@ -27,6 +27,16 @@ if "configfile" in aws:
 
 session = boto3.Session( profile_name=aws[ "profile" ] )
 
+# build the notification list, adding PI if found
+notify_list = [ "arn:aws:sns:us-west-2:{}:rcic-team-notify".format( aws[ "accountid" ] ) ]
+pi_topic = "arn:aws:sns:us-west-2:{}:{}-{}-uci-notify".format( aws[ "accountid" ], args.user, args.host )
+sns_client = session.client( "sns" )
+try:
+    sns_client.get_topic_attributes( TopicArn=pi_topic )
+    notify_list.append( pi_topic )
+except sns_client.exceptions.NotFoundException:
+    print( "no SNS topic found for PI, notifications to RCIC Team only")
+
 def define_metrics( bucketname ):
     m=[]
     expression = {
@@ -70,9 +80,7 @@ cw_client.put_metric_alarm(
     AlarmName="{}-{} exceeded size".format( args.user, args.host ),
     AlarmDescription="The {} has exceeded {} TB of storage in Standard and Glacier".format( bucket, args.limit ),
     ActionsEnabled=True,
-    AlarmActions=[
-        "arn:aws:sns:us-west-2:{}:rcic-team-notify".format( aws[ "accountid" ] )
-    ],
+    AlarmActions=notify_list,
     EvaluationPeriods=1,
     DatapointsToAlarm=1,
     Threshold=args.limit * 1000000000000,
