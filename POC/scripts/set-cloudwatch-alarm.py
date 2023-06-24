@@ -10,7 +10,7 @@ with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage="Replace IAM user access keys"
+usage="Add a notification when the total storage of a specific S3 bucket exceeds the given size threshold"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -18,9 +18,10 @@ p.add_argument( "host",
         help="hostname" )
 p.add_argument( "limit", type=int,
         help="Size limit in TB" )
+p.add_argument( "-d". "--disable", action="store_true",
+        help="disable the action notification, e.g. while testing" )
 args = p.parse_args()
 
-bucket = args.user + "-" + args.host + "-uci-bkup-bucket"
 # override location of .aws/config
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
@@ -75,11 +76,12 @@ def define_metrics( bucketname ):
     return m
 
 
+bucket = args.user + "-" + args.host + "-uci-bkup-bucket"
 cw_client = session.client( "cloudwatch" )
 cw_client.put_metric_alarm(
     AlarmName="{}-{} exceeded size".format( args.user, args.host ),
     AlarmDescription="The {} has exceeded {} TB of storage in Standard and Glacier".format( bucket, args.limit ),
-    ActionsEnabled=True,
+    ActionsEnabled=False if args.disable else True,
     AlarmActions=notify_list,
     EvaluationPeriods=1,
     DatapointsToAlarm=1,
