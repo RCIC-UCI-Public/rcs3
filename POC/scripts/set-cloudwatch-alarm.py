@@ -18,7 +18,7 @@ p.add_argument( "host",
         help="hostname" )
 p.add_argument( "limit", type=int,
         help="Size limit in TB" )
-p.add_argument( "-d". "--disable", action="store_true",
+p.add_argument( "-d", "--disable", action="store_true",
         help="disable the action notification, e.g. while testing" )
 args = p.parse_args()
 

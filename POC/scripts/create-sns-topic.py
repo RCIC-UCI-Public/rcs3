@@ -27,6 +27,19 @@ args = p.parse_args()
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
+
+session = boto3.Session( profile_name=aws[ "profile" ] )
+
+# check if associated S3 bucket exists
+s3_client = session.client( "s3" )
+bucket = args.user + "-" + args.host + "-uci-bkup-bucket"
+try:
+    s3_client.head_bucket( Bucket=bucket )
+except s3_client.exceptions.ClientError:
+    print( "SNS topic not created, missing S3 bucket: {}".format( bucket ) )
+    sys.exit(1)
+
+
 # create list of emails to subscribe to SNS topic
 maillist=[]
 if not args.exclude:
@@ -34,8 +47,6 @@ if not args.exclude:
 if args.email:
     maillist += args.email
 
-
-session = boto3.Session( profile_name=aws[ "profile" ] )
 
 sns_client = session.client( "sns" )
 
