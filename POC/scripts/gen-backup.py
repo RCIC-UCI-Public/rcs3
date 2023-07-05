@@ -18,7 +18,9 @@ from multiprocessing import Pool
 class runBackup(object):
    
     def run_backup(job):
-        print("=== %s started at %s" % (job.name,datetime.datetime.now()))
+        sync = "sync" if "sync" in job.cmd else "top-up"
+        print("=== %s %s started at %s" % (job.name,sync,datetime.datetime.now()))
+        sys.stdout.flush()
         # Write the filter file for the job
         with open(job.filterfile,"w") as f:
             f.writelines(job.filters)
@@ -42,6 +44,7 @@ class runBackup(object):
             try:
                 for finished in pool.imap_unordered(runBackup.run_backup, self._alljobs):
                     print("=== %s completed at %s" % (finished,datetime.datetime.now()))
+                    sys.stdout.flush()
                 print("All tasks completed.")
             except:
                 pass
@@ -51,6 +54,7 @@ class runBackup(object):
 class backupJob(object):
     def __init__(self,name,path):
         self._name = str(name)
+        self._destprefix = str(name)
         self._path = path
         self._excludes = list()
         self._includedirs = list()
@@ -82,6 +86,14 @@ class backupJob(object):
     @logfile.setter
     def logfile(self,value):
         self._logfile = value 
+
+    @property
+    def destprefix(self):
+        return self._destprefix
+        
+    @destprefix.setter
+    def destprefix(self,value):
+        self._destprefix = value 
 
     @property
     def filterfile(self):
@@ -177,7 +189,7 @@ class backupJob(object):
         self._cmd.extend(filefilter)
         self._cmd.extend(rc_global)
         self._cmd.extend([self._path])
-        self._cmd.extend(["%s:%s%s" % (endpoint,self._name,self._path)])
+        self._cmd.extend(["%s:%s%s" % (endpoint,self._destprefix,self._path)])
 
     def _build_filters(self):
         self._filters=list()
@@ -221,6 +233,10 @@ def generate(jobsfile):
               pass
            try:
               bupJob.checkers=jobs['checkers']
+           except:
+              pass
+           try:
+              bupJob.destprefix=jobs['prefix']
            except:
               pass
            try:
