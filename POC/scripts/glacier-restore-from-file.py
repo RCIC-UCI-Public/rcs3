@@ -32,7 +32,18 @@ p.add_argument( "objfile",
         help="file containing S3 objects, one per line" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
+p.add_argument( "-o", "--output",
+        help="override output file" )
 args = p.parse_args()
+
+
+listjobs = []
+if args.output:
+    results = args.output
+else:
+    results = "{}/{}-{}-glacier-jobids.txt".format( aws[ "outputdir"], args.user, args.host )
+if args.verbose:
+    print( "Saving output to: {}".format( results ) )
 
 
 arnprefix = "arn:aws:s3:::"
@@ -65,6 +76,7 @@ if "configfile" in aws:
 try:
     with open( args.objfile ) as fp:
         session = boto3.Session( profile_name=aws[ "profile" ] )
+        s3 = session.client( "s3" )
         s3c = session.client( "s3control" )
         for rawobj in fp:
             obj = rawobj.strip()
@@ -80,8 +92,7 @@ try:
                 # add ETag to manifest
                 man_dict = {
                     "Spec": {
-                        "Format": "S3BatchOperations_CSV_20180820",
-                        "Fields": [ "Bucket", "Key" ]
+                        "Format": "S3InventoryReport_CSV_20161130"
                     },
                     "Location": {
                         "ObjectArn": re.sub( "s3://", arnprefix, obj ),
@@ -100,6 +111,11 @@ try:
                     RoleArn="arn:aws:iam::774954368688:role/read-restore-all-buckets-role",
                     Tags=tag_list
                 )
-                print( response )
+                if args.verbose:
+                    print( response[ "JobId" ] )
+                listjobs.append( response[ "JobId" ] )
+    with open( results, "w" ) as f:
+        for jobid in listjobs:
+            f.write( "{}\n".format( jobid ) )
 except IOError:
     print( "could not read file: {}".format( args.objfile ) )
