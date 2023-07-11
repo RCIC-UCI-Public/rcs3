@@ -37,6 +37,7 @@ done
 
 # put bucket policy for inventory bucket
 cat $templates/template-inventory-permissions.json | \
+sed s/xxxuciawsacctxxx/$uciawsacct/ | \
 sed s/xxxuserxxx/$user/ | \
 sed s/xxxhostxxx/$host/ > $outputs/$user-$host-inv-perm.json
 
