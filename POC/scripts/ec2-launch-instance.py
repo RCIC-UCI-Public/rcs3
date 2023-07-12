@@ -77,7 +77,7 @@ response = ec2.run_instances(
   ],
   TagSpecifications= make_tags( args.user, args.host ),
   IamInstanceProfile= {
-    "Arn": "arn:aws:iam::{}:instance-profile/read-restore-all-buckets-role".format( aws[ "accountid" ] )
+    "Arn": "arn:aws:iam::{}:instance-profile/process-user-restore-requests".format( aws[ "accountid" ] )
   },
   PrivateDnsNameOptions= {
     "HostnameType": "ip-name",
