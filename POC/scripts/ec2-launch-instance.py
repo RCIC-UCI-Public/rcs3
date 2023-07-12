@@ -88,5 +88,6 @@ response = ec2.run_instances(
 if args.verbose:
     print( response )
 ec2_id = response[ "Instances" ][0][ "InstanceId" ]
-response = ec2.describe_instances( InstanceIds=[ ec2_id ])
-print( response[ "Reservations" ][0][ "Instances" ][0][ "PublicDnsName" ] )
+print( "Instance id: {}".format( ec2_id ) )
+print( "After DNS name is assigned during boot, login with:" )
+print( "ssh -i <private_key> -l ec2-user <dns-name>" )
