@@ -3,17 +3,15 @@
 import argparse
 import boto3
 import os
-import re
 import sys
 import yaml
-import json
 
 
 with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage=""
+usage="Remove lifecycle configuration from bucket and write policy from matching user"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -28,6 +26,7 @@ args = p.parse_args()
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
+# when run from AWS services, profile is not used
 if "profile" in aws:
     session = boto3.Session( profile_name=aws[ "profile" ] )
 else:
@@ -58,7 +57,7 @@ try:
 except iam.exceptions.NoSuchEntityException:
     print( "Account not found: {}".format( username ) )
     sys.exit(1)
-policyarn = "arn:aws:iam::{}:policy/{}-{}-uci-bkup-policy".format( aws[ "accountid" ], args.user, args.host )
+policyarn = "arn:aws:iam::{}:policy/{}-{}-uci-write-policy".format( aws[ "accountid" ], args.user, args.host )
 # try to detach user policy, okay if not attached
 try:
     iam.detach_user_policy(
