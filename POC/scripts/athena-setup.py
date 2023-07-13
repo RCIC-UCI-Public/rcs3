@@ -12,7 +12,7 @@ with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage=""
+usage="Create Athena workgroup, database, and load external schema into table based on user and host"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -80,7 +80,7 @@ except athena.exceptions.InvalidRequestException:
 query_list =[]
 # create database in default collection
 response = athena.start_query_execution( 
-    QueryString="create database if not exists {}".format( args.user ),
+    QueryString="create database if not exists {}".format( args.host ),
     WorkGroup=args.user
 )
 if args.verbose:
@@ -105,4 +105,4 @@ if args.verbose:
     response = athena.batch_get_query_execution(
         QueryExecutionIds = query_list
     )
-    print( json.dumps( response, indent=4 ) )
+    print( json.dumps( response, indent=4, default=str ) )
