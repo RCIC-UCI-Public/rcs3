@@ -47,17 +47,17 @@ except s3.exceptions.ClientError:
     print( "No S3 bucket: {}".format( bucketname ) )
     sys.exit(1)
 # verify that hive object exists, ignore response, catch exception
-if inventorydir in aws:
-    hivedir = aws[ "inventorydir" ]
+if args.inventorydir:
+    hivedir = args.inventorydir
 else:
-    hivedir = "{1}-{2}-uci-bkup-bucket/{1}-{2}-daily/hive/dt={3}-01-00/".format( args.user, args.host, str(datetime.date.today()) )
+    hivedir = "{0}-{1}-uci-bkup-bucket/{0}-{1}-daily/hive/dt={2}-01-00/".format( args.user, args.host, str(datetime.date.today()) )
 hivesym = "{}symlink.txt".format( hivedir )
 try:
     s3.head_object(
         Bucket=bucketname,
         Key=hivesym
     )
-except s3.exceptions.NoSuchKey:
+except s3.exceptions.ClientError:
     print( "No key: {}".format( hivesym ) )
     sys.exit(1)
 
