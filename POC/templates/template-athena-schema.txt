@@ -1,0 +1,14 @@
+CREATE EXTERNAL TABLE {}(
+  bucketname string,
+  filename string,
+  version_id string,
+  is_latest boolean,
+  is_delete_marker boolean,
+  filesize bigint,
+  last_modified_date string,
+  storage_class string
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat'
+OUTPUTFORMAT  'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat'
+LOCATION 's3://{}/{}' ;
