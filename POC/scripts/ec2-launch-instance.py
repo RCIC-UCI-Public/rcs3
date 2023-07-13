@@ -1,4 +1,4 @@
-#! /usr/bin/python3.9
+#! /usr/bin/python3
 
 import argparse
 import boto3
@@ -89,5 +89,21 @@ if args.verbose:
     print( response )
 ec2_id = response[ "Instances" ][0][ "InstanceId" ]
 print( "Instance id: {}".format( ec2_id ) )
-print( "After DNS name is assigned during boot, login with:" )
-print( "ssh -i <private_key> -l ec2-user <dns-name>" )
+# wait up to Delay times MaxAttempts for instance to be ready
+try:
+    waiter = ec2.get_waiter( "instance_status_ok" )
+    waiter.wait(
+        InstanceIds=[ ec2_id ],
+        WaiterConfig={
+            "Delay": 120,
+            "MaxAttempts": 5
+        }
+    )
+    response = ec2.describe_instances(
+        InstanceIds=[ ec2_id ]
+    )
+    dnsname = response[ "Reservations" ][ 0 ][ "Instances" ][ 0 ][ "PublicDnsName" ]
+    print( "ssh -i <private_key> -l ec2-user {}".format( dnsname ) )
+except:
+    print( "Instance not ready, check AWS Console for status and hostname" )
+
