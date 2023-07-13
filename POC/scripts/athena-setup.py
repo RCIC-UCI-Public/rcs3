@@ -6,6 +6,7 @@ import datetime
 import os
 import sys
 import yaml
+import json
 
 with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
@@ -17,6 +18,10 @@ p.add_argument( "user",
         help="user UCInetID" )
 p.add_argument( "host",
         help="hostname" )
+p.add_argument( "-v", "--verbose", action="store_true",
+        help="optional print statements for more detail" )
+p.add_argument( "-i", "--inventorydir",
+        help="override hive inventory directory" )
 args = p.parse_args()
 
 if not "schemafile" in aws:
@@ -42,7 +47,10 @@ except s3.exceptions.ClientError:
     print( "No S3 bucket: {}".format( bucketname ) )
     sys.exit(1)
 # verify that hive object exists, ignore response, catch exception
-hivedir = "{1}-{2}-uci-bkup-bucket/{1}-{2}-daily/hive/dt={3}-01-00/".format( args.user, args.host, str(datetime.date.today()) )
+if inventorydir in aws:
+    hivedir = aws[ "inventorydir" ]
+else:
+    hivedir = "{1}-{2}-uci-bkup-bucket/{1}-{2}-daily/hive/dt={3}-01-00/".format( args.user, args.host, str(datetime.date.today()) )
 hivesym = "{}symlink.txt".format( hivedir )
 try:
     s3.head_object(
@@ -67,22 +75,30 @@ try:
         }
     )
 except athena.exceptions.InvalidRequestException:
-    pass
+    pass    
 
+query_list =[]
 # create database in default collection
 response = athena.start_query_execution( 
     QueryString="create database if not exists {}".format( args.user ),
     WorkGroup=args.user
 )
+query_list.append( response[ "QueryExecutionId" ] )
 
 # load hive schema into table
 with open( aws[ "schemafile" ], "r" ) as fp:
     loadschema = fp.read()
     response = athena.start_query_execution(
-        QueryString=loadschema.format( "lopez", "mybucket", "keylocation" ),
+        QueryString=loadschema.format( args.host, bucketname, hivedir ),
         QueryExecutionContext={
             'Database': args.user
         },
         WorkGroup=args.user
     )
-    print( response[ "QueryExecutionId" ] )
+    query_list.append( response[ "QueryExecutionId" ] )
+
+if args.verbose:
+    response = athena.batch_get_query_execution(
+        QueryExecutionIds = query_list
+    )
+    print( json.dumps( response, indent=4 ) )
