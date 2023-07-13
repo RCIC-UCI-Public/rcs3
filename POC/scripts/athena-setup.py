@@ -83,6 +83,8 @@ response = athena.start_query_execution(
     QueryString="create database if not exists {}".format( args.user ),
     WorkGroup=args.user
 )
+if args.verbose:
+    print( response[ "QueryExecutionId" ] )
 query_list.append( response[ "QueryExecutionId" ] )
 
 # load hive schema into table
@@ -95,6 +97,8 @@ with open( aws[ "schemafile" ], "r" ) as fp:
         },
         WorkGroup=args.user
     )
+    if args.verbose:
+        print( response[ "QueryExecutionId" ] )
     query_list.append( response[ "QueryExecutionId" ] )
 
 if args.verbose:
