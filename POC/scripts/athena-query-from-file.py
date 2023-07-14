@@ -10,7 +10,7 @@ with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage=""
+usage="Execute an Athena query for each line in the query file associated with user and host"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -18,6 +18,8 @@ p.add_argument( "host",
         help="hostname" )
 p.add_argument( "queryfile",
         help="file containing strings to query" )
+p.add_argument( "-v", "--verbose", action="store_true",
+        help="optional print statements for more detail" )
 p.add_argument( "-l", "--limit", type=int,
         help="set a limit on return results" )
 args = p.parse_args()
@@ -30,16 +32,22 @@ else:
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
-session = boto3.Session( profile_name=aws[ "profile" ] )
+# when run from AWS services, profile is not used
+if "profile" in aws:
+    session = boto3.Session( profile_name=aws[ "profile" ] )
+else:
+    session = boto3
 
 try:
     with open( args.queryfile ) as fp:
-        athena_client = session.client( "athena" )
+        athena = session.client( "athena" )
+        bucket = "{}-{}-uci-bkup-bucket".format( args.user, args.host )
         for filename in fp:
-            query = "select * from {} where filename like '{}' and storage_class like 'GLACIER'{};"\
-                .format( args.host, filename.strip(), limits )
-            print( query )
-            response = athena_client.start_query_execution(
+            query = "select bucketname as '{}', filename, version_id from {} where filename like '{}' and storage_class like 'GLACIER'{};"\
+                .format( bucket, args.host, filename.strip(), limits )
+            if args.verbose:
+                print( query )
+            response = athena.start_query_execution(
                 QueryString=query,
                 QueryExecutionContext={
                     'Database': args.user

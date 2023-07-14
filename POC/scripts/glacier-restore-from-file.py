@@ -22,7 +22,7 @@ with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage=""
+usage="Initiate a S3 Batch restore from Glacier for each line in the local file; each line should be an object in S3 in CVS format containing at minimum bucket, filename, and version id information for objects in Glacier"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -49,7 +49,7 @@ if args.verbose:
 arnprefix = "arn:aws:s3:::"
 op_dict = {
     "S3InitiateRestoreObject": {
-        "ExpirationInDays": 1,
+        "ExpirationInDays": 7,
         "GlacierJobTier": "BULK"
     }
 }
@@ -73,9 +73,14 @@ if args.verbose:
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
+# when run from AWS services, profile is not used
+if "profile" in aws:
+    session = boto3.Session( profile_name=aws[ "profile" ] )
+else:
+    session = boto3
+
 try:
     with open( args.objfile ) as fp:
-        session = boto3.Session( profile_name=aws[ "profile" ] )
         s3 = session.client( "s3" )
         s3c = session.client( "s3control" )
         for rawobj in fp:
@@ -87,12 +92,17 @@ try:
             if not obj_key_pair:
                 print( "skipping, could not parse: {}".format( obj ) )
             else:
+                print( obj_key_pair[0] )
+                print( obj_key_pair[1] )
                 # get ETag for object which is required for S3 Batch job
                 response = s3.head_object( Bucket=obj_key_pair[0], Key=obj_key_pair[1] )
                 # add ETag to manifest
                 man_dict = {
                     "Spec": {
-                        "Format": "S3InventoryReport_CSV_20161130"
+                        "Format": "S3BatchOperations_CSV_20180820",
+                        "Fields": [
+                            "Bucket", "Key", "VersionId"
+                        ]
                     },
                     "Location": {
                         "ObjectArn": re.sub( "s3://", arnprefix, obj ),
@@ -117,5 +127,6 @@ try:
     with open( results, "w" ) as f:
         for jobid in listjobs:
             f.write( "{}\n".format( jobid ) )
+        print( "S3 Batch job ids saved to: {}".format( results ) )
 except IOError:
     print( "could not read file: {}".format( args.objfile ) )
