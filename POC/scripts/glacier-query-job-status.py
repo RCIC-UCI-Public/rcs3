@@ -1,4 +1,4 @@
-#! /usr/bin/python3.9
+#! /usr/bin/python3
 
 import argparse
 import boto3
@@ -94,4 +94,4 @@ if send:
         )
     except sns_client.exception.NotFound:
         print( "No notification sent: {}".format( results ) )
-    
+

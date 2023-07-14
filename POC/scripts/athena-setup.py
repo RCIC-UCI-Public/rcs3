@@ -5,6 +5,7 @@ import boto3
 import datetime
 import os
 import sys
+import time
 import yaml
 import json
 
@@ -80,12 +81,14 @@ except athena.exceptions.InvalidRequestException:
 query_list =[]
 # create database in default collection
 response = athena.start_query_execution( 
-    QueryString="create database if not exists {}".format( args.host ),
+    QueryString="create database if not exists {}".format( args.user ),
     WorkGroup=args.user
 )
 if args.verbose:
     print( response[ "QueryExecutionId" ] )
 query_list.append( response[ "QueryExecutionId" ] )
+# insert small delay to allow database to be created
+time.sleep(5) 
 
 # load hive schema into table
 with open( aws[ "schemafile" ], "r" ) as fp:

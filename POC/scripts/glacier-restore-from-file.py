@@ -1,4 +1,4 @@
-#! /usr/bin/python3.9
+#! /usr/bin/python3
 
 import argparse
 import boto3
@@ -106,7 +106,7 @@ try:
                     Operation=op_dict,
                     Report=rep_dict,
                     Manifest=man_dict,
-                    Description="restore from glacier for {} {}".format( args.usr, args.host ),
+                    Description="restore from glacier for {} {}".format( args.user, args.host ),
                     Priority=0,
                     RoleArn="arn:aws:iam::774954368688:role/read-restore-all-buckets-role",
                     Tags=tag_list
