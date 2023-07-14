@@ -40,7 +40,11 @@ if args.verbose:
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
-session = boto3.Session( profile_name=aws[ "profile" ] )
+# when run from AWS services, profile is not used
+if "profile" in aws:
+    session = boto3.Session( profile_name=aws[ "profile" ] )
+else:
+    session = boto3
 
 try:
     with open( args.idsfile ) as fp:
@@ -77,8 +81,8 @@ with open( results, "w" ) as f:
         response = athena_client.get_query_execution(
             QueryExecutionId=jobid
         )
-    f.write( response[ "QueryExecution" ][ "ResultConfiguration" ][ "OutputLocation" ] )
-    f.write( "\n" )
+        f.write( response[ "QueryExecution" ][ "ResultConfiguration" ][ "OutputLocation" ] )
+        f.write( "\n" )
 
 # Report empty results, errors, and jobs that are not ready
 for i in listempty:
