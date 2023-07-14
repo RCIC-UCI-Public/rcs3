@@ -43,7 +43,7 @@ try:
         athena = session.client( "athena" )
         bucket = "{}-{}-uci-bkup-bucket".format( args.user, args.host )
         for filename in fp:
-            query = "select bucketname as '{}', filename, version_id from {} where filename like '{}' and storage_class like 'GLACIER'{};"\
+            query = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and storage_class like 'GLACIER'{};"\
                 .format( bucket, args.host, filename.strip(), limits )
             if args.verbose:
                 print( query )
