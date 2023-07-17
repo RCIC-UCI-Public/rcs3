@@ -25,7 +25,7 @@ p.add_argument( "-r", "--runonce", action="store_true", default=False,
         help="do not loop, run once and exit" )
 p.add_argument( "-n", "--notify",
         help="override the default SNS topic" )
-p.add_argument( "-s", "--sleepinterval", type=int, default=3600
+p.add_argument( "-s", "--sleepinterval", type=int, default=3600,
         help="override the default number of seconds to sleep" )
 args = p.parse_args()
 
@@ -34,6 +34,7 @@ listrunning = []
 listready = []
 listfail = []
 listerror = []
+listrecheck = []
 if args.notify:
     results = args.notify
 else:
@@ -65,6 +66,8 @@ except IOError:
 s3c = session.client( "s3control" )
 while len( listrunning ) > 0:
     for jobid in listrunning:
+        if args.verbose:
+            print( "JobId: {}".format( jobid ) )
         try:
             response = s3c.describe_job(
                 AccountId=aws[ "accountid" ],
@@ -72,37 +75,37 @@ while len( listrunning ) > 0:
             )
             jobstate = response[ "Job" ][ "Status" ]
             if args.verbose:
-                print( "Checking: {}".format( jobstate ) )
+                print( "State: {}".format( jobstate ) )
             if jobstate == "Complete":
                 listready.append( jobid )
-                listrunning.remove( jobid )
             elif jobstate == "Failed":
                 listfail.append( jobid )
-                listrunning.remove( jobid )
             else:
-                pass
+                listrecheck.append( jobid )
         except s3c.exceptions.InvalidRequestException:
-                listerror.append( jobid )
-                listrunning.remove( jobid )
-                print( "Invalid id: {}".format( jobid ) )
-    if runonce:
+            listerror.append( jobid )
+            print( "Invalid id: {}".format( jobid ) )
+    if args.runonce:
         break
-    time.sleep( args.sleepinterval )
+    if len( listrecheck ) > 0:
+        if args.verbose:
+            print( "Sleeping {} seconds".format( args.sleepinterval ) )
+        time.sleep( args.sleepinterval )
+    listrunning = listrecheck
 
 # Report completions, failures, errors, and jobs that are not ready
 sns_message = ""
 send = True
 for i in listready:
-    print( "Completed: {}".format( i ) )
     sns_message += "Completed: {}\n".format( i )
 for i in listfail:
-    print( "Job failed: {}".format( i ) )
     sns_message += "Job failed: {}\n".format( i )
 for i in listerror:
-    print( "Not a valid job id: {}".format( i ) )
+    sns_message += "Invalid job id: {}".format( i )
 for i in listrunning:
-    send = False
-    print( "Jobs not completed: {}".format( i ) )
+    sns_message += "Job not completed: {}".format( i )
+if args.verbose:
+    print( sns_message )
 
 if send:
     sns = session.client( "sns" )
