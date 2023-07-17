@@ -1,0 +1,39 @@
+## This is the common exclusions file to trim down paths and files names that should not usually be backed up
+## <pattern>/**   recursively excludes subdirectories. See https://rclone.org/filtering/ for pattern matching
+## 
+---
+## Common snapshot/cache directories
+- .zfs/**
+- .snapshot/**
+- .vscode/**
+- .DS_Store/**
+- .plist/**
+- .strings
+- .cprestoretmp.*
+- .part
+- .tmp
+## Common Browser Caches
+- Google/Chrome/.*cache.*
+- Google/Chrome/Safe Browsing.*
+- iPhoto Library/iPod Photo Cache/**
+- Mozilla/Firefox/.*cache.*
+- Music/Subscription/.*
+
+## Unix/Linux System Paths
+## These exclusions are important if the path to backup is "/". 
+#
+# - /bin/**
+# - /boot/**
+# - /dev/**
+# - /etc/**
+# - /initrd/*
+# - /lib/**
+# - /lost\+found/**
+# - /opt/**
+# - /proc/**
+# - /sbin/**
+# - /srv/**
+# - /sys/**
+# - /tmp/**
+# - /usr/**
+# - /var/**
