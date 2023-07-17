@@ -206,6 +206,8 @@ def generate(jobsfile):
     """ returns a list of backupJobs objects """ 
 
     alljobs = [] 
+    jobscriptdir=os.path.realpath(os.path.dirname(jobsfile))
+
     with open( jobsfile, "r" ) as f:
         jobdefs = yaml.safe_load( f )
     
@@ -215,6 +217,17 @@ def generate(jobsfile):
             excludes=paths['exclude_global']
         except:
             excludes=list()
+
+        # Read common excludes from a file (must be in the same subdir as the jobs file)
+        # exclude_file=os.path.normpath(os.path.join(jobscriptdir, paths['exclude_file']))
+        try:
+            exclude_file=os.path.normpath(os.path.join(jobscriptdir, paths['exclude_file']))
+            with open( exclude_file,'r') as ef:
+                excludes_in_file = yaml.safe_load(ef)
+                excludes.extend(excludes_in_file)
+        except KeyError as e:
+            pass 
+                  
         for jobs in paths['jobs']:
            bupJob = backupJob(jobs['name'],path)
            alljobs.extend([bupJob])
