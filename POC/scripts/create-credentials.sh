@@ -10,5 +10,5 @@ fi
 read -p "Enter AWS Access Key: " access_key 
 read -p "Enter AWS Secret Accesss Key: " secret_access_key
 cat $TEMPLATES_DIR/credentials.in | \
-sed "/^aws_access_key/ c aws_access_key = $access_key" | \
+sed "/^aws_access_key/ c aws_access_key_id = $access_key" | \
 sed "/^aws_secret_access_key/ c aws_secret_access_key = $secret_access_key"
