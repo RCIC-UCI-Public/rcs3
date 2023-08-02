@@ -8,7 +8,7 @@
     },
     "IsEnabled": true,
     "Id": "xxxuserxxx-xxxhostxxx-daily",
-    "IncludedObjectVersions": "Current",
+    "IncludedObjectVersions": "All",
     "OptionalFields": [
         "Size",
         "LastModifiedDate",
