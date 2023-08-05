@@ -1,0 +1,36 @@
+{
+    "MetricAlarms": [
+        {
+            "AlarmName": "%OWNER%-%SYSTEM% exceeded number objects quota",
+            "AlarmArn": "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% exceeded number objects quota",
+            "AlarmDescription": "The %SYSTEM% server owned by %OWNER% has exceeded its object quota of %OBJECTQUOTA% objects",
+            "AlarmConfigurationUpdatedTimestamp": "2023-08-03T22:36:15.083000+00:00",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [
+		%NOTIFY%
+            ],
+            "InsufficientDataActions": [],
+            "MetricName": "NumberOfObjects",
+            "Namespace": "AWS/S3",
+            "Statistic": "Average",
+            "Dimensions": [
+                {
+                    "Name": "StorageType",
+                    "Value": "AllStorageTypes"
+                },
+                {
+                    "Name": "BucketName",
+                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                }
+            ],
+            "Period": 86400,
+            "EvaluationPeriods": 1,
+            "DatapointsToAlarm": 1,
+            "Threshold": %OBJECTQUOTA%.0,
+            "ComparisonOperator": "GreaterThanThreshold",
+            "TreatMissingData": "missing"
+        }
+    ],
+    "CompositeAlarms": []
+}

@@ -1,0 +1,75 @@
+{
+    "MetricAlarms": [
+        {
+            "AlarmName": "%OWNER%-%SYSTEM% exceeded storage quota",
+            "AlarmArn": "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% exceeded storage quota",
+            "AlarmDescription": "The %OWNER%-%SYSTEM%-%BUCKET% has exceeded %SIZEQUOTA% bytes of storage in Standard and Glacier",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [
+                   %NOTIFY%
+            ],
+            "InsufficientDataActions": [],
+            "StateValue": "OK",
+            "Dimensions": [],
+            "EvaluationPeriods": 1,
+            "DatapointsToAlarm": 1,
+            "Threshold": %SIZEQUOTA%.0,
+            "ComparisonOperator": "GreaterThanThreshold",
+            "TreatMissingData": "missing",
+            "Metrics": [
+                {
+                    "Id": "e1",
+                    "Expression": "SUM(METRICS())",
+                    "Label": "%OWNER%-%SYSTEM%-%BUCKET% Total Storage",
+                    "ReturnData": true
+                },
+                {
+                    "Id": "m1",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3",
+                            "MetricName": "BucketSizeBytes",
+                            "Dimensions": [
+                                {
+                                    "Name": "StorageType",
+                                    "Value": "StandardStorage"
+                                },
+                                {
+                                    "Name": "BucketName",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "ReturnData": false
+                },
+                {
+                    "Id": "m2",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3",
+                            "MetricName": "BucketSizeBytes",
+                            "Dimensions": [
+                                {
+                                    "Name": "StorageType",
+                                    "Value": "GlacierStorage"
+                                },
+                                {
+                                    "Name": "BucketName",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "ReturnData": false
+                }
+            ]
+        }
+    ],
+    "CompositeAlarms": []
+}

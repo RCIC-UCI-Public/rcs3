@@ -1,0 +1,187 @@
+{
+    "MetricAlarms": [
+        {
+            "AlarmName": "%OWNER%-%SYSTEM% excessive daily activity",
+            "AlarmArn": "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% excessive daily activity",
+            "AlarmDescription": "The bucket for owner %OWNER% and system %SYSTEM% has an activity ratio #requests/#objects of > 1.5 over the last day. ",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [
+		%NOTIFY%
+            ],
+            "InsufficientDataActions": [],
+            "Dimensions": [],
+            "EvaluationPeriods": 1,
+            "DatapointsToAlarm": 1,
+            "Threshold": 1.5,
+            "ComparisonOperator": "GreaterThanThreshold",
+            "TreatMissingData": "missing",
+            "Metrics": [
+                {
+                    "Id": "e2",
+                    "Expression": "e1/m1",
+                    "Label": "Requests/Objects Ratio",
+                    "ReturnData": true
+                },
+                {
+                    "Id": "e1",
+                    "Expression": "SUM([m2,m3,m4])",
+                    "Label": "All Requests",
+                    "ReturnData": false
+                },
+                {
+                    "Id": "m2",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3/Storage-Lens",
+                            "MetricName": "AllRequests",
+                            "Dimensions": [
+                                {
+                                    "Name": "metrics_version",
+                                    "Value": "1.0"
+                                },
+                                {
+                                    "Name": "storage_class",
+                                    "Value": "STANDARD"
+                                },
+                                {
+                                    "Name": "aws_region",
+                                    "Value": "%REGION%"
+                                },
+                                {
+                                    "Name": "bucket_name",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                },
+                                {
+                                    "Name": "aws_account_number",
+                                    "Value": "%ACCOUNT%"
+                                },
+                                {
+                                    "Name": "configuration_id",
+                                    "Value": "%LENS%"
+                                },
+                                {
+                                    "Name": "record_type",
+                                    "Value": "BUCKET"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "Label": "Requests - Standard",
+                    "ReturnData": false
+                },
+                {
+                    "Id": "m3",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3/Storage-Lens",
+                            "MetricName": "AllRequests",
+                            "Dimensions": [
+                                {
+                                    "Name": "metrics_version",
+                                    "Value": "1.0"
+                                },
+                                {
+                                    "Name": "storage_class",
+                                    "Value": "GLACIER"
+                                },
+                                {
+                                    "Name": "aws_region",
+                                    "Value": "%REGION%"
+                                },
+                                {
+                                    "Name": "bucket_name",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                },
+                                {
+                                    "Name": "aws_account_number",
+                                    "Value": "%ACCOUNT%"
+                                },
+                                {
+                                    "Name": "configuration_id",
+                                    "Value": "%LENS%"
+                                },
+                                {
+                                    "Name": "record_type",
+                                    "Value": "BUCKET"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "Label": "Requests - Glacier",
+                    "ReturnData": false
+                },
+                {
+                    "Id": "m4",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3/Storage-Lens",
+                            "MetricName": "AllRequests",
+                            "Dimensions": [
+                                {
+                                    "Name": "metrics_version",
+                                    "Value": "1.0"
+                                },
+                                {
+                                    "Name": "storage_class",
+                                    "Value": "-"
+                                },
+                                {
+                                    "Name": "aws_region",
+                                    "Value": "%REGION%"
+                                },
+                                {
+                                    "Name": "bucket_name",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                },
+                                {
+                                    "Name": "aws_account_number",
+                                    "Value": "%ACCOUNT%"
+                                },
+                                {
+                                    "Name": "configuration_id",
+                                    "Value": "%LENS%"
+                                },
+                                {
+                                    "Name": "record_type",
+                                    "Value": "BUCKET"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "Label": "Requests - Bucket",
+                    "ReturnData": false
+                },
+                {
+                    "Id": "m1",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3",
+                            "MetricName": "NumberOfObjects",
+                            "Dimensions": [
+                                {
+                                    "Name": "StorageType",
+                                    "Value": "AllStorageTypes"
+                                },
+                                {
+                                    "Name": "BucketName",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Average"
+                    },
+                    "ReturnData": false
+                }
+            ]
+        }
+    ],
+    "CompositeAlarms": []
+}

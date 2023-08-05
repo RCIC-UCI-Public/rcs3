@@ -1,3 +1,4 @@
+---
 profile: "774954368688_AWSAdministratorAccess"
 accountid: "774954368688"
 outputdir: "outputs/"
@@ -7,3 +8,13 @@ lifecyclejson: "templates/lifecycle-all.json"
 commandfile: "templates/ec2-after-boot-commands.txt"
 schemafile: "templates/template-athena-schema.txt"
 notify: "arn:aws:sns:us-west-2:774954368688:rcic-team-notify"
+## Alarm Setup
+region: "us-west-2"
+lens: "Single-Glass-of-Pain"
+bucket_postfix: "uci-bkup-bucket"
+admin_notify: "rcic-team-notify"
+owner_notify: "uci-notify"
+bucket_alarm_templates:
+  - object-quota-exceeded.json 
+  - excessive-daily-usage.json 
+  - space-quota-exceeded.json
