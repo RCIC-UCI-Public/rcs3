@@ -45,18 +45,19 @@ def save_objects( o, f, n ):
 
 count = 0
 filen = 1
-for i in jp[ "DeleteMarkers" ]:
-    x = {}
-    objkeys.add( i[ "Key" ] )
-    x[ "Key" ] =  i[ "Key" ]
-    x[ "VersionId" ] =  i[ "VersionId" ]
-    objs.append( x )
-    count += 1
-    if count == args.maxcount:
-        save_objects( objs, args.outputfile, filen )
-        objs = []
-        count = 0
-        filen += 1
+if "DeleteMarkers" in jp:
+    for i in jp[ "DeleteMarkers" ]:
+        x = {}
+        objkeys.add( i[ "Key" ] )
+        x[ "Key" ] =  i[ "Key" ]
+        x[ "VersionId" ] =  i[ "VersionId" ]
+        objs.append( x )
+        count += 1
+        if count == args.maxcount:
+            save_objects( objs, args.outputfile, filen )
+            objs = []
+            count = 0
+            filen += 1
 
 if args.all_objects:
     for i in jp[ "Versions" ]:
