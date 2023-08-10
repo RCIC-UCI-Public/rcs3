@@ -18,3 +18,4 @@ bucket_alarm_templates:
   - object-quota-exceeded.json 
   - excessive-daily-usage.json 
   - space-quota-exceeded.json
+  - no-activity.json

@@ -56,6 +56,7 @@ class backupJob(object):
         self._name = str(name)
         self._destprefix = str(name)
         self._path = path
+        self._destpath = self._path
         self._excludes = list()
         self._includedirs = list()
         self._includefiles = list()
@@ -189,7 +190,7 @@ class backupJob(object):
         self._cmd.extend(filefilter)
         self._cmd.extend(rc_global)
         self._cmd.extend([self._path])
-        self._cmd.extend(["%s:%s%s" % (endpoint,self._destprefix,self._path)])
+        self._cmd.extend(["%s:%s%s" % (endpoint,self._destprefix,self._destpath)])
 
     def _build_filters(self):
         self._filters=list()
@@ -231,6 +232,11 @@ def generate(jobsfile):
         for jobs in paths['jobs']:
            bupJob = backupJob(jobs['name'],path)
            alljobs.extend([bupJob])
+
+           try:
+              bupJob._destpath = jobs['destpath']
+           except:
+              bupJob._destpath = path 
 
            try:
               bupJob.includedirs = jobs['subdirectories']

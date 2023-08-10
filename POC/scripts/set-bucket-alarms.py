@@ -85,35 +85,30 @@ def main(argv):
 
 def put_alarm(cw,MA):
     print("Putting Alarm: ",MA['AlarmName'], "into cloudwatch")
+    # Common arguments (ignores anything superfluous in the MA dictionary) 
+    MAargs = {
+         'AlarmName' : MA['AlarmName'],
+         'AlarmDescription' : MA['AlarmDescription'],
+         'ActionsEnabled' : MA['ActionsEnabled'],
+         'AlarmActions' : MA['AlarmActions'],
+         'EvaluationPeriods' : MA['EvaluationPeriods'],
+         'DatapointsToAlarm' : MA['DatapointsToAlarm'],
+         'Threshold' : MA['Threshold'],
+         'ComparisonOperator' : MA['ComparisonOperator'],
+         'TreatMissingData' : MA['TreatMissingData']}
+    
     # Two cases: 1) Alarm is a single Metric, 2) Alarm uses multiple metrics
     try:
-       cw.put_metric_alarm(
-         MetricName=MA['MetricName'],
-         Dimensions=MA['Dimensions'],
-         Namespace=MA['Namespace'],
-         Statistic=MA['Statistic'],
-         Period=MA['Period'],
-         AlarmName=MA['AlarmName'],
-         AlarmDescription=MA['AlarmDescription'],
-         ActionsEnabled=MA['ActionsEnabled'],
-         AlarmActions=MA['AlarmActions'],
-         EvaluationPeriods=MA['EvaluationPeriods'],
-         DatapointsToAlarm=MA['DatapointsToAlarm'],
-         Threshold=MA['Threshold'],
-         ComparisonOperator=MA['ComparisonOperator'],
-         TreatMissingData=MA['TreatMissingData'])
+         MAargs['MetricName'] = MA['MetricName']
+         MAargs['Dimensions'] = MA['Dimensions']
+         MAargs['Namespace'] = MA['Namespace']
+         MAargs['Statistic'] = MA['Statistic']
+         MAargs['Period'] = MA['Period']
     except:
-       cw.put_metric_alarm(
-         Metrics=MA['Metrics'],
-         AlarmName=MA['AlarmName'],
-         AlarmDescription=MA['AlarmDescription'],
-         ActionsEnabled=MA['ActionsEnabled'],
-         AlarmActions=MA['AlarmActions'],
-         EvaluationPeriods=MA['EvaluationPeriods'],
-         DatapointsToAlarm=MA['DatapointsToAlarm'],
-         Threshold=MA['Threshold'],
-         ComparisonOperator=MA['ComparisonOperator'],
-         TreatMissingData=MA['TreatMissingData'])
+         MAargs['Metrics'] = MA['Metrics']
+
+    cw.put_metric_alarm(**MAargs)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
