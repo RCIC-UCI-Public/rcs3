@@ -11,7 +11,8 @@ notify: "arn:aws:sns:us-west-2:774954368688:rcic-team-notify"
 ## Alarm Setup
 region: "us-west-2"
 lens: "Single-Glass-of-Pain"
-bucket_postfix: "uci-bkup-bucket"
+bucket_postfix: "uci-p-bkup-bucket"
+inventory_postfix: "uci-p-inventory"
 admin_notify: "rcic-team-notify"
 owner_notify: "uci-notify"
 bucket_alarm_templates:
