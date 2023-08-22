@@ -3,42 +3,22 @@
 ## Path is commmon to the jobs relative to the path
 ---
 srcpaths:
-- path: /volume1/cncm
+- path: /datadir
+  ## Local decision to exclude .git subdirs
   exclude_global:
-    - .DS_Store
+    - .git/**
+
+  ## Patterns from a file to exclude
+  exclude_file: common_excludes.yaml
+
   jobs:
-    - name: backup-1
+    - name: backup1
       subdirectories:
-        - Lab/DataImages
+        - DataImages
 
-    - name: backup-2
+    - name: backup2 
       subdirectories:
-        - Lab/Pan_public
+        - commondata 
 
-    - name: backup-3
-      subdirectories:
-        - Lab/DataImages2
-
-    - name: backup-4
-      subdirectories:
-        - Lab/twophoton2
-
-    - name: backup-5
-      subdirectories:
-        - Lab/Xiaoxiao_public
-        - Lab/Qiao_public
-        - Lab/Kevin_public
-
-    - name: backup-6
-      subdirectories:
-        - Lab/Wenhao
-        - Lab/Jasmine_public
-        - Lab/Xulab_data_backup
-        - Lab/Max_public
-        - Lab/2p data
-        - Lab/Nicole_public
-        - Lab/miniscope
-        - Lab/Bereket_public
-        - Lab/Hai_Zhang_public
 
 

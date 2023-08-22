@@ -5,15 +5,15 @@
             "Effect": "Deny",
             "Action": "s3:DeleteBucket",
             "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket"
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx"
             ]
         },
         {
             "Effect": "Allow",
             "Action": "s3:*",
             "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket",
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket/*"
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx",
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
             ],
             "Condition": {}
         },

@@ -37,8 +37,8 @@
                 "s3:PutObjectAcl"
             ],
             "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket",
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket/*"
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx",
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
             ],
             "Condition": {
                 "Bool": {"aws:ViaAWSService": "false"},
@@ -69,8 +69,8 @@
                 "s3:GetObjectAttributes"
             ],
             "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-inventory",
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-inventory/*"
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx/*"
             ],
             "Condition": {
                 "Bool": {"aws:ViaAWSService": "false"},
@@ -119,8 +119,8 @@
                 "s3:PutObjectAcl"
             ],
             "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket",
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-bkup-bucket/*"
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx",
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
             ],
             "Condition": {
                 "Bool": {"aws:ViaAWSService": "true"}
@@ -144,8 +144,8 @@
                 "s3:GetObjectAttributes"
             ],
             "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-inventory",
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-uci-inventory/*"
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx/*"
             ],
             "Condition": {
                 "Bool": {"aws:ViaAWSService": "true"}

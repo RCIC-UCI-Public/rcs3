@@ -13,6 +13,7 @@ region: "us-west-2"
 lens: "Single-Glass-of-Pain"
 bucket_postfix: "uci-p-bkup-bucket"
 inventory_postfix: "uci-p-inventory"
+policy_postfix: "uci-p-bkup-policy"
 admin_notify: "rcic-team-notify"
 owner_notify: "uci-notify"
 bucket_alarm_templates:
