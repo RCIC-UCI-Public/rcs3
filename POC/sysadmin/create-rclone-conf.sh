@@ -2,7 +2,8 @@
 # Creates an rclone.conf file on stdout using the same user host pattern as buckets
 MYDIR=$(dirname $(realpath $0))
 TEMPLATES_DIR=$MYDIR/../templates
-source  <($MYDIR/aws-settings-to-bash.py)
+COMMON_DIR=$MYDIR/../common
+source  <($COMMON_DIR/aws-settings-to-bash.py)
 
 if [ $# -ne 2 ] ; then
     echo $0 user host

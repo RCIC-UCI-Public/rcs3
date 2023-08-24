@@ -6,9 +6,10 @@ MYDIR=$(dirname $(realpath $0))
 TEMPLATES_DIR=$MYDIR/../templates
 CONFIG_DIR=$MYDIR/../config
 OUTPUTS_DIR=$MYDIR/../outputs
+COMMON_DIR=$MYDIR/../common
 
 # READ in the variables in the $CONFIG_DIR/aws-settings.yaml and present as bash variables 
-source  <($MYDIR/aws-settings-to-bash.py)
+source  <($COMMON_DIR/aws-settings-to-bash.py)
 
 if [ $# -ne 2 ] ; then
     echo $0 user host
