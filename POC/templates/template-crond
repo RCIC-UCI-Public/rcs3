@@ -1,2 +1,2 @@
-0 11 * * 0 (/root/rcs3/POC/scripts/gen-backup.py run &>> /var/log/gen-backup.log) &
-0 11 * * 1-6 (/root/rcs3/POC/scripts/gen-backup.py --top-up=24h run &>> /var/log/gen-backup.log) &
+0 11 * * 0 (/root/rcs3/POC/sysadmin/gen-backup.py run &>> /var/log/gen-backup.log) &
+0 11 * * 1-6 (/root/rcs3/POC/sysadmin/gen-backup.py --top-up=24h run &>> /var/log/gen-backup.log) &
