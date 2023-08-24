@@ -1,0 +1,61 @@
+{
+        "Id": "xxxlensxxx",
+        "AccountLevel": {
+            "ActivityMetrics": {
+                "IsEnabled": true
+            },
+            "BucketLevel": {
+                "ActivityMetrics": {
+                    "IsEnabled": true
+                },
+                "PrefixLevel": {
+                    "StorageMetrics": {
+                        "IsEnabled": true,
+                        "SelectionCriteria": {
+                            "Delimiter": "/",
+                            "MaxDepth": 5,
+                            "MinStorageBytesPercentage": 3.0
+                        }
+                    }
+                },
+                "AdvancedCostOptimizationMetrics": {
+                    "IsEnabled": true
+                },
+                "AdvancedDataProtectionMetrics": {
+                    "IsEnabled": true
+                },
+                "DetailedStatusCodesMetrics": {
+                    "IsEnabled": true
+                }
+            },
+            "AdvancedCostOptimizationMetrics": {
+                "IsEnabled": true
+            },
+            "AdvancedDataProtectionMetrics": {
+                "IsEnabled": true
+            },
+            "DetailedStatusCodesMetrics": {
+                "IsEnabled": true
+            }
+        },
+        "Include": {
+            "Regions": [
+                "xxxregionxxx"
+            ]
+        },
+        "IsEnabled": true,
+        "DataExport": {
+            "S3BucketDestination": {
+                "Format": "CSV",
+                "OutputSchemaVersion": "V_1",
+                "AccountId": "xxxaccountidxxx",
+                "Arn": "arn:aws:s3:::xxxlensbucketxxx",
+                "Encryption": {
+                    "SSES3": {}
+                }
+            },
+            "CloudWatchMetrics": {
+                "IsEnabled": true
+            }
+        }
+}
