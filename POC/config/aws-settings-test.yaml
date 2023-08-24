@@ -19,7 +19,7 @@ lens: "rcs3-pane"
 reports: "s3://rcs3-godfather-uci-s-bucket"
 
 # 4. Notification for the cloud admin team (region, account, sns-team name)
-notify: "arn:aws:sns:us-west-2:774954368688:rcic-team-notify"
+notify: "arn:aws:sns:us-west-2:166566894905:rcic-team-notify"
 admin_notify: "rcic-team-notify"
 owner_notify: "uci-notify"
 

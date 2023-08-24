@@ -1,21 +1,37 @@
+### Settings for the Production Instance RCS3 
 ---
-profile: "774954368688_AWSAdministratorAccess"
-accountid: "774954368688"
+#@@@@ The following MUST be localized to the AWS Account @@@@ 
+profile: "291988307276_AWSAdministratorAccess"
+accountid: "291988307276"
+region: "us-west-2"
+
+# 1. Where bucket postfixes where backups and inventories are stored
+#    policy postfix
+bucket_postfix: "uci-p-bkup-bucket"
+inventory_postfix: "uci-p-inventory"
+policy_postfix: "uci-bkup-policy"
+
+# 2. The name of the storage lens bucket 
+lensbucket: "rcs3-pane-uci-p-report"
+lens: "rcs3-pane"
+
+# 3. Where restore reports from Athena queries are stored
+reports: "s3://rcs3-godfather-uci-p-bucket"
+
+# 4. Notification for the cloud admin team (region, account, sns-team name)
+notify: "arn:aws:sns:us-west-2:291988307276:rcic-team-notify"
+admin_notify: "rcic-team-notify"
+owner_notify: "uci-notify"
+
+#@@@@----------------------------------------------------@@@@
+### Following should not be changed localization ###
 outputdir: "outputs/"
 configfile: "config/aws-admin"
-reports: "s3://rcic-godfather-uci"
 lifecyclejson: "templates/lifecycle-all.json"
 commandfile: "templates/ec2-after-boot-commands.txt"
 schemafile: "templates/template-athena-schema.txt"
-notify: "arn:aws:sns:us-west-2:774954368688:rcic-team-notify"
+
 ## Alarm Setup
-region: "us-west-2"
-lens: "Single-Glass-of-Pain"
-bucket_postfix: "uci-p-bkup-bucket"
-inventory_postfix: "uci-p-inventory"
-policy_postfix: "uci-p-bkup-policy"
-admin_notify: "rcic-team-notify"
-owner_notify: "uci-notify"
 bucket_alarm_templates:
   - object-quota-exceeded.json 
   - excessive-daily-usage.json 
