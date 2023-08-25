@@ -3,6 +3,7 @@
 import platform
 import psutil
 import math
+import os
 
 def detect_system_info():
     # Detect operating system
@@ -26,14 +27,18 @@ def detect_system_info():
     if operating_system == "Linux":
         distribution = platform.linux_distribution()
 
-    return operating_system, arch, total_memory_gb, num_cores, hyperthreading_enabled, distribution
+    # Check if running inside a Docker container
+    inside_docker = "Yes" if os.path.exists("/.dockerenv") else "No"
+
+    return operating_system, arch, total_memory_gb, num_cores, hyperthreading_enabled, distribution, inside_docker
 
 if __name__ == "__main__":
-    operating_system, arch, total_memory_gb, num_cores, hyperthreading_enabled, distribution = detect_system_info()
+    operating_system, arch, total_memory_gb, num_cores, hyperthreading_enabled, distribution, inside_docker = detect_system_info()
     print("Operating System:", operating_system)
+    print("Distribution:", distribution)
     print("Operating System Architecture:", arch)
     print("Total Memory (GB):", total_memory_gb)
     print("Number of CPU Cores:", num_cores)
     print("Hyperthreading Enabled:", hyperthreading_enabled)
-    print("Distribution:", distribution)
+    print("Running Inside Docker:", inside_docker)
 
