@@ -9,6 +9,7 @@ RUN yum -y install \
     procps-ng \
     python3 \
     python3-yaml \
+    python3-psutil \
     findutils \
     epel-release \
     htop \
