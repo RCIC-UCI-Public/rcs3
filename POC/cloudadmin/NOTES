@@ -1,0 +1,40 @@
+These are NOTES that will go into the web docs
+I.  Brand new AWS account - setting up the admin side
+
+    a. Edit the file config/aws-settings.yaml to reflect site naming
+       1. replace everything with uci-p (uci "production") with something else (e.g., <universityname>-p)
+       2. Change the admin_notify and owner_notify to something that makes local sense.       
+
+    b. Create the default Storage Lens Configuration
+       cloudadmin/create-storage-len.sh
+
+    c. Create the administrator notification topic and subscribe your admins to it
+       cloudadmin/create-admin-sns-topic.py -e <email1> [<email> ...]
+
+II. New System to be added
+
+    A. Cloudadmin tasks
+        a. create the backup bucket for the owner-system
+            cloudadmin/create-bucket-with-inventory.sh <owner> <system>
+
+        b. Transmit securely (in zoom chat seems to work, the access key, password for the system's service account)
+
+        c. create the owner notification topic for the bucket
+           cloudadmin/create-sns-topic.py <owner> <system> -x [-e email [email email ...]] 
+
+        d. create the bucket alarms with object and storage limits
+           cloudadmin/set-bucket-alarms.py <owner> <system> <#objects quota> <#TB space quota>
+
+
+    B. Sysadmin tasks
+        a.  Have the system adminstrator clone the github repo.  
+        b.  Make sure key software is installed: (Python3 with yaml module, aws, rclone)
+        c.  After the bucket has been created, localize the setup
+            sysadmin/localize.sh <owner> <system>
+            --> this requires the access key/password from above. Asked for interactively
+        d.  Copy templates/jobs.yaml config/jobs.yaml
+            edit to reflect the specific configuration of the system
+        e.  Dryrun test the backup
+            sysadmin/gen-backup.py --dryrun run
+
+    
