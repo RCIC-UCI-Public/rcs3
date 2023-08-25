@@ -12,7 +12,7 @@
 - .cprestoretmp.*
 - .part
 - .tmp
-- .cache
+- .cache/**
 ## Common Browser Caches
 - Google/Chrome/.*cache.*
 - Google/Chrome/Safe Browsing.*
