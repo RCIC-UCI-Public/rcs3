@@ -24,8 +24,19 @@ def main(argv):
     configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
     templatedir=os.path.normpath(os.path.join(scriptdir, "..","templates","alarms-bucket"))
 
+    ## Read the settings file (This needs to be made common code)
+    # if RCS3_AWS_SETTINGS is defined, use it
+    try:
+       settingsfile=os.environ['RCS3_AWS_SETTINGS']
+    except:
+       settingsfile="aws-settings.yaml"
+
+    yamlfile=os.path.join(configdir,settingsfile)
+    if os.path.sep in settingsfile or os.path.exists(settingsfile):
+        yamlfile=settingsfile
+
     # Read the global configuration settings
-    with open( os.path.join(configdir,"aws-settings.yaml"), "r" ) as f:
+    with open( os.path.join(yamlfile), "r" ) as f:
         aws = yaml.safe_load( f )
     
     
