@@ -12,33 +12,14 @@ import os
 import sys
 import yaml
 import json
-
-def replace_all(text, dic):
-    """ replace text with (key,value) (key is not regex).  """
-    for target in dic.keys():
-        text = text.replace(target, dic[target])
-    return text
+import rcs3functions as rcs3
 
 def main(argv):
     scriptdir=os.path.realpath(os.path.dirname(__file__))
     configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
     templatedir=os.path.normpath(os.path.join(scriptdir, "..","templates","alarms-bucket"))
 
-    ## Read the settings file (This needs to be made common code)
-    # if RCS3_AWS_SETTINGS is defined, use it
-    try:
-       settingsfile=os.environ['RCS3_AWS_SETTINGS']
-    except:
-       settingsfile="aws-settings.yaml"
-
-    yamlfile=os.path.join(configdir,settingsfile)
-    if os.path.sep in settingsfile or os.path.exists(settingsfile):
-        yamlfile=settingsfile
-
-    # Read the global configuration settings
-    with open( os.path.join(yamlfile), "r" ) as f:
-        aws = yaml.safe_load( f )
-    
+    aws=rcs3.read_aws_settings()
     
     usage="Create alarms for a specific system with number of objects quotaa and others"
     p = argparse.ArgumentParser( description=usage )
@@ -68,7 +49,7 @@ def main(argv):
         sns_client.get_topic_attributes( TopicArn=pi_topic )
         notify_list.append( '"%s"' % pi_topic )
     except sns_client.exceptions.NotFoundException:
-        print( "no SNS topic found for PI, notifications to RCIC Team only")
+        print( "no SNS topic found for PI, notifications to cloudadmin Team only")
     notify=",".join(notify_list)
     
     # read each alarm template in aws["bucket_alarm_templates"]
@@ -88,7 +69,7 @@ def main(argv):
 
     for f in aws["bucket_alarm_templates"]:
         with open(os.path.join(templatedir,f),"r") as tf:
-            replaced = [ replace_all(x,rvalues) for x in tf.readlines()] 
+            replaced = [ rcs3.replace_all(x,rvalues) for x in tf.readlines()] 
             output = json.loads("".join(replaced))
             # make call cloudwatch 
             for MA in output['MetricAlarms']:
