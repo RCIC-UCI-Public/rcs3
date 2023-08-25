@@ -7,6 +7,9 @@
 - .snapshot/**
 - .vscode/**
 - .DS_Store/**
+- '#snapshot/**'
+- '#recycle/**'
+- '@eaDir/**'
 - .plist/**
 - .strings
 - .cprestoretmp.*
