@@ -12,6 +12,9 @@ import os
 import sys
 import yaml
 import json
+
+scriptdir=os.path.realpath(os.path.dirname(__file__))
+sys.path.append(os.path.join(scriptdir,"..","common"))
 import rcs3functions as rcs3
 
 def main(argv):

@@ -5,9 +5,11 @@ import boto3
 import os
 import sys
 import yaml
-import rcs3functions as rcs3
 
 scriptdir=os.path.realpath(os.path.dirname(__file__))
+sys.path.append(os.path.join(scriptdir,"..","common"))
+import rcs3functions as rcs3
+
 configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
 templatedir=os.path.normpath(os.path.join(scriptdir, "..","templates","alarms-bucket"))
 
