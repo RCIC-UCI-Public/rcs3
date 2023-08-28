@@ -30,7 +30,7 @@ II. New System to be added
         a.  Have the system adminstrator clone the github repo.  
         b.  Make sure key software is installed: (Python3 with yaml module, aws, rclone)
         c.  After the bucket has been created, localize the setup
-            sysadmin/localize.sh <owner> <system>
+            sysadmin/localize.py <owner> <system>
             --> this requires the access key/password from above. Asked for interactively
         d.  Copy templates/jobs.yaml config/jobs.yaml
             edit to reflect the specific configuration of the system
