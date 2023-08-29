@@ -4,6 +4,8 @@ import boto3
 import os
 import sys
 import yaml
+scriptdir=os.path.realpath(os.path.dirname(__file__))
+sys.path.append(os.path.join(scriptdir,"..","common"))
 import rcs3functions as rcs3
 
 aws=rcs3.read_aws_settings()
