@@ -152,7 +152,7 @@ class backupJob(object):
         return " ".join(self._cmd) 
 
     ##### Methods ######
-    def construct_cmd(self,endpoint,loglevel="INFO",top_up=None,dryrun=False,threads=None,checkers=None):
+    def construct_cmd(self,endpoint,loglevel="INFO",top_up=None,dryrun=False,threads=None,checkers=None,baseonly=False):
         """ construct the rclone command for this backupJob"""
         if threads is not None:
            tcount = threads
@@ -184,13 +184,14 @@ class backupJob(object):
  
         # build the command in pieces
         self._cmd=["rclone"]
-        self._cmd.extend(sync)
         self._cmd.extend(confcred)
-        self._cmd.extend(logarg)
-        self._cmd.extend(filefilter)
         self._cmd.extend(rc_global)
-        self._cmd.extend([self._path])
-        self._cmd.extend(["%s:%s%s" % (endpoint,self._destprefix,self._destpath)])
+        if not baseonly:
+            self._cmd.extend(logarg)
+            self._cmd.extend(filefilter)
+            self._cmd.extend(sync)
+            self._cmd.extend([self._path])
+            self._cmd.extend(["%s:%s%s" % (endpoint,self._destprefix,self._destpath)])
 
     def _build_filters(self):
         self._filters=list()
@@ -303,8 +304,8 @@ def main(argv):
     parser.add_argument("--topup-jobs",   dest="topupjobs",  default=None,help=helptopupjob)
     parser.add_argument("-p", "--parallel",   dest="parallel",  default=2,help="how many backup jobs to run in parallel (2)")
     parser.add_argument("-K", "--checkers",  dest="checkers", default=32,help="how many checkers to run in parallel (32)")
-    parser.add_argument('command', metavar='command',choices=['list','run','detail'], nargs=1,
-              help='list | detail | run  ')
+    parser.add_argument('command', metavar='command',choices=['list','run','detail','rclone'], nargs=1,
+              help='list | detail | run | rclone ')
 
     # Parse the arguments
     args = parser.parse_args()
@@ -323,6 +324,10 @@ def main(argv):
 
     # Build the jobs
     alljobs = generate(args.jobsfile)
+    yamlbackup = backupJob('rcs3config',os.path.dirname(args.jobsfile))
+    yamlbackup.includefiles = [os.path.basename(args.jobsfile)]
+    alljobs.extend([yamlbackup])
+
     # Filter the jobs based on optional jobslist argument
     syncjobs = []
     topupjobs = []
@@ -333,6 +338,9 @@ def main(argv):
     if args.topupjobs != None:
         topupjobnames = args.topupjobs.split(",")
         topupjobs = list(filter( lambda x: True if x.name in topupjobnames else False, alljobs))
+
+    # Always sync the jobs.yaml file
+    syncjobs.append([yamlbackup])
 
     # Handle non-empty jobslist or a combination of sync/topupjobs 
     if args.joblist != None:
@@ -362,6 +370,11 @@ def main(argv):
                 print("== command ==")
                 print(job)
                 print("=============")
+    elif command == 'rclone':
+        """ print the base rclone command with globals filled in """
+        yamlbackup.construct_cmd(args.endpoint, baseonly=True)
+        os.sys.stdout.write(str(yamlbackup))
+
     elif command == 'run':
         runner = runBackup(alljobs,parallel=int(args.parallel))
         runner.run_jobs()
