@@ -18,8 +18,7 @@ lens: "rcs3-pane"
 # 3. Where restore reports from Athena queries are stored
 reports: "s3://rcs3-godfather-uci-s-bucket"
 
-# 4. Notification for the cloud admin team (region, account, sns-team name)
-notify: "arn:aws:sns:us-west-2:166566894905:rcic-team-notify"
+# 4. Notification for the cloud admin team (region, account)
 admin_notify: "rcic-team-notify"
 owner_notify: "uci-notify"
 
@@ -37,3 +36,5 @@ bucket_alarm_templates:
   - excessive-daily-usage.json 
   - space-quota-exceeded.json
   - no-activity.json
+cloudwatch_dashboard_templates:
+  - cost-estimates.json
