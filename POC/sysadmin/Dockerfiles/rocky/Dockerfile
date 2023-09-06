@@ -3,6 +3,8 @@ FROM rockylinux/rockylinux:8
 
 # Install desired packages via yum
 RUN yum -y install \
+    epel-release 
+RUN yum -y install \
     git \
     zip \
     vim \
@@ -11,7 +13,6 @@ RUN yum -y install \
     python3-yaml \
     python3-psutil \
     findutils \
-    epel-release \
     htop \
     parallel \
     jq \
