@@ -33,4 +33,5 @@ RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[
 # ...
 
 # Entry point or command to run when the container starts
-CMD ["sh", "-c", "crond start && /bin/bash"]
+#CMD ["sh", "-c", "crond start && /bin/bash"]
+CMD /sbin/crond -n 
