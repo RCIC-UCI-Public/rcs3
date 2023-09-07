@@ -1,4 +1,3 @@
-
 {
     "DashboardName": "Cost-Estimates",
     "variables": [
@@ -7,21 +6,21 @@
             "pattern": "SDISCOUNT",
             "inputType": "select",
             "id": "StorageCostFactor",
-            "label": "StorageCostFactor",
-            "defaultValue": "0.55",
+            "label": "Storage Discount",
+            "defaultValue": "0.45",
             "visible": true,
             "values": [
                 {
-                    "value": "1.00",
-                    "label": "1.00"
+                    "value": "0.00",
+                    "label": "0%"
                 },
                 {
-                    "value": ".83",
-                    "label": ".83"
+                    "value": "0.17",
+                    "label": "17%"
                 },
                 {
-                    "value": ".55",
-                    "label": ".55"
+                    "value": "0.45",
+                    "label": "45%"
                 }
             ]
         },
@@ -30,21 +29,21 @@
             "pattern": "EDISCOUNT",
             "inputType": "select",
             "id": "EnterpriseMultiplier",
-            "label": "EnterpriseMultiplier",
-            "defaultValue": "0.83",
+            "label": "Enterprise Discount",
+            "defaultValue": "0.17",
             "visible": true,
             "values": [
                 {
-                    "value": "1.00",
-                    "label": "1.00"
+                    "value": "0.00",
+                    "label": "0%"
                 },
                 {
-                    "value": ".90",
-                    "label": ".90"
+                    "value": "0.10",
+                    "label": "10%"
                 },
                 {
-                    "value": "0.83",
-                    "label": "0.83"
+                    "value": "0.17",
+                    "label": "17%"
                 }
             ]
         }
@@ -53,7 +52,7 @@
         {
             "height": 11,
             "width": 11,
-            "y": 3,
+            "y": 4,
             "x": 0,
             "type": "metric",
             "properties": {
@@ -61,7 +60,7 @@
                     [ { "expression": "SUM([m1,m2,m3])", "label": "Glacier-Put-Post-List-Requests (mean: ${AVG})", "id": "e1", "region": "%REGION%" } ],
                     [ { "expression": "SUM([m4,m5,m6,m7,m8,m9])", "label": "Bucket-Standard-Put-Post-List-Requests (mean: ${AVG})", "id": "e2", "region": "%REGION%" } ],
                     [ { "expression": "SUM([m10,m11,m12])", "label": "AllRequests (mean: ${AVG})", "id": "e3", "region": "%REGION%" } ],
-                    [ { "expression": "EDISCOUNT* (  ((e3 - (e2 + e1))*.0004/10.0) + (e2*.005) + (e1*.03))/1000", "label": "API Cost (mean: $ ${AVG})", "id": "e4", "yAxis": "right", "region": "%REGION%" } ],
+                    [ { "expression": "(1-EDISCOUNT)* (  ((e3 - (e2 + e1))*.0004/10.0) + (e2*.005) + (e1*.03))/1000", "label": "API Cost (mean: $ ${AVG})", "id": "e4", "yAxis": "right", "region": "%REGION%" } ],
                     [ { "expression": "RUNNING_SUM(e4)", "label": "SUM API Cost ($ ${MAX})", "id": "e5", "yAxis": "right", "region": "%REGION%" } ],
                     [ "AWS/S3/Storage-Lens", "PostRequests", "metrics_version", "1.0", "storage_class", "GLACIER", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "label": "Glacier - PostRequests", "id": "m1", "visible": false, "region": "%REGION%" } ],
                     [ ".", "PutRequests", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "label": "Glacier - PutRequests", "id": "m2", "visible": false, "region": "%REGION%" } ],
@@ -98,13 +97,15 @@
         {
             "height": 11,
             "width": 12,
-            "y": 3,
+            "y": 4,
             "x": 11,
             "type": "metric",
             "properties": {
                 "metrics": [
-                    [ { "expression": "SDISCOUNT*((m1*258.05/365) + (m4*44.24/365))/(1024*1024*1024*1024)", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "e1", "yAxis": "right", "region": "%REGION%", "color": "#2ca02c" } ],
+                    [ { "expression": "(1-SDISCOUNT)*((e3*.021) + (e4*.0036))", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "e1", "yAxis": "right", "region": "%REGION%", "color": "#2ca02c" } ],
                     [ { "expression": "RUNNING_SUM(e1)", "label": "Total Cost ($ ${MAX})", "id": "e2", "yAxis": "right", "region": "%REGION%", "color": "#98df8a" } ],
+                    [ { "expression": "m1*9.313e-10/30.4", "label": "GB-Months-Standard", "id": "e3", "region": "%REGION%" } ],
+                    [ { "expression": "m4*9.313e-10/30.4", "label": "GB-Months-Glacier", "id": "e4", "region": "%REGION%" } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "id": "m1", "region": "%REGION%", "color": "#bcbd22" } ],
                     [ ".", "DeleteMarkerStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m7", "region": "%REGION%", "color": "#ffbb78" } ],
                     [ ".", "NonCurrentVersionStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m8", "region": "%REGION%", "color": "#dbdb8d" } ],
@@ -132,30 +133,32 @@
             }
         },
         {
-            "height": 3,
+            "height": 4,
             "width": 23,
             "y": 0,
             "x": 0,
             "type": "metric",
             "properties": {
-                "sparkline": true,
                 "metrics": [
-                    [ { "expression": "SDISCOUNT*((m1*258.05/365) + (m4*44.24/365))/(1024*1024*1024*1024)", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "e1", "yAxis": "right", "region": "%REGION%" } ],
-                    [ { "expression": "RUNNING_SUM(e1)", "label": "Total Cost ($ ${MAX})", "id": "e2", "yAxis": "right", "region": "%REGION%" } ],
+                    [ { "expression": "(1-SDISCOUNT)*((e9*.021) + (e10*.0036))", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "e1", "yAxis": "right", "region": "%REGION%" } ],
+                    [ { "expression": "RUNNING_SUM(e1)", "label": "Total Storage Cost ($ ${MAX})", "id": "e2", "yAxis": "right", "region": "%REGION%" } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "id": "m1", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "SUM([m7,m8])", "label": "STANDARD Snapshot Bytes", "id": "e3", "region": "%REGION%", "visible": false } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "GLACIER", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "id": "m4", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "SUM([m2,m3])", "label": "GLACIER - Snapshot Bytes", "id": "e4", "region": "%REGION%", "visible": false } ],
-                    [ { "expression": ".9095*m4", "label": "Glacier Storage TBytes", "id": "e5" } ],
-                    [ { "expression": ".9095*m1", "label": "Standard Storage TBytes", "id": "e8" } ],
-                    [ { "expression": ".9095*e4", "label": "Glacier Snapshot TBytes", "id": "e6" } ],
-                    [ { "expression": ".9095*e3", "label": "Standard Snapshot TBytes", "id": "e7" } ],
+                    [ { "expression": ".9095*m4", "label": "Glacier TBytes", "id": "e5", "region": "%REGION%" } ],
+                    [ { "expression": ".9095*m1", "label": "Standard TBytes", "id": "e8", "region": "%REGION%" } ],
+                    [ { "expression": ".9095*e4", "label": "Glacier Snapshot TBytes", "id": "e6", "region": "%REGION%" } ],
+                    [ { "expression": ".9095*e3", "label": "Standard Snapshot TBytes", "id": "e7", "region": "%REGION%" } ],
+                    [ { "expression": "m1*9.313e-10/30.4", "label": "GB-Months-Standard", "id": "e9", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "m4*9.313e-10/30.4", "label": "GB-Months-Glacier", "id": "e10", "region": "%REGION%", "visible": false } ],
                     [ "AWS/S3/Storage-Lens", "DeleteMarkerStorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "id": "m7", "region": "%REGION%", "visible": false } ],
                     [ ".", "NonCurrentVersionStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m8", "region": "%REGION%", "visible": false } ],
                     [ ".", "CurrentVersionStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m10", "region": "%REGION%", "visible": false } ],
                     [ ".", "NonCurrentVersionStorageBytes", ".", ".", ".", "GLACIER", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m2", "region": "%REGION%", "visible": false } ],
                     [ ".", "DeleteMarkerStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m3", "region": "%REGION%", "visible": false } ]
                 ],
+                "sparkline": true,
                 "view": "singleValue",
                 "stacked": false,
                 "region": "%REGION%",
