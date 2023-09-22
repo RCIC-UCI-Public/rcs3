@@ -323,10 +323,11 @@ def main(argv):
        sys.exit(-1)
 
     # Build the jobs
-    alljobs = generate(args.jobsfile)
+    # Always backup up the job file (usually ../config/jobs.yaml)
     yamlbackup = backupJob('rcs3config',os.path.dirname(args.jobsfile))
     yamlbackup.includefiles = [os.path.basename(args.jobsfile)]
-    alljobs.extend([yamlbackup])
+    alljobs = [yamlbackup] 
+    alljobs.extend(generate(args.jobsfile))
 
     # Filter the jobs based on optional jobslist argument
     syncjobs = []
@@ -340,7 +341,7 @@ def main(argv):
         topupjobs = list(filter( lambda x: True if x.name in topupjobnames else False, alljobs))
 
     # Always sync the jobs.yaml file
-    syncjobs.append([yamlbackup])
+    syncjobs.extend([yamlbackup])
 
     # Handle non-empty jobslist or a combination of sync/topupjobs 
     if args.joblist != None:

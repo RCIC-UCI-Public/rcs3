@@ -2,7 +2,7 @@
 ## <pattern>/**   recursively excludes subdirectories. See https://rclone.org/filtering/ for pattern matching
 ## 
 ---
-## Common snapshot/cache directories
+## Common snapshot/cache/Trash directories
 - .zfs/**
 - .snapshot/**
 - .vscode/**
@@ -16,6 +16,7 @@
 - .part
 - .tmp
 - .cache/**
+- .Trash*/**
 ## Common Browser Caches
 - Google/Chrome/.*cache.*
 - Google/Chrome/Safe Browsing.*
