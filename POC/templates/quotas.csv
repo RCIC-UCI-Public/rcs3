@@ -1,0 +1,15 @@
+# This file can be processed to set quotas
+# It's format is comma separated value (CSV)
+# Any line that begins with a # is ignored.
+# spaces immediately following , are ignored
+# ID,Systems,Object Quota (Millions), Storage Quota (TB)
+# Header
+ID,SYSTEM,QUOTA_OBJECT,QUOTA_STORAGE
+# Sample quota entry:
+#    owner: panteater 
+#    system: researchdata
+#    objectquota: 2M
+#    storagequota: 7T
+#panteater,researchdata,2,7 
+#            OR
+#panteater, researchdata, 2, 7 

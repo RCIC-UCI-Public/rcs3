@@ -1,0 +1,11 @@
+# This file can be processed to set quotas
+# It's format is comma separated value (CSV)
+# Any line that begins with a # is ignored
+# ID,Systems,Object Quota (Millions), Storage Quota (TB)
+ID,SYSTEM,QUOTA_OBJECT,QUOTA_STORAGE
+cestark, bmc,2,7 
+cestark,fibre-data,12,11
+cestark,hippocampus,30,90
+medhap,rivendell,4,90
+xiangmix,cncm,40,900
+xiangmix,xuisebnas,7,70

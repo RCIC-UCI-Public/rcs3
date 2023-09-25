@@ -4,6 +4,25 @@ import os
 import sys
 import yaml
 import json
+import io
+
+
+class TextIgnoreCommentsWrapper(io.TextIOWrapper):
+    """ Wrap a file to filter out lines STARTING with '#' when reading"""
+    def __init__(self, filename, mode='r', encoding='utf-8'):
+        file = open(filename, mode + 'b')  # Open in binary mode
+        super().__init__(file, encoding=encoding)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        line = super().readline()
+        while line and line.startswith("#"):
+            line = super().readline()
+        if not line:
+            raise StopIteration
+        return line
 
 def read_aws_settings(settings=None,configdir=None):
     """return a dictionary of aws-settings"""
@@ -34,4 +53,6 @@ def replace_all(text, dic):
     for target in dic.keys():
         text = text.replace(target, dic[target])
     return text
+
+
 
