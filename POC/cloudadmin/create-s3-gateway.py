@@ -30,6 +30,25 @@ else:
 
 ec2 = session.client( "ec2" )
 
+# special case, use the default VPC and the program looks up the Id
+if args.vpcid == "default":
+    response = ec2.describe_vpcs(
+        Filters=[
+            {
+                "Name": "is-default",
+                "Values": [ "true" ]
+            }
+        ]
+    )
+    vpc_info = response[ "Vpcs" ]
+    if vpc_info:
+        args.vpcid = vpc_info[0][ "VpcId" ]
+        if args.verbose:
+            print( args.vpcid )
+    else:
+        print( "Default VPC not defined." )
+        sys.exit( -1 )
+
 # retrieve the route table id, needed for creating the S2 gateway
 response = ec2.describe_route_tables(
     Filters=[
@@ -39,9 +58,14 @@ response = ec2.describe_route_tables(
         }
     ]
 )
-rt_id = response[ "RouteTables" ][0][ "RouteTableId" ]
-if args.verbose:
-    print( rt_id )
+route_table_info = response[ "RouteTables" ]
+if route_table_info:
+    rt_id = route_table_info[0][ "RouteTableId" ]
+    if args.verbose:
+        print( rt_id )
+else:
+    print( "No VPC or route table for {}".format( args.vpcid ) )
+    sys.exit( -1 )
 
 # create the S3 gateway within the VPC
 response = ec2.create_vpc_endpoint(
