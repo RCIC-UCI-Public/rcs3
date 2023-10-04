@@ -1,0 +1,64 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "information",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeIamInstanceProfileAssociations",
+                "ec2:DescribeInstanceAttribute",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceStatus",
+                "ec2:ReportInstanceStatus"
+            ],
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*"
+        },
+        {
+            "Sid": "tagging",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateTags"
+            ]
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*",
+            "Condition": {
+                "StringEquals": {
+                    "ec2:CreateAction": "RunInstances"
+                }
+            }
+        },
+        {
+            "Sid": "profile",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AssociateIamInstanceProfile"
+            ],
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*",
+            "Condition": {
+                "ArnEqualsIfExists": {
+                    "ec2:InstanceProfile": [
+                        "arn:aws:iam::774954368688:instance-profile/lopez-fedaykin-restore"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "restrict",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:ModifyInstanceAttribute",
+                "ec2:RunInstances"
+            ],
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*",
+            "Condition": {
+                "StringEqualsIfExists": {
+                    "ec2:InstanceType": [
+                        "t2.micro"
+                    ],
+                    "aws:Requestedregion": [
+                        "us-west-2"
+                    ]
+                }
+            }
+        }
+    ]
+}
