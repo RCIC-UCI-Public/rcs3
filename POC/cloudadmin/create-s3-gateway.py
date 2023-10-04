@@ -77,7 +77,7 @@ response = ec2.create_vpc_endpoint(
             "Tags": [
                 {
                     "Key": "Name",
-                    "Value": "s3-endpoint-vpc-{}".format( args.vpcid )
+                    "Value": "s3-endpoint-{}".format( args.vpcid )
                 }
             ]
         }
@@ -85,3 +85,5 @@ response = ec2.create_vpc_endpoint(
 )
 if args.verbose:
     print( response )
+print( "Add this VPC endpoint id to your permissions policies:" )
+print( response[ "VpcEndpoint" ][ "VpcEndpointId" ] )
