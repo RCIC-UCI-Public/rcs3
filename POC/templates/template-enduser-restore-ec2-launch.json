@@ -11,15 +11,15 @@
                 "ec2:DescribeInstanceStatus",
                 "ec2:ReportInstanceStatus"
             ],
-            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*"
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountidxxx:*/*"
         },
         {
             "Sid": "tagging",
             "Effect": "Allow",
             "Action": [
                 "ec2:CreateTags"
-            ]
-            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*",
+            ],
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountidxxx:*/*",
             "Condition": {
                 "StringEquals": {
                     "ec2:CreateAction": "RunInstances"
@@ -32,7 +32,7 @@
             "Action": [
                 "ec2:AssociateIamInstanceProfile"
             ],
-            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*",
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountidxxx:*/*",
             "Condition": {
                 "ArnEqualsIfExists": {
                     "ec2:InstanceProfile": [
@@ -48,7 +48,7 @@
                 "ec2:ModifyInstanceAttribute",
                 "ec2:RunInstances"
             ],
-            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountxxx:*/*",
+            "Resource": "arn:aws:ec2:xxxregionxxx:xxxaccountidxxx:*/*",
             "Condition": {
                 "StringEqualsIfExists": {
                     "ec2:InstanceType": [
