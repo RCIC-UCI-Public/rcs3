@@ -15,7 +15,7 @@ import transform
 with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
-usage=""
+usage="Create and attach a policy to the service account to allow the launch of EC2 instances based on a pre-defined policy template."
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
