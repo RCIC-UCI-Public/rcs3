@@ -21,7 +21,7 @@ def make_tags( u, h ):
     return tag_spec
 
 
-with open( config/aws-settings.yaml", "r" ) as f:
+with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 usage="Allow the user to launch an EC2 instance for self-service restores from S3 Glacier"
