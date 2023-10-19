@@ -2,15 +2,13 @@
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "WriteBackup",
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",
                 "s3:ListBucketMultipartUploads",
                 "s3:ListBucketVersions",
-                "s3:ListJobs",
                 "s3:ListMultipartUploadParts",
-                "s3:DescribeJob",
-                "s3:GetAccountPublicAccessBlock",
                 "s3:GetBucketAcl",
                 "s3:GetBucketNotification",
                 "s3:GetBucketLocation",
@@ -18,7 +16,6 @@
                 "s3:GetBucketObjectLockConfiguration",
                 "s3:GetBucketPolicy",
                 "s3:GetBucketVersioning",
-                "s3:GetBucketPublicAccessBlock",
                 "s3:GetBucketPolicyStatus",
                 "s3:GetEncryptionConfiguration",
                 "s3:GetLifecycleConfiguration",
@@ -31,7 +28,6 @@
                 "s3:GetObjectVersionAttributes",
                 "s3:GetObjectVersionTagging",
                 "s3:AbortMultipartUpload",
-                "s3:CreateJob",
                 "s3:DeleteObject",
                 "s3:PutObject",
                 "s3:PutObjectAcl"
@@ -41,27 +37,19 @@
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
             ],
             "Condition": {
-                "Bool": {"aws:ViaAWSService": "false"},
-                "IpAddress": {
-                    "aws:SourceIp": [
-                        "128.200.0.0/16",
-                        "128.195.0.0/16",
-                        "192.5.19.0/24"
-                    ]
-                }
+                xxxiprestrictionsxxx
             }
         },
         {
+            "Sid": "ReadInventory",
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",
-                "s3:GetAccountPublicAccessBlock",
                 "s3:GetBucketAcl",
                 "s3:GetBucketNotification",
                 "s3:GetBucketLocation",
                 "s3:GetBucketLogging",
                 "s3:GetBucketPolicy",
-                "s3:GetBucketPublicAccessBlock",
                 "s3:GetBucketPolicyStatus",
                 "s3:GetEncryptionConfiguration",
                 "s3:GetObject",
@@ -73,82 +61,54 @@
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx/*"
             ],
             "Condition": {
-                "Bool": {"aws:ViaAWSService": "false"},
-                "IpAddress": {
-                    "aws:SourceIp": [
-                        "128.200.0.0/16",
-                        "128.195.0.0/16",
-                        "192.5.19.0/24"
+                xxxiprestrictionsxxx
+            }
+        },
+        {
+            "Sid": "ListAllBuckets",
+            "Effect": "Allow",
+            "Action": "s3:ListAllMyBuckets",
+            "Resource": "*",
+            "Condition": {
+                xxxiprestrictionsxxx
+            }
+        },
+        {
+            "Sid": "ViewPersonalFolder",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::xxxreportsxxx"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "s3:prefix": [
+                        "xxxuserxxx",
+                        "xxxuserxxx/"
+                    ],
+                    "s3:delimiter": [
+                        "/"
                     ]
-                }
+                },
+                xxxiprestrictionsxxx
             }
         },
         {
+            "Sid": "AddFileToPersonalFolder",
             "Effect": "Allow",
             "Action": [
                 "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-                "s3:ListBucketVersions",
-                "s3:ListJobs",
-                "s3:ListMultipartUploadParts",
-                "s3:DescribeJob",
-                "s3:GetAccountPublicAccessBlock",
-                "s3:GetBucketAcl",
-                "s3:GetBucketNotification",
-                "s3:GetBucketLocation",
-                "s3:GetBucketLogging",
-                "s3:GetBucketObjectLockConfiguration",
-                "s3:GetBucketPolicy",
-                "s3:GetBucketVersioning",
-                "s3:GetBucketPublicAccessBlock",
-                "s3:GetBucketPolicyStatus",
-                "s3:GetEncryptionConfiguration",
-                "s3:GetLifecycleConfiguration",
                 "s3:GetObject",
-                "s3:GetObjectAcl",
-                "s3:GetObjectAttributes",
-                "s3:GetObjectRetention",
-                "s3:GetObjectVersion",
-                "s3:GetObjectVersionAcl",
-                "s3:GetObjectVersionAttributes",
-                "s3:GetObjectVersionTagging",
-                "s3:AbortMultipartUpload",
-                "s3:CreateJob",
-                "s3:DeleteObject",
                 "s3:PutObject",
-                "s3:PutObjectAcl"
+                "s3:DeleteObject"
             ],
             "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx",
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
+                "arn:aws:s3:::xxxreportsxxx/xxxuserxxx/*"
             ],
-            "Condition": {
-                "Bool": {"aws:ViaAWSService": "true"}
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListBucket",
-                "s3:GetAccountPublicAccessBlock",
-                "s3:GetBucketAcl",
-                "s3:GetBucketNotification",
-                "s3:GetBucketLocation",
-                "s3:GetBucketLogging",
-                "s3:GetBucketPolicy",
-                "s3:GetBucketPublicAccessBlock",
-                "s3:GetBucketPolicyStatus",
-                "s3:GetEncryptionConfiguration",
-                "s3:GetObject",
-                "s3:GetObjectAcl",
-                "s3:GetObjectAttributes"
-            ],
-            "Resource": [
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
-                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx/*"
-            ],
-            "Condition": {
-                "Bool": {"aws:ViaAWSService": "true"}
+            "Condition": { 
+                xxxiprestrictionsxxx
             }
         }
     ]
