@@ -30,3 +30,18 @@ def template_to_string(tname, mytable ):
     for k in mytable.keys():
         tf = tf.replace( k, mytable[ k ] )
     return tf
+
+
+# create condition statement for policy from supplied list of IP addresses
+# "IpAddress": { "aws:SourceIp": [ "d.d.d.d/d", "d.d.d.d/d" ] }
+def createPolicyIpCondition( ipList ):
+    condPrefix = "\"IpAddress\": { \"aws:SourceIp\": [ \""
+    count = 0
+    for ip in ipList:
+        if count > 0:
+            condPrefix += "\", \""
+        condPrefix += ip
+        count += 1
+    condPrefix += "\" ] }"
+    return condPrefix
+
