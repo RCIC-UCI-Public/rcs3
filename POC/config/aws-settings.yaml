@@ -29,6 +29,13 @@ vpcid: "vpc-dddddddddd"
 keypair: "admin-ssh"
 storagegateway: "vpce-dddddddddd"
 
+# 6. Restrict service accounts to specific array of IP addresses using
+# condition statments in policy definiations. Expected format is d.d.d.d/d
+iprestrictions:
+  - "128.200.0.0/16"
+  - "128.195.0.0/16"
+  - "192.5.19.0/24"
+
 #@@@@----------------------------------------------------@@@@
 ### Following should not be changed localization ###
 outputdir: "outputs/"
