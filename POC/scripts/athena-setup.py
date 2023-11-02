@@ -13,7 +13,7 @@ with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage="Create Athena workgroup, database, and load external schema into table based on user and host"
+usage="Create Athena database, and load external schema into table based on user and host"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -39,9 +39,12 @@ if "profile" in aws:
 else:
     session = boto3
 
-s3 = session.client( "s3" )
+if "region" in aws:
+    s3 = session.client( "s3", region_name=aws[ "region" ] )
+else:
+    s3 = session.client( "s3" )
 # verify that bucket exists, ignore response, catch exception
-bucketname="{}-{}-uci-inventory".format( args.user, args.host )
+bucketname="{}-{}-{}".format( args.user, args.host, aws[ "inventory_postfix" ] )
 try:
     s3.head_bucket( Bucket=bucketname )
 except s3.exceptions.ClientError:
@@ -51,7 +54,7 @@ except s3.exceptions.ClientError:
 if args.inventorydir:
     hivedir = args.inventorydir
 else:
-    hivedir = "{0}-{1}-uci-bkup-bucket/{0}-{1}-daily/hive/dt={2}-01-00/".format( args.user, args.host, str(datetime.date.today()) )
+    hivedir = "{0}-{1}-{3}/{0}-{1}-daily/hive/dt={2}-01-00/".format( args.user, args.host, str(datetime.date.today()), aws[ "bucket_postfix" ] )
 hivesym = "{}symlink.txt".format( hivedir )
 try:
     s3.head_object(
@@ -62,22 +65,11 @@ except s3.exceptions.ClientError:
     print( "No key: {}".format( hivesym ) )
     sys.exit(1)
 
-athena = session.client( "athena" )
-# create the work group, okay if already exists
-try:
-    response = athena.create_work_group(
-        Name=args.user,
-        Configuration={
-            'ResultConfiguration': {
-                'OutputLocation': "{}/{}".format( aws[ "reports" ], args.user )
-            },
-            'EnforceWorkGroupConfiguration': False,
-            'PublishCloudWatchMetricsEnabled': True
-        }
-    )
-except athena.exceptions.InvalidRequestException:
-    pass    
-
+if "region" in aws:
+    athena = session.client( "athena", region_name=aws[ "region" ] )
+else:
+    athena = session.client( "athena" )
+# assumes Athena workgroup created earlier by cloudadmin
 query_list =[]
 # create database in default collection
 response = athena.start_query_execution( 
