@@ -62,7 +62,10 @@ except IOError:
     print( "could not read file: {}".format( args.idsfile ) )
     sys.exit(-1)
 
-athena_client = session.client( "athena" )
+if "region" in aws:
+    athena_client = session.client( "athena", region_name=aws[ "region" ] )
+else:
+    athena_client = session.client( "athena" )
 while len( listrunning ) > 0:
     for jobid in listrunning:
         if args.verbose:
