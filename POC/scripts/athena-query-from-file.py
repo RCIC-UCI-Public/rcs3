@@ -40,8 +40,11 @@ else:
 
 try:
     with open( args.queryfile ) as fp:
-        athena = session.client( "athena" )
-        bucket = "{}-{}-uci-bkup-bucket".format( args.user, args.host )
+        if "region" in aws:
+            athena = session.client( "athena", region_name=aws[ "region" ] )
+        else:
+            athena = session.client( "athena" )
+        bucket = "{}-{}-{}".format( args.user, args.host, aws[ "bucket_postfix" ] )
         for filename in fp:
             query = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and storage_class like 'GLACIER'{};"\
                 .format( bucket, args.host, filename.strip(), limits )
