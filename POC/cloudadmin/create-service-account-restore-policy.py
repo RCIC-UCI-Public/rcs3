@@ -50,8 +50,8 @@ if not os.path.isfile( input_template ):
 my_vars = {
     "xxxuserxxx": args.user,
     "xxxhostxxx": args.host,
-    "xxxbucketxxx": args.user + "-" + args.host + "-" + aws[ "bucket_postfix" ],
-    "xxxinventoryxxx": args.user + "-" + args.host + "-" + aws[ "inventory_postfix" ],
+    "xxxbucketxxx": aws[ "bucket_postfix" ],
+    "xxxinventoryxxx": aws[ "inventory_postfix" ],
     "xxxreportsxxx": aws[ "reports" ].removeprefix( "s3://"),
     "xxxs3endpointxxx": aws[ "storagegateway" ],
     "xxxaccountidxxx": aws[ "accountid" ],
