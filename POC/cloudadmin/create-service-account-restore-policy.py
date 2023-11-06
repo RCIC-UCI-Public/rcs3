@@ -23,8 +23,6 @@ p.add_argument( "host",
         help="hostname" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
-p.add_argument( "-d", "--delete", action="store_true",
-        help="delete oldest policy version, otherwise error if 5 exist." )
 args = p.parse_args()
 
 # override location of .aws/config
@@ -64,19 +62,25 @@ json_policy = transform.template_to_string( input_template, my_vars )
 try:
     policy_arn = "arn:aws:iam::{}:policy/{}-{}-policy"\
         .format( aws[ "accountid" ], args.user, args.host )
-    if args.delete:
-        response = iam.list_policy_versions( PolicyArn=policy_arn )
-        if len( response[ "Versions" ] ) > 4:
-            vid = response[ "Versions" ][ 4 ][ "VersionId" ]
-            response = iam.delete_policy_version( PolicyArn=policy_arn, VersionId=vid )
+    response = iam.list_policy_versions( PolicyArn=policy_arn )
+    if args.verbose:
+        print( response )
+    if len( response[ "Versions" ] ) > 4:
+        vid = response[ "Versions" ][ 4 ][ "VersionId" ]
+        response = iam.delete_policy_version( PolicyArn=policy_arn, VersionId=vid )
     response = iam.create_policy_version(
         PolicyArn=policy_arn,
         PolicyDocument=json_policy,
         SetAsDefault=True
     )
-except iam.exceptions.LimitExceededException:
-    print( "Max version exceeded. Re-run with \"-d\" to remove oldest version" )
-    sys.exit( -1 )
+except iam.exceptions.NoSuchEntityException:
+    print( "Creating policy: {}".format( policy_arn ) )
+    try:
+        response = client.create_policy(
+            PolicyName="{}-{}-policy".format( args.user, args.host ),
+            PolicyDocument=json_policy,
+            Description="Allow EC2 instance to restore {}-{}-{}".format( args.user, args.host, aws[ "bucket_postfix" ] )
+        )
 except Exception as error:
     print( type(error).__name__ )
     print( error )
