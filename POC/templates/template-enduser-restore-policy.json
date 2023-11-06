@@ -36,14 +36,7 @@
             "Resource": [
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx",
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
-            ],
-            "Condition": {
-                "StringEquals": {
-                    "aws:SourceVpce": [
-                        "xxxs3endpointxxx"
-                    ]
-                }
-            }
+            ]
         },
         {
             "Sid": "inventory",
@@ -64,32 +57,31 @@
             "Resource": [
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx/*"
-            ],
-            "Condition": {
-                "StringEquals": {
-                    "aws:SourceVpce": [
-                        "xxxs3endpointxxx"
-                    ]
-                }
-            }
+            ]
         },
         {
             "Sid": "reports",
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucket"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::xxxreportsxxx"
+            ]
+        },
+        {
+            "Sid": "AllowWrite2UserFolder",
             "Effect": "Allow",
             "Action": [
+                "s3:ListBucket",
                 "s3:GetObject",
-                "s3:PutObject"
+                "s3:PutObject",
+                "s3:DeleteObject"
             ],
             "Resource": [
                 "arn:aws:s3:::xxxreportsxxx/xxxuserxxx/*"
-            ],
-            "Condition": {
-                "StringEquals": {
-                    "aws:SourceVpce": [
-                        "xxxs3endpointxxx"
-                    ]
-                }
-            }
+            ]
         },
         {
             "Sid": "S3BatchJobPermissions",
@@ -103,14 +95,7 @@
             ],
             "Resource": [
                 "*"
-            ],
-            "Condition": {
-                "StringEquals": {
-                    "aws:SourceVpce": [
-                        "xxxs3endpointxxx"
-                    ]
-                }
-            }
+            ]
         }
     ]
 }
