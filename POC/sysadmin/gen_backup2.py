@@ -295,11 +295,15 @@ class restoreJob(backupJob):
        super().__init__(name, archivepath)
        self._archivepath=archivepath
        self._mode = "copy"
+       self._excludeMetadata = ["--metadata-exclude", "tier=GLACIER"]
 
     def _syncdirection(self,sync,endpoint):
         """ Restore from remote to remote """
         # sync is based on mode in job (defaults to copy) 
-        return([self._mode,"%s:%s" % (endpoint,self._archivepath),self._destpath])
+        rval = []
+        rval.extend(self._excludeMetadata)
+        rval.extend([self._mode,"%s:%s" % (endpoint,self._archivepath),self._destpath])
+        return rval
 
 ## *****************************
 ## main routine
