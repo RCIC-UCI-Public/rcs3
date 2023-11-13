@@ -1,0 +1,14 @@
+## This is a sample jobs.yaml the defines four backup jobs on a single path
+## Job names must be distinct (not checked, yet)
+## Path is commmon to the jobs relative to the path
+---
+srcpaths:
+- archivepath: pub-all/dfs8/pub/ppapadop
+  exclude_file: common_excludes.yaml
+  jobs:
+    - name: testdir 
+      destpath: /tmp/ppapadop
+      files:
+        - "testdir/*.amb"
+        - "testdir/*.ann"
+      mode: sync
