@@ -65,7 +65,9 @@ class backupJob(object):
         self._filterfile = "/tmp/%s.filter" % name
         self._threads = 2
         self._checkers = 32
+        self._timestamp = None
         self._cmd = list()
+        self._extra = list()
 
     ## Standard Setters and Getters for various components of a backup job object
     @property
@@ -145,6 +147,30 @@ class backupJob(object):
         self._checkers = value 
 
     @property
+    def timestamp(self):
+        return self._timestamp
+
+    @timestamp.setter
+    def timestamp(self,value):
+        """Set timestamp if of correct format"""
+        r = re.compile('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[A-Z]')
+        if r.match(value) is not None:
+            self._timestamp = value 
+        else:
+            sys.stderr.write("invalid timestamp format (%s). Exiting\n" % value)
+            sys.exit(-1)
+
+  
+    @property
+    def extra(self):
+        return self._extra
+
+    @extra.setter
+    def extra(self,value):
+        """Set Rclone extra arguments"""
+        self._extra = re.split('\s+',value)
+
+    @property
     def cmd(self):
         return self._cmd
         
@@ -195,6 +221,7 @@ class backupJob(object):
         """ Default is backup from host to remote """
         # sync is of type [] in backup
         rval = [x for x in sync]
+        rval.extend(self.extra)
         rval.extend([self._path,"%s:%s%s" % (endpoint,self._destprefix,self._destpath)])
         return rval
 
@@ -295,13 +322,14 @@ class restoreJob(backupJob):
        super().__init__(name, archivepath)
        self._archivepath=archivepath
        self._mode = "copy"
-       self._excludeMetadata = ["--metadata-exclude", "tier=GLACIER"]
 
     def _syncdirection(self,sync,endpoint):
         """ Restore from remote to remote """
+        rval = [x for x in self.extra]
+        # If timestamp is set, use it 
+        if self.timestamp is not None:
+            rval.extend(["--s3-version-at",self.timestamp])
         # sync is based on mode in job (defaults to copy) 
-        rval = []
-        rval.extend(self._excludeMetadata)
         rval.extend([self._mode,"%s:%s" % (endpoint,self._archivepath),self._destpath])
         return rval
 
@@ -324,10 +352,12 @@ def main(argv):
     helpjobsfile = "Override the default jobs file (%s). Example: --yaml=testjobs.yaml\n" % jobdefault
 
     helpendpoint = "Override the default backup rclone endpoint( s3-backup )\n"
+    helptimestamp = "Restore based upon state at particular time. Format: 2023-09-24T12:00:00Z (Year-Month-Day(T)hour:minute:second(Zone). Use Z for Zulu (GMT) time. Default: None (most recent)"
 
     helpjob = "comma-separated list of job names to run, list, etc. \n"
     helpsyncjob = "comma separated list of sync jobs to run. Cannot set both jobs and syncjobs"
     helptopupjob = "comma separated list of top-up jobs to run. Cannot set both jobs and topupjobs"
+    helpextra = "extra rclone arguments. Quote arguments. Example: '--metadata-exclude tier=GLACIER'. Default: None"
     ## Define command-line parser
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter,allow_abbrev=True)
     # optional arguments
@@ -337,7 +367,9 @@ def main(argv):
     parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
     parser.add_argument("-j", "--jobs",   dest="joblist",  default=None,help=helpjob)
+    parser.add_argument("-x", "--extra",   dest="xrclone",  default=None,help=helpextra)
     parser.add_argument("-R", "--restore",   dest="restore",  default=False, action='store_true',help="Restore instead of backup")
+    parser.add_argument("-S", "--timestamp", dest="timestamp",  default=None,help=helptimestamp)
     parser.add_argument("--sync-jobs",   dest="syncjobs",  default=None,help=helpsyncjob)
     parser.add_argument("--topup-jobs",   dest="topupjobs",  default=None,help=helptopupjob)
     parser.add_argument("-p", "--parallel",   dest="parallel",  default=2,help="how many backup jobs to run in parallel (2)")
@@ -374,6 +406,13 @@ def main(argv):
        mode = restoreJob('notused','notused')
        
     alljobs.extend(mode.generate(args.jobsfile))
+    if args.timestamp is not None:
+       for job in alljobs:
+           job.timestamp = args.timestamp
+
+    if args.xrclone is not None:
+       for job in alljobs:
+           job.extra = args.xrclone
 
     # Filter the jobs based on optional jobslist argument
     syncjobs = []
