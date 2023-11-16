@@ -75,12 +75,11 @@ try:
     )
 except iam.exceptions.NoSuchEntityException:
     print( "Creating policy: {}".format( policy_arn ) )
-    try:
-        response = client.create_policy(
-            PolicyName="{}-{}-policy".format( args.user, args.host ),
-            PolicyDocument=json_policy,
-            Description="Allow EC2 instance to restore {}-{}-{}".format( args.user, args.host, aws[ "bucket_postfix" ] )
-        )
+    response = iam.create_policy(
+        PolicyName="{}-{}-policy".format( args.user, args.host ),
+        PolicyDocument=json_policy,
+        Description="Allow EC2 instance to restore {}-{}-{}".format( args.user, args.host, aws[ "bucket_postfix" ] )
+    )
 except Exception as error:
     print( type(error).__name__ )
     print( error )
