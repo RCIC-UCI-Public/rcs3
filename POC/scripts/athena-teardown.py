@@ -30,7 +30,10 @@ if "profile" in aws:
 else:
     session = boto3
 
-athena_client = session.client( "athena" )
+if "region" in aws:
+    athena_client = session.client( "athena", region_name=aws[ "region" ] )
+else:
+    athena_client = session.client( "athena" )
 # drop table
 response = athena_client.start_query_execution( 
     QueryString="drop table if exists {}".format( args.host ),
