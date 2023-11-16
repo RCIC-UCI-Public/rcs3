@@ -1,0 +1,36 @@
+{
+    "Version":"2012-10-17",
+    "Statement":[
+        {
+            "Sid": "target",
+            "Effect":"Allow",
+            "Action":[
+                "s3:RestoreObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
+            ]
+        },
+        {
+            "Sid": "manifest",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:GetObjectVersion"
+            ],
+            "Resource": [
+                "arn:aws:s3:::xxxreportsxxx/xxxuserxxx/*"
+            ]
+        },
+        {
+            "Sid": "reports",
+            "Effect":"Allow",
+            "Action":[
+                "s3:PutObject"
+            ],
+            "Resource":[
+                "arn:aws:s3:::xxxreportsxxx/xxxuserxxx/*"
+            ]
+        }
+    ]
+}
