@@ -122,7 +122,7 @@ try:
                     Manifest=man_dict,
                     Description="restore from glacier for {} {}".format( args.user, args.host ),
                     Priority=0,
-                    RoleArn="arn:aws:iam::774954368688:role/read-restore-all-buckets-role",
+                    RoleArn="arn:aws:iam::{}:role/{}-{}-restore".format( aws[ "accountid" ], args.user, args.host ),
                     Tags=tag_list
                 )
                 if args.verbose:
