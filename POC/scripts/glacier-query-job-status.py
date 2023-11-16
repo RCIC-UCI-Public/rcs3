@@ -63,7 +63,10 @@ except IOError:
     print( "could not read file: {}".format( args.idsfile ) )
     sys.exit(-1)
 
-s3c = session.client( "s3control" )
+if "region" in aws:
+    s3c = session.client( "s3control", region_name=aws[ "region" ] )
+else:
+    s3c = session.client( "s3control" )
 while len( listrunning ) > 0:
     for jobid in listrunning:
         if args.verbose:
@@ -108,7 +111,10 @@ if args.verbose:
     print( sns_message )
 
 if send:
-    sns = session.client( "sns" )
+    if "region" in aws:
+        sns = session.client( "sns", region_name=aws[ "region" ] )
+    else:
+        sns = session.client( "sns" )
     try:
         response = sns.publish(
             TopicArn=results,

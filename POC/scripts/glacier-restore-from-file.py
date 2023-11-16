@@ -81,8 +81,12 @@ else:
 
 try:
     with open( args.objfile ) as fp:
-        s3 = session.client( "s3" )
-        s3c = session.client( "s3control" )
+        if "region" in aws:
+            s3 = session.client( "s3", region_name=aws[ "region" ] )
+            s3c = session.client( "s3control", region_name=aws[ "region" ] )
+        else:
+            s3 = session.client( "s3" )
+            s3c = session.client( "s3control" )
         for rawobj in fp:
             obj = rawobj.strip()
             if args.verbose:
