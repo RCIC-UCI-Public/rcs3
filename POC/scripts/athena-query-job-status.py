@@ -4,6 +4,7 @@ import argparse
 import boto3
 import os
 import sys
+import time
 import yaml
 
 with open( "config/aws-settings.yaml", "r" ) as f:
