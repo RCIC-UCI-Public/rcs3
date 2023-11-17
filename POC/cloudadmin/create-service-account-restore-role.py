@@ -12,15 +12,17 @@ basedir = os.path.dirname( execdir )
 sys.path.append( basedir  + "/common" )
 import transform
 
-with open( "config/aws-settings.yaml", "r" ) as f:
+with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
-usage="Create and attach a policy to an EC2 instance with access to specific resources."
+usage="Create role by attaching trust relationship to existing policy."
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
 p.add_argument( "host",
         help="hostname" )
+p.add_argument( "purpose",
+        help="which trust relationship to apply" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
@@ -41,7 +43,7 @@ else:
     iam = session.client( "iam" )
 
 # load the template which allows launching EC2 instance
-input_template = basedir + "/templates/template-enduser-restore-trust.json"
+input_template = basedir + "/templates/template-service-account-{}-trust.json".format( args.purpose )
 if not os.path.isfile( input_template ):
     print( "Not found: {}".format( input_template ) )
     sys.exit( -1 )
@@ -52,15 +54,15 @@ with open( input_template, "r" ) as fp:
 # test if bucket exists in case of typo on the command line
 # test if user policy exists
 
-# create the EC2 policy or lookup an existing policy
+# lookup an existing policy
 try:
-    policy_arn = "arn:aws:iam::{}:policy/{}-{}-policy"\
-        .format( aws[ "accountid" ], args.user, args.host )
-    role_name = "{}-{}-restore".format( args.user, args.host )
+    policy_arn = "arn:aws:iam::{}:policy/{}-{}-{}-policy"\
+        .format( aws[ "accountid" ], args.user, args.host, args.purpose )
+    role_name = "{}-{}-{}-role".format( args.user, args.host, args.purpose )
     response = iam.create_role(
         RoleName=role_name,
         AssumeRolePolicyDocument=json_policy,
-        Description="Allow EC2 instance to process Glacier restore requests for {} {}".format( args.user, args.host )
+        Description="Allow {} to process requests for {} {}".format( args.purpose, args.user, args.host )
     )
     if args.verbose:
         print( response )
