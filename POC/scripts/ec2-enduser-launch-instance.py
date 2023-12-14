@@ -67,7 +67,9 @@ response = ec2.run_instances(
   NetworkInterfaces= [
     {
       "AssociatePublicIpAddress": True,
-      "DeviceIndex": 0
+      "DeviceIndex": 0,
+      "Groups": [ aws[ "securitygroupid" ] ],
+      "SubnetId": aws[ "subnetid" ]
     }
   ],
   TagSpecifications= make_tags( args.user, args.host ),

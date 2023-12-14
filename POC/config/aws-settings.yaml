@@ -26,6 +26,8 @@ owner_notify: "uci-notify"
 instancetype: "t2.micro"
 ami: "ami-dddddddddd"
 vpcid: "vpc-dddddddddd"
+subnetid: "subnet-xxxxxxxxxxx"
+securitygroupid: "sg-xxxxxxxxxxx"
 keypair: "admin-ssh"
 storagegateway: "vpce-dddddddddd"
 
