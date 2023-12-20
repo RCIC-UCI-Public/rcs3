@@ -122,7 +122,7 @@ try:
                     Manifest=man_dict,
                     Description="restore from glacier for {} {}".format( args.user, args.host ),
                     Priority=0,
-                    RoleArn="arn:aws:iam::{}:role/{}-{}-restore".format( aws[ "accountid" ], args.user, args.host ),
+                    RoleArn="arn:aws:iam::{}:role/{}-{}-restore-s3batch-perms-role".format( aws[ "accountid" ], args.user, args.host ),
                     Tags=tag_list
                 )
                 if args.verbose:
