@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/bin/env python3
 """ Localize the rclone and credentials for the particular system """
 
 import argparse

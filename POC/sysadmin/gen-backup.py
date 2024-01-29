@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/bin/env python3
 # Generate rclone synchronization command lines based on yaml-formatted jobs files 
 # Author: Philip Papadopoulos (ppapadop@uci.edu)
 # (C) UC Regents 2023
