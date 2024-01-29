@@ -28,8 +28,8 @@ class runBackup(object):
         process.wait()
         return job.name
 
-    def __init__(self,alljobs,parallel=2):
-        self._lockfile = "/var/lock/gen-backup.lock"
+    def __init__(self,alljobs,parallel=2,lockfile="/var/lock/gen-backup.lock"):
+        self._lockfile = lockfile 
         self._alljobs = alljobs
         self._parallel = parallel
 
@@ -65,7 +65,10 @@ class backupJob(object):
         self._filterfile = "/tmp/%s.filter" % name
         self._threads = 2
         self._checkers = 32
+        self._timestamp = None
         self._cmd = list()
+        self._extra = list()
+        self._rclonecmd = "rclone"
 
     ## Standard Setters and Getters for various components of a backup job object
     @property
@@ -145,6 +148,39 @@ class backupJob(object):
         self._checkers = value 
 
     @property
+    def timestamp(self):
+        return self._timestamp
+
+    @timestamp.setter
+    def timestamp(self,value):
+        """Set timestamp if of correct format"""
+        r = re.compile('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[A-Z]')
+        if r.match(value) is not None:
+            self._timestamp = value 
+        else:
+            sys.stderr.write("invalid timestamp format (%s). Exiting\n" % value)
+            sys.exit(-1)
+
+  
+    @property
+    def extra(self):
+        return self._extra
+
+    @property
+    def rclonecmd(self):
+        return self._rclonecmd
+
+    @extra.setter
+    def rclonecmd(self,value):
+        """Set Rclone cmd to override ENV """
+        self._rclonecmd = value 
+
+    @extra.setter
+    def extra(self,value):
+        """Set Rclone extra arguments"""
+        self._extra = re.split('\s+',value)
+
+    @property
     def cmd(self):
         return self._cmd
         
@@ -183,15 +219,21 @@ class backupJob(object):
         confcred = ["--config", rclone_config, "--s3-shared-credentials-file",credentials]
  
         # build the command in pieces
-        self._cmd=["rclone"]
+        self._cmd = [ self._rclonecmd ]
         self._cmd.extend(confcred)
         self._cmd.extend(rc_global)
         if not baseonly:
             self._cmd.extend(logarg)
             self._cmd.extend(filefilter)
-            self._cmd.extend(sync)
-            self._cmd.extend([self._path])
-            self._cmd.extend(["%s:%s%s" % (endpoint,self._destprefix,self._destpath)])
+            self._cmd.extend(self._syncdirection(sync,endpoint))
+
+    def _syncdirection(self,sync,endpoint):
+        """ Default is backup from host to remote """
+        # sync is of type [] in backup
+        rval = [x for x in sync]
+        rval.extend(self.extra)
+        rval.extend([self._path,"%s:%s%s" % (endpoint,self._destprefix,self._destpath)])
+        return rval
 
     def _build_filters(self):
         self._filters=list()
@@ -204,69 +246,102 @@ class backupJob(object):
         # catchall to exclude anything else not explicitly included or excluded above
         self._filters.extend(["- **\n"])
 
-def generate(jobsfile):
-    """ returns a list of backupJobs objects """ 
-
-    alljobs = [] 
-    jobscriptdir=os.path.realpath(os.path.dirname(jobsfile))
-
-    with open( jobsfile, "r" ) as f:
-        jobdefs = yaml.safe_load( f )
+    def generate(self,jobsfile):
+        """ returns a list of backupJobs (or restoreJob) objects """ 
     
-    for paths in jobdefs['srcpaths']:
-        path=paths['path']
-        try:
-            excludes=paths['exclude_global']
-        except:
-            excludes=list()
+        alljobs = [] 
+        jobscriptdir=os.path.realpath(os.path.dirname(jobsfile))
+    
+        with open( jobsfile, "r" ) as f:
+            jobdefs = yaml.safe_load( f )
+        
+        for paths in jobdefs['srcpaths']:
+            # Can read path or archivepath. Archivepath is a syntactic-sugar for restore jobs
+            try:
+                path=paths['path']
+            except:
+                path = None
+            try:
+                archivepath=paths['archivepath']
+                path = archivepath
+            except:
+                pass
 
-        # Read common excludes from a file (must be in the same subdir as the jobs file)
-        # exclude_file=os.path.normpath(os.path.join(jobscriptdir, paths['exclude_file']))
-        try:
-            exclude_file=os.path.normpath(os.path.join(jobscriptdir, paths['exclude_file']))
-            with open( exclude_file,'r') as ef:
-                excludes_in_file = yaml.safe_load(ef)
-                excludes.extend(excludes_in_file)
-        except KeyError as e:
-            pass 
-                  
-        for jobs in paths['jobs']:
-           bupJob = backupJob(jobs['name'],path)
-           alljobs.extend([bupJob])
+            try:
+                excludes=paths['exclude_global']
+            except:
+                excludes=list()
+    
+            # Read common excludes from a file (must be in the same subdir as the jobs file)
+            # exclude_file=os.path.normpath(os.path.join(jobscriptdir, paths['exclude_file']))
+            try:
+                exclude_file=os.path.normpath(os.path.join(jobscriptdir, paths['exclude_file']))
+                with open( exclude_file,'r') as ef:
+                    excludes_in_file = yaml.safe_load(ef)
+                    excludes.extend(excludes_in_file)
+            except KeyError as e:
+                pass 
+                      
+            for jobs in paths['jobs']:
+               # Creates either a backupjob or a restore job
+               # python-fu to create a new object that is the same class as this one
+               bupJob = object.__new__(type(self))
+               bupJob.__init__(jobs['name'],path)
+               alljobs.extend([bupJob])
+    
+               try:
+                  bupJob._destpath = jobs['destpath']
+               except:
+                  bupJob._destpath = path 
+    
+               try:
+                  bupJob.includedirs = jobs['subdirectories']
+               except:
+                  pass
+               try:
+                  bupJob.includefiles=jobs['files']
+               except:
+                  pass
+               try:
+                  bupJob.threads=jobs['threads']
+               except:
+                  pass
+               try:
+                  bupJob.checkers=jobs['checkers']
+               except:
+                  pass
+               try:
+                  bupJob.destprefix=jobs['prefix']
+               except:
+                  pass
+               try:
+                  bupJob._mode=jobs['mode']
+               except:
+                  pass 
+               try:
+                  bupJob.excludes=excludes
+                  bupJob.excludes=excludes+jobs['exclude']
+               except:
+                  pass
+    
+        return alljobs 
 
-           try:
-              bupJob._destpath = jobs['destpath']
-           except:
-              bupJob._destpath = path 
+class restoreJob(backupJob):
+    """ Similar to a backupUp job but order is reversed """
+    def __init__(self,name,archivepath):
+       super().__init__(name, archivepath)
+       self._archivepath=archivepath
+       self._mode = "copy"
 
-           try:
-              bupJob.includedirs = jobs['subdirectories']
-           except:
-              pass
-           try:
-              bupJob.includefiles=jobs['files']
-           except:
-              pass
-           try:
-              bupJob.threads=jobs['threads']
-           except:
-              pass
-           try:
-              bupJob.checkers=jobs['checkers']
-           except:
-              pass
-           try:
-              bupJob.destprefix=jobs['prefix']
-           except:
-              pass
-           try:
-              bupJob.excludes=excludes
-              bupJob.excludes=excludes+jobs['exclude']
-           except:
-              pass
-
-    return alljobs 
-
+    def _syncdirection(self,sync,endpoint):
+        """ Restore from remote to remote """
+        rval = [x for x in self.extra]
+        # If timestamp is set, use it 
+        if self.timestamp is not None:
+            rval.extend(["--s3-version-at",self.timestamp])
+        # sync is based on mode in job (defaults to copy) 
+        rval.extend([self._mode,"%s:%s" % (endpoint,self._archivepath),self._destpath])
+        return rval
 
 ## *****************************
 ## main routine
@@ -287,10 +362,12 @@ def main(argv):
     helpjobsfile = "Override the default jobs file (%s). Example: --yaml=testjobs.yaml\n" % jobdefault
 
     helpendpoint = "Override the default backup rclone endpoint( s3-backup )\n"
+    helptimestamp = "Restore based upon state at particular time. Format: 2023-09-24T12:00:00Z (Year-Month-Day(T)hour:minute:second(Zone). Use Z for Zulu (GMT) time. Default: None (most recent)"
 
     helpjob = "comma-separated list of job names to run, list, etc. \n"
     helpsyncjob = "comma separated list of sync jobs to run. Cannot set both jobs and syncjobs"
     helptopupjob = "comma separated list of top-up jobs to run. Cannot set both jobs and topupjobs"
+    helpextra = "extra rclone arguments. Quote arguments. Example: '--metadata-exclude tier=GLACIER'. Default: None"
     ## Define command-line parser
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter,allow_abbrev=True)
     # optional arguments
@@ -300,10 +377,16 @@ def main(argv):
     parser.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
     parser.add_argument("-j", "--jobs",   dest="joblist",  default=None,help=helpjob)
+    parser.add_argument("-x", "--extra",   dest="xrclone",  default=None,help=helpextra)
+    parser.add_argument("-R", "--restore",   dest="restore",  default=False, action='store_true',help="Restore instead of backup")
+    parser.add_argument("-S", "--timestamp", dest="timestamp",  default=None,help=helptimestamp)
     parser.add_argument("--sync-jobs",   dest="syncjobs",  default=None,help=helpsyncjob)
     parser.add_argument("--topup-jobs",   dest="topupjobs",  default=None,help=helptopupjob)
     parser.add_argument("-p", "--parallel",   dest="parallel",  default=2,help="how many backup jobs to run in parallel (2)")
     parser.add_argument("-K", "--checkers",  dest="checkers", default=32,help="how many checkers to run in parallel (32)")
+    parser.add_argument("--rclonecmd",  dest="rclonecmd", default=None, help="Full path to rclone executable")
+    parser.add_argument("--lockfile",  dest="lockfile", default="/var/lock/gen-backup.lock",help="Alternate location for lockfile (default: /var/lock/gen-backup.lock)")
+
     parser.add_argument('command', metavar='command',choices=['list','run','detail','rclone'], nargs=1,
               help='list | detail | run | rclone ')
 
@@ -323,11 +406,30 @@ def main(argv):
        sys.exit(-1)
 
     # Build the jobs
-    # Always backup up the job file (usually ../config/jobs.yaml)
-    yamlbackup = backupJob('rcs3config',os.path.dirname(args.jobsfile))
-    yamlbackup.includefiles = [os.path.basename(args.jobsfile)]
-    alljobs = [yamlbackup] 
-    alljobs.extend(generate(args.jobsfile))
+    # Are we restoring or backing up?
+    yamlbackup = None
+    if not args.restore:
+       # Always backup up the job file (usually ../config/jobs.yaml)
+       yamlbackup = backupJob('rcs3config',os.path.dirname(args.jobsfile))
+       yamlbackup.includefiles = [os.path.basename(args.jobsfile)]
+       alljobs = [yamlbackup] 
+       mode = yamlbackup
+    else:
+       alljobs = []
+       mode = restoreJob('notused','notused')
+       
+    alljobs.extend(mode.generate(args.jobsfile))
+    if args.timestamp is not None:
+       for job in alljobs:
+           job.timestamp = args.timestamp
+
+    if args.rclonecmd is not None:
+       for job in alljobs:
+           job.rclonecmd = args.rclonecmd
+
+    if args.xrclone is not None:
+       for job in alljobs:
+           job.extra = args.xrclone
 
     # Filter the jobs based on optional jobslist argument
     syncjobs = []
@@ -340,8 +442,9 @@ def main(argv):
         topupjobnames = args.topupjobs.split(",")
         topupjobs = list(filter( lambda x: True if x.name in topupjobnames else False, alljobs))
 
-    # Always sync the jobs.yaml file
-    syncjobs.extend([yamlbackup])
+    # Always sync the jobs.yaml if in backup mode 
+    if yamlbackup is not None:
+        syncjobs.extend([yamlbackup])
 
     # Handle non-empty jobslist or a combination of sync/topupjobs 
     if args.joblist != None:
@@ -377,7 +480,7 @@ def main(argv):
         os.sys.stdout.write(str(yamlbackup))
 
     elif command == 'run':
-        runner = runBackup(alljobs,parallel=int(args.parallel))
+        runner = runBackup(alljobs,parallel=int(args.parallel),lockfile=args.lockfile)
         runner.run_jobs()
 
 if __name__ == "__main__":
