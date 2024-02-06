@@ -9,6 +9,8 @@
                 "sparkline": true,
                 "metrics": [
                     [ { "expression": "SUM([e5,e8])", "label": "Total Storage", "id": "e2", "yAxis": "right", "region": "%REGION%" } ],
+                    [ "AWS/S3", "NumberOfObjects", "BucketName", "%OWNER%-%SYSTEM%-%BUCKET%", "StorageType", "AllStorageTypes", { "id": "m2", "region": "%REGION%", "label": "Object Count" } ],
+                    [ { "expression": "SUM([e1,e54 ])", "label": "Daily Storage+API (mean: $ ${AVG})", "id": "e21", "yAxis": "right", "region": "%REGION%" } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "bucket_name", "%OWNER%-%SYSTEM%-%BUCKET%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "BUCKET", { "id": "m1", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "SUM([m7,m8])", "label": "STANDARD Snapshot Bytes", "id": "e3", "region": "%REGION%", "visible": false } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "GLACIER", "aws_region", "%REGION%", "bucket_name", "%OWNER%-%SYSTEM%-%BUCKET%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "BUCKET", { "id": "m4", "region": "%REGION%", "visible": false } ],
@@ -18,7 +20,6 @@
                     [ { "expression": ".9095*e4", "label": "Glacier Snapshot TBytes", "id": "e6", "region": "%REGION%" } ],
                     [ { "expression": ".9095*e3", "label": "Standard Snapshot TBytes", "id": "e7", "region": "%REGION%" } ],
                     [ { "expression": "(1-0.45)*((e9*0.021) + (e10*0.0036))", "label": "Daily Storage Cost", "id": "e1", "yAxis": "right", "region": "%REGION%", "visible": false } ],
-                    [ { "expression": "SUM([e1,e54 ])", "label": "Daily Storage+API (mean: $ ${AVG})", "id": "e21", "yAxis": "right", "region": "%REGION%" } ],
                     [ { "expression": "m1*9.313e-10/days", "label": "GB-Months-Standard", "id": "e9", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "m4*9.313e-10/days", "label": "GB-Months-Glacier", "id": "e10", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "IF(MONTH(m4) == 2, 28, IF(MONTH(m4)==4 || MONTH(m4)==6 || MONTH(m4)==9 || MONTH(m4)==11,30,31))", "label": "Days in Month", "id": "days", "region": "%REGION%", "visible": false } ],
@@ -53,7 +54,7 @@
                 "yAxis": {
                     "right": {
                         "label": "Cost $",
-                        "showUnits": false
+                        "showUnits": true 
                     },
                     "left": {
                         "label": "Storage Bytes",
