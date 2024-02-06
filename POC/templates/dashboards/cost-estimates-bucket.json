@@ -1,0 +1,84 @@
+{
+    "DashboardName": "Cost-Estimates-Bucket",
+    "variables": [
+        {
+            "type": "pattern",
+            "pattern": "SDISCOUNT",
+            "inputType": "select",
+            "id": "StorageCostFactor",
+            "label": "Storage Discount",
+            "defaultValue": "0.45",
+            "visible": true,
+            "values": [
+                {
+                    "value": "0.00",
+                    "label": "0%"
+                },
+                {
+                    "value": "0.17",
+                    "label": "17%"
+                },
+                {
+                    "value": "0.45",
+                    "label": "45%"
+                }
+            ]
+        },
+        {
+            "type": "pattern",
+            "pattern": "EDISCOUNT",
+            "inputType": "select",
+            "id": "EnterpriseMultiplier",
+            "label": "Enterprise Discount",
+            "defaultValue": "0.18",
+            "visible": true,
+            "values": [
+                {
+                    "value": "0.00",
+                    "label": "0%"
+                },
+                {
+                    "value": "0.17",
+                    "label": "17%"
+                },
+                {
+                    "value": "0.18",
+                    "label": "18%"
+                }
+            ]
+        },
+        {
+            "type": "pattern",
+            "pattern": "S3STD",
+            "inputType": "select",
+            "id": "S3StorageCost",
+            "label": "S3 standard",
+            "defaultValue": "0.021",
+            "visible": false,
+            "values": [
+                {
+                    "value": "0.021",
+                    "label": "web"
+                }
+            ]
+        },
+        {
+            "type": "pattern",
+            "pattern": "S3GLACIER",
+            "inputType": "select",
+            "id": "S3GlacierStorageCost",
+            "label": "S3 glacier",
+            "defaultValue": "0.0036",
+            "visible": false,
+            "values": [
+                {
+                    "value": "0.0036",
+                    "label": "web"
+                }
+            ]
+        }
+    ],
+    "widgets": [
+%WIDGETS%
+    ]
+}

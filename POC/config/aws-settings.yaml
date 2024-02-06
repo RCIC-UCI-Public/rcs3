@@ -55,3 +55,9 @@ bucket_alarm_templates:
 
 cloudwatch_dashboard_templates:
   - cost-estimates.json 
+
+## Dashboards made from an array of inner templates 
+cloudwatch_dashboard_array:
+  - wrapper: cost-estimates-bucket.json
+    inner: bucket-storage.json
+    replacevar: "%WIDGETS%"

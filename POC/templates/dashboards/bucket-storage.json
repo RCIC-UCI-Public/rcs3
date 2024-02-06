@@ -1,0 +1,65 @@
+        {
+            "height": %HEIGHT%,
+            "width": 23,
+            "y": %YLOCATION%,
+            "x": 0,
+            "type": "metric",
+            "properties": 
+            {
+                "sparkline": true,
+                "metrics": [
+                    [ { "expression": "SUM([e5,e8])", "label": "Total Storage", "id": "e2", "yAxis": "right", "region": "%REGION%" } ],
+                    [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "bucket_name", "%OWNER%-%SYSTEM%-%BUCKET%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "BUCKET", { "id": "m1", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "SUM([m7,m8])", "label": "STANDARD Snapshot Bytes", "id": "e3", "region": "%REGION%", "visible": false } ],
+                    [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "GLACIER", "aws_region", "%REGION%", "bucket_name", "%OWNER%-%SYSTEM%-%BUCKET%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "BUCKET", { "id": "m4", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "SUM([m5,m6])", "label": "GLACIER - Snapshot Bytes", "id": "e4", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": ".9095*m4", "label": "Glacier TBytes", "id": "e5", "region": "%REGION%" } ],
+                    [ { "expression": ".9095*m1", "label": "Standard TBytes", "id": "e8", "region": "%REGION%" } ],
+                    [ { "expression": ".9095*e4", "label": "Glacier Snapshot TBytes", "id": "e6", "region": "%REGION%" } ],
+                    [ { "expression": ".9095*e3", "label": "Standard Snapshot TBytes", "id": "e7", "region": "%REGION%" } ],
+                    [ { "expression": "(1-0.45)*((e9*0.021) + (e10*0.0036))", "label": "Daily Storage Cost", "id": "e1", "yAxis": "right", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "SUM([e1,e54 ])", "label": "Daily Storage+API (mean: $ ${AVG})", "id": "e21", "yAxis": "right", "region": "%REGION%" } ],
+                    [ { "expression": "m1*9.313e-10/days", "label": "GB-Months-Standard", "id": "e9", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "m4*9.313e-10/days", "label": "GB-Months-Glacier", "id": "e10", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "IF(MONTH(m4) == 2, 28, IF(MONTH(m4)==4 || MONTH(m4)==6 || MONTH(m4)==9 || MONTH(m4)==11,30,31))", "label": "Days in Month", "id": "days", "region": "%REGION%", "visible": false } ],
+                    [ "AWS/S3/Storage-Lens", "DeleteMarkerStorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "bucket_name", "%OWNER%-%SYSTEM%-%BUCKET%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "BUCKET", { "id": "m7", "region": "%REGION%", "visible": false } ],
+                    [ ".", "NonCurrentVersionStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m8", "region": "%REGION%", "visible": false } ],
+                    [ ".", "CurrentVersionStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m10", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "SUM([m31,m32,m33])", "label": "Glacier-Put-Post-List-Requests (mean: ${AVG})", "id": "e51", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "SUM([m34,m35,m36,m37,m38,m39])", "label": "Bucket-Standard-Put-Post-List-Requests (mean: ${AVG})", "id": "e52", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "SUM([m40,m41,m42])", "label": "AllRequests (mean: ${AVG})", "id": "e53", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "(1-0.18)* (  ((e53 - (e52 + e51))*.0004/10.0) + (e52*.005) + (e51*.03))/1000", "label": "API Cost (mean: $ ${AVG})", "id": "e54", "yAxis": "right", "region": "%REGION%", "visible": false } ],
+                    [ { "expression": "RUNNING_SUM(e54)", "label": "SUM API Cost ($ ${MAX})", "id": "e55", "yAxis": "right", "region": "%REGION%", "visible": false } ],
+                    [ "AWS/S3/Storage-Lens", "PostRequests", "metrics_version", "1.0", "storage_class", "GLACIER", "aws_region", "%REGION%", "bucket_name", "%OWNER%-%SYSTEM%-%BUCKET%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "BUCKET", { "label": "Glacier - PostRequests", "id": "m31", "visible": false, "region": "%REGION%" } ],
+                    [ ".", "PutRequests", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "label": "Glacier - PutRequests", "id": "m32", "visible": false, "region": "%REGION%" } ],
+                    [ ".", "ListRequests", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "label": "Glacier - ListRequests", "id": "m33", "visible": false, "region": "%REGION%" } ],
+                    [ "...", "STANDARD", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m34", "label": "Standard - ListRequests", "visible": false, "region": "%REGION%" } ],
+                    [ "...", "-", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m35", "label": "Bucket - ListRequests", "visible": false, "region": "%REGION%" } ],
+                    [ ".", "PutRequests", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m36", "label": "Bucket - PutRequests", "visible": false, "region": "%REGION%" } ],
+                    [ "...", "STANDARD", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m37", "label": "Standard - PutRequests", "visible": false, "region": "%REGION%" } ],
+                    [ ".", "PostRequests", ".", ".", ".", "-", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m38", "label": "Bucket - PostRequests", "visible": false, "region": "%REGION%" } ],
+                    [ "...", "STANDARD", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m39", "label": "Standard - PostRequests", "visible": false, "region": "%REGION%" } ],
+                    [ ".", "AllRequests", ".", ".", ".", "GLACIER", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m40", "label": "GLACIER - All Requests", "visible": false, "region": "%REGION%" } ],
+                    [ "...", "-", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m41", "label": "Bucket - AllRequests", "visible": false, "region": "%REGION%" } ],
+                    [ "...", "STANDARD", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m42", "label": "Standard - AllRequests", "visible": false, "region": "%REGION%" } ],
+                    [ ".", "NonCurrentVersionStorageBytes", ".", ".", ".", "GLACIER", ".", ".", "aws_account_number", "%ACCOUNT%", "bucket_name", "%OWNER%-%SYSTEM%-%BUCKET%", ".", ".", "record_type", "BUCKET", { "id": "m5", "visible": false } ],
+                    [ ".", "DeleteMarkerStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "m6", "visible": false } ]
+                ],
+                "view": "singleValue",
+                "stacked": false,
+                "region": "%REGION%",
+                "stat": "Sum",
+                "period": 86400,
+                "yAxis": {
+                    "right": {
+                        "label": "Cost $",
+                        "showUnits": false
+                    },
+                    "left": {
+                        "label": "Storage Bytes",
+                        "showUnits": false
+                    }
+                },
+                "title": "%OWNER% - %SYSTEM%"
+            }
+        }

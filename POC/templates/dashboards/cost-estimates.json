@@ -46,7 +46,39 @@
                     "label": "17%"
                 }
             ]
+        },
+
+        {
+            "type": "pattern",
+            "pattern": "S3STD",
+            "inputType": "select",
+            "id": "S3StorageCost",
+            "label": "S3 standard",
+            "defaultValue": "0.021",
+            "visible": false,
+            "values": [
+                {
+                    "value": "0.021",
+                    "label": "web"
+                }
+            ]
+        },
+        {
+            "type": "pattern",
+            "pattern": "S3GLACIER",
+            "inputType": "select",
+            "id": "S3GlacierStorageCost",
+            "label": "S3 glacier",
+            "defaultValue": "0.0036",
+            "visible": false,
+            "values": [
+                {
+                    "value": "0.0036",
+                    "label": "web"
+                }
+            ]
         }
+
     ],
     "widgets": [
         {
@@ -102,7 +134,7 @@
             "type": "metric",
             "properties": {
                 "metrics": [
-                    [ { "expression": "(1-SDISCOUNT)*((e3*.021) + (e4*.0036))", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "e1", "yAxis": "right", "region": "%REGION%", "color": "#2ca02c" } ],
+                    [ { "expression": "(1-SDISCOUNT)*((e3*S3STD) + (e4*S3GLACIER))", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "e1", "yAxis": "right", "region": "%REGION%", "color": "#2ca02c" } ],
                     [ { "expression": "RUNNING_SUM(e1)", "label": "Total Cost ($ ${MAX})", "id": "e2", "yAxis": "right", "region": "%REGION%", "color": "#98df8a" } ],
                     [ { "expression": "m1*9.313e-10/days", "label": "GB-Months-Standard", "id": "e3", "region": "%REGION%" } ],
                     [ { "expression": "m4*9.313e-10/days", "label": "GB-Months-Glacier", "id": "e4", "region": "%REGION%" } ],
@@ -150,7 +182,7 @@
                     [ { "expression": ".9095*m1", "label": "Standard TBytes", "id": "e8", "region": "%REGION%" } ],
                     [ { "expression": ".9095*e4", "label": "Glacier Snapshot TBytes", "id": "e6", "region": "%REGION%" } ],
                     [ { "expression": ".9095*e3", "label": "Standard Snapshot TBytes", "id": "e7", "region": "%REGION%" } ],
-                    [ { "expression": "(1-SDISCOUNT)*((e9*.021) + (e10*.0036))", "label": "Daily Storage Cost", "id": "e1", "yAxis": "right", "region": "%REGION%", "visible": false} ],
+                    [ { "expression": "(1-SDISCOUNT)*((e9*S3STD) + (e10*S3GLACIER))", "label": "Daily Storage Cost", "id": "e1", "yAxis": "right", "region": "%REGION%", "visible": false} ],
                     [ { "expression": "SUM([e1,e54 ])", "label": "Daily Storage+API (mean: $ ${AVG})", "id": "e21", "yAxis": "right", "region": "%REGION%" } ],
 
                     [ { "expression": "m1*9.313e-10/days", "label": "GB-Months-Standard", "id": "e9", "region": "%REGION%", "visible": false } ],

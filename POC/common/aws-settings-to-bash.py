@@ -41,7 +41,10 @@ def main(argv):
         key="RCS3_%s" % x.upper()
         value = aws[x]
         if type(aws[x]) == list:
-        	value = ",".join(aws[x])
+           if type(aws[x][0]) == dict:
+              value = '"%s"' % str(aws[x])
+           else:
+              value = ",".join(aws[x])
         
         print("%s=%s" % (key,value))
 
