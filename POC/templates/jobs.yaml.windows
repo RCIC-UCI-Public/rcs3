@@ -1,0 +1,23 @@
+## This is a sample jobs.yaml the defines a single backup job
+#  One can define multiple backups jobs, just replicate the existing backup1 stanza (and rename it)
+## Job names must be distinct (not checked, yet)
+## Path is commmon to the jobs relative to the path
+---
+srcpaths:
+- path: "C:/"
+  ## Local decision to exclude .git subdirs
+  exclude_global:
+    - .git/**
+
+  ## Patterns from a file to exclude
+  exclude_file: common_excludes.yaml
+
+  jobs:
+    - name: backup1
+      subdirectories:
+        - Users/phili/Documents
+      files:
+        - Users/phili/Downloads/yubikey-manager-qt-1.1.3-win64.exe
+
+
+
