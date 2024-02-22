@@ -42,7 +42,6 @@ def main(argv):
         csv_reader = csv.reader(fw,skipinitialspace=True)
         header = next(csv_reader)
         systems = [ row[0:2] for row in csv_reader]
-
     systems.sort()
    
     # override location of .aws/config
@@ -57,12 +56,13 @@ def main(argv):
         wrapper = dashboard["wrapper"]
         inner = dashboard["inner"]
         replacevar = dashboard["replacevar"]
-        systemplates = ""
-
+        height = dashboard["height"]
+        systemplates = '{ "type":"text", "height": 1, "properties": { "markdown" : "**Systems Protected: %COUNT%**" }},\n'
         # Iterate through the system to build out the array of inner templates
-        yloc = 0
         height = 4
+        nsys = 0
         for [owner,system] in systems:
+            nsys += 1
             rvalues = { 
                 "%LENS%" : aws["lens"],
                 "%REGION%" : aws["region"],
@@ -70,10 +70,11 @@ def main(argv):
                 "%BUCKET%" :  aws["bucket_postfix"],
                 "%OWNER%" : owner,
                 "%SYSTEM%" : system,
-                "%HEIGHT%" : str(height),
-                "%YLOCATION%" : str(yloc)}
-            yloc += height
+                "%HEIGHT%" : str(height)}
   
+            # read the inner template file and string replace using the rvalues dictionary
+            # Append to the systemplates  string
+
             with open(os.path.join(templatedir,inner),"r") as ifile:
                  replaced = [ rcs3.replace_all(x,rvalues) for x in ifile.readlines()] 
                  s = "".join(replaced)
@@ -81,11 +82,15 @@ def main(argv):
                  systemplates += ",\n"
                 
         ## Now read the wrapper file and insert the iterated data above
-        rvalues[replacevar] = systemplates[:-2]
+        ## cut out the final ',\n' chars from the iteration above
+        rvalues["%COUNT%"] = str(nsys)
+        replaced = rcs3.replace_all(systemplates,rvalues)
+        rvalues[replacevar] = replaced[:-2]
+
         with open(os.path.join(templatedir,wrapper),"r") as ofile:
              fullfile = [ rcs3.replace_all(x,rvalues) for x in ofile.readlines()] 
 
-        # print("".join(fullfile))
+        ## String replacements done, convert to json and upload the dashboard
         fulljson = json.loads("".join(fullfile))
         put_dashboard(cw_client,fulljson)
  
