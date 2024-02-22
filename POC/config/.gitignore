@@ -2,3 +2,5 @@ aws-admin
 credentials
 rclone.conf
 jobs.yaml
+aws-settings.yaml
+restore.yaml
