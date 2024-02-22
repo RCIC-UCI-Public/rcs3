@@ -4,3 +4,4 @@ rclone.conf
 jobs.yaml
 aws-settings.yaml
 restore.yaml
+quotas.csv

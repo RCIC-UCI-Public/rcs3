@@ -61,3 +61,4 @@ cloudwatch_dashboard_array:
   - wrapper: cost-estimates-bucket.json
     inner: bucket-storage.json
     replacevar: "%WIDGETS%"
+    height: 4

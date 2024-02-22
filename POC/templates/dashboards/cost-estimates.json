@@ -178,7 +178,7 @@
                     [ { "expression": "SUM([e1,e54 ])", "label": "Daily Storage+API (mean: $ ${AVG})", "id": "e21", "yAxis": "right", "region": "%REGION%", "color": "#36b000" } ],
                     [ { "expression": ".9095*m4", "label": "Glacier TBytes", "id": "e5", "region": "%REGION%", "color": "#0273c9" } ],
                     [ { "expression": ".9095*m1", "label": "Standard TBytes", "id": "e8", "region": "%REGION%", "color": "#f76f20" } ],
-                    [ { "expression": ".9095*e4", "label": "Glacier Snapshot TBytes", "id": "e6", "region": "%REGION%", "color": "#0091ff" } ],
+                    [ { "expression": ".9095*e4", "label": "Glacier Snapshot TBytes", "id": "e6", "region": "%REGION%", "color": "#66b6f2" } ],
                     [ { "expression": ".9095*e3", "label": "Standard Snapshot TBytes", "id": "e7", "region": "%REGION%", "color": "#ff9f67" } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "id": "m1", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "SUM([m7,m8])", "label": "STANDARD Snapshot Bytes", "id": "e3", "region": "%REGION%", "visible": false } ],
