@@ -44,8 +44,13 @@ def read_aws_settings(settings=None,configdir=None):
         yamlfile=settings
 
     # Read the global configuration settings
-    with open( os.path.join(yamlfile), "r" ) as f:
-        aws = yaml.safe_load( f )
+    try:
+        with open( os.path.join(yamlfile), "r" ) as f:
+           aws = yaml.safe_load( f )
+    except Exception as e:
+        errMsg = "ABORT: unable to open settings file '%s'\n" % yamlfile
+        sys.stderr.write(errMsg)
+        sys.exit(-1) 
     return aws
 
 def replace_all(text, dic):
