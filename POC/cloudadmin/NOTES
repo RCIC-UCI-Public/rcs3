@@ -6,7 +6,7 @@ I.  Brand new AWS account - setting up the admin side
        2. Change the admin_notify and owner_notify to something that makes local sense.       
 
     b. Create the default Storage Lens Configuration
-       cloudadmin/create-storage-len.sh
+       cloudadmin/create-storage-lens.sh
 
     c. Create the administrator notification topic and subscribe your admins to it
        cloudadmin/create-admin-sns-topic.py -e <email1> [<email> ...]
