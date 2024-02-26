@@ -33,8 +33,8 @@ if (!(Test-Path $path/$PYDIR/python.exe -PathType Leaf))
    & $PYDIR\python.exe get-pip.py --no-warn-script-location
    echo "Setting up $PYDIR\$PYDIR._pth"
    Add-Content -Path $PYDIR\$PYDIR._pth -Value "./Lib/site-packages"
-   echo "installing pyyaml"
-   & $PYDIR\python.exe -m pip install pyyaml 
+   echo "installing pyyaml and boto3"
+   & $PYDIR\python.exe -m pip install pyyaml boto3
 }
 
 
