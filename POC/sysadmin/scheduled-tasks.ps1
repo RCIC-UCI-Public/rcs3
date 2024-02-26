@@ -7,7 +7,8 @@ $LOCALBIN="$RCS3ROOT\..\bin"
 $LOCKFILE="$RCS3ROOT\..\gen-backup.lock"
 $LOGFILE="$RCS3ROOT\..\gen-backup.log"
 $RCLONE="$LOCALBIN\rclone.exe"
-$GENBACKUP="$CWD\..\sysadmin\gen-backup.py"
+$PYTHON=$CWD\..\python311\python.exe
+$GENBACKUP="$PYTHON $CWD\..\sysadmin\gen-backup.py"
 $COMMONARGS="-WindowStyle Hidden" 
 #
 # When to weekly sync verse daily top up
