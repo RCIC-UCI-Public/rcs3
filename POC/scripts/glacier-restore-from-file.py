@@ -110,7 +110,7 @@ try:
                     },
                     "Location": {
                         "ObjectArn": re.sub( "s3://", arnprefix, obj ),
-                        "ETag": response[ "ETag" ]
+                        "ETag": response[ "ETag" ].strip( '\"' )
                     }
                 }
                 if args.verbose:
@@ -121,9 +121,8 @@ try:
                     Report=rep_dict,
                     Manifest=man_dict,
                     Description="restore from glacier for {} {}".format( args.user, args.host ),
-                    Priority=0,
-                    RoleArn="arn:aws:iam::{}:role/{}-{}-restore-s3batch-perms-role".format( aws[ "accountid" ], args.user, args.host ),
-                    Tags=tag_list
+                    Priority=10,
+                    RoleArn="arn:aws:iam::{}:role/{}-{}-restore-s3batch-perms-role".format( aws[ "accountid" ], args.user, args.host )
                 )
                 if args.verbose:
                     print( response[ "JobId" ] )
