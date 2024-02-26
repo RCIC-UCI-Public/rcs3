@@ -83,18 +83,22 @@ while len( listrunning ) > 0:
                 listready.append( jobid )
             elif jobstate == "Failed":
                 listfail.append( jobid )
+            elif jobstate == "Cancelled":
+                listfail.append( jobid )
             else:
                 listrecheck.append( jobid )
         except s3c.exceptions.InvalidRequestException:
             listerror.append( jobid )
             print( "Invalid id: {}".format( jobid ) )
     if args.runonce:
+        listrunning = listrecheck
         break
     if len( listrecheck ) > 0:
         if args.verbose:
             print( "Sleeping {} seconds".format( args.sleepinterval ) )
         time.sleep( args.sleepinterval )
     listrunning = listrecheck
+    listrecheck = []
 
 # Report completions, failures, errors, and jobs that are not ready
 sns_message = ""
