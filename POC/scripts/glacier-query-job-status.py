@@ -109,17 +109,22 @@ while len( listrunning ) > 0:
 
 # Report completions, failures, errors, and jobs that are not ready
 sns_message = ""
+status = "ready"
 send = True
 if sleepcount >= args.timeoutinterval:
     sns_message += "Monitoring exceeds timeout interval; job no longer being monitored.\n\n"
+    status = "timed out"
 for i in listready:
     sns_message += "Completed: {}\n".format( i )
 for i in listfail:
     sns_message += "Job failed: {}\n".format( i )
+    status = "failures"
 for i in listerror:
     sns_message += "Invalid job id: {}\n".format( i )
+    status = "failures"
 for i in listrunning:
     sns_message += "Job not completed: {}\n".format( i )
+    status = "timed out"
 if args.verbose:
     print( sns_message )
 
@@ -132,7 +137,7 @@ if send:
         response = sns.publish(
             TopicArn=results,
             Message=sns_message,
-            Subject="{} {} restore ready".format( args.user, args.host )
+            Subject="{} {} restore {}".format( args.user, args.host, status )
         )
     except sns.exception.NotFound:
         print( "No notification sent: {}".format( results ) )
