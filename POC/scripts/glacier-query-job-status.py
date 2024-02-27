@@ -111,7 +111,7 @@ while len( listrunning ) > 0:
 sns_message = ""
 status = "ready"
 send = True
-if sleepcount >= args.timeoutinterval:
+if sleepcount >= args.timeoutinterval and len(listrunning) > 0:
     sns_message += "Monitoring exceeds timeout interval; job no longer being monitored.\n\n"
     status = "timed out"
 for i in listready:
