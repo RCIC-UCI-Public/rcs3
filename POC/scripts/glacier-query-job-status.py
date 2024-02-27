@@ -11,7 +11,8 @@ with open( "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage="Query the S3 Batch job ids until completion and send notification"
+usage="Query the S3 Batch job ids until completion and send notification."
+# S3 Batch bulk retrieval should complete in 12 hours; exit if not completed in 12 hours.
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
@@ -27,6 +28,8 @@ p.add_argument( "-n", "--notify",
         help="override the default SNS topic" )
 p.add_argument( "-s", "--sleepinterval", type=int, default=3600,
         help="override the default number of seconds to sleep" )
+p.add_argument( "-t", "--timeoutinterval", type=int, default=12,
+        help="number of checks until exiting, uses sleepinterval" )
 args = p.parse_args()
 
 
@@ -35,6 +38,7 @@ listready = []
 listfail = []
 listerror = []
 listrecheck = []
+sleepcount = 0
 if args.notify:
     results = args.notify
 else:
@@ -94,15 +98,20 @@ while len( listrunning ) > 0:
         listrunning = listrecheck
         break
     if len( listrecheck ) > 0:
+        if sleepcount >= args.timeoutinterval:
+            break
         if args.verbose:
             print( "Sleeping {} seconds".format( args.sleepinterval ) )
         time.sleep( args.sleepinterval )
+        sleepcount += 1
     listrunning = listrecheck
     listrecheck = []
 
 # Report completions, failures, errors, and jobs that are not ready
 sns_message = ""
 send = True
+if sleepcount >= args.timeoutinterval:
+    sns_message += "Monitoring exceeds timeout interval; job no longer being monitored.\n\n"
 for i in listready:
     sns_message += "Completed: {}\n".format( i )
 for i in listfail:
