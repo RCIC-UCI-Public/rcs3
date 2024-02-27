@@ -108,9 +108,9 @@ for i in listready:
 for i in listfail:
     sns_message += "Job failed: {}\n".format( i )
 for i in listerror:
-    sns_message += "Invalid job id: {}".format( i )
+    sns_message += "Invalid job id: {}\n".format( i )
 for i in listrunning:
-    sns_message += "Job not completed: {}".format( i )
+    sns_message += "Job not completed: {}\n".format( i )
 if args.verbose:
     print( sns_message )
 
