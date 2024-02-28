@@ -5,6 +5,7 @@ import argparse
 import os
 import sys
 import stat
+sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 from rclone_conf import RcloneConf
 from credentials import Credentials
 
