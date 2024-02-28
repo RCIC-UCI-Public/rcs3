@@ -31,8 +31,8 @@ if "configfile" in aws:
 
 #print( args.user, args.host )
 acctname = args.user +  "-" + args.host + "-sa"
-primarybucket = args.user + "-" + args.host + "-" + bucket_postfix
-inventorybucket = args.user + "-" + args.host + "-" + inventory_postfix
+primarybucket = args.user + "-" + args.host + "-" + aws[ "bucket_postfix" ]
+inventorybucket = args.user + "-" + args.host + "-" + aws[ "inventory_postfix" ]
 session = boto3.Session( profile_name=aws[ "profile" ] )
 
 # s3 bucket cleanup
