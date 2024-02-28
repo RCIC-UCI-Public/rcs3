@@ -13,6 +13,7 @@ RUN yum -y install \
     python3 \
     python3-yaml \
     python3-psutil \
+    python3-boto3 \
     findutils \
     htop \
     parallel \
@@ -24,7 +25,7 @@ RUN yum -y install \
     curl \
     wget
 
-# Get the latest version of rclone - v1.63.1 as of this writing
+# Get the latest version of rclone - v1.65.2 as of this writing
 RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[ \t]+' '{print $2}') && \
     curl -O "https://downloads.rclone.org/$RCLONE_VERSION/rclone-$RCLONE_VERSION-linux-amd64.rpm" && \
     yum localinstall -y "rclone-$RCLONE_VERSION-linux-amd64.rpm" && \
@@ -34,5 +35,4 @@ RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[
 # ...
 
 # Entry point or command to run when the container starts
-#CMD ["sh", "-c", "crond start && /bin/bash"]
 CMD /sbin/crond -n 
