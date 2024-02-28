@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 
 import argparse
 import boto3
@@ -6,8 +6,10 @@ import os
 import sys
 import yaml
 
-sys.path.append( "scripts" )
-from commonfunctions import delete_user_keys
+execdir = os.path.dirname(os.path.abspath(__file__))
+basedir = os.path.dirname( execdir )
+sys.path.append( basedir  + "/common" )
+from rcs3functions import delete_user_keys
 
 
 usage="Delete S3 bucket and IAM user, detach policies, delete access keys"
@@ -16,9 +18,11 @@ p.add_argument( "user",
         help="user UCInetID" )
 p.add_argument( "host",
         help="hostname" )
+p.add_argument( "-v", "--verbose", action="store_true",
+        help="optional print statements for more detail" )
 args = p.parse_args()
 
-with open( "config/aws-settings.yaml", "r" ) as f:
+with open( basedir + "config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 # override location of .aws/config
@@ -27,8 +31,8 @@ if "configfile" in aws:
 
 #print( args.user, args.host )
 acctname = args.user +  "-" + args.host + "-sa"
-primarybucket = args.user + "-" + args.host + "-uci-bkup-bucket"
-inventorybucket = args.user + "-" + args.host + "-uci-inventory"
+primarybucket = args.user + "-" + args.host + "-" + bucket_postfix
+inventorybucket = args.user + "-" + args.host + "-" + inventory_postfix
 session = boto3.Session( profile_name=aws[ "profile" ] )
 
 # s3 bucket cleanup
@@ -46,14 +50,18 @@ except s3_client.exceptions.NoSuchBucket:
 iam_client = session.client( "iam" )
 try:
     userpolicies = iam_client.list_attached_user_policies( UserName=acctname )
-    #print( userpolicies )
+    if args.verbose:
+        print( userpolicies )
     userkeys = iam_client.list_access_keys( UserName=acctname )
-    #print( userkeys )
+    if args.verbose:
+        print( userkeys )
     for policies in userpolicies[ "AttachedPolicies" ]:
         policyarn = policies[ "PolicyArn" ]
-        #print( policyarn )
+        if args.verbose:
+            print( policyarn )
         iam_client.detach_user_policy( UserName=acctname, PolicyArn=policyarn )
-        iam_client.delete_policy( PolicyArn=policyarn )
+        # need to handle policy versions, so disable policy deletion for now
+        #iam_client.delete_policy( PolicyArn=policyarn )
     
     delete_user_keys( iam_client, acctname )
     
