@@ -1,5 +1,5 @@
-# Use the latest version of Rocky Linux 8 as the base image
-FROM rockylinux/rockylinux:8
+# Use the latest version of Rocky Linux 9 as the base image
+FROM rockylinux/rockylinux:9
 
 # Install desired packages via yum
 RUN yum -y update
