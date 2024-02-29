@@ -41,7 +41,7 @@ RUN echo "Downloading AWS CLI package..." && \
     unzip awscliv2.zip && \
     echo "Installing AWS CLI..." && \
     ./aws/install && \
-    echo "Clean up ..."" && \
+    echo "Clean up ..." && \
     rm -f awscliv2.zip && \
     rm -rf aws
 
