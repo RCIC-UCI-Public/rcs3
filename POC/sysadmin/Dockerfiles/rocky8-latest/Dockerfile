@@ -5,15 +5,18 @@ FROM rockylinux/rockylinux:8
 RUN yum -y update
 RUN yum -y install \
     epel-release 
+
+# Python3.9 and selected packages
+RUN yum -y install alternatives python39
+RUN alternatives --set python3 /usr/bin/python3.9
+RUN alternatives --set python /usr/bin/python3.9
+RUN python3 -m pip install pyyaml boto3 psutil distro 
+
 RUN yum -y install \
     git \
     zip \
     vim \
     procps-ng \
-    python3 \
-    python3-yaml \
-    python3-psutil \
-    python3-boto3 \
     findutils \
     htop \
     parallel \
