@@ -31,8 +31,16 @@ RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[
     yum localinstall -y "rclone-$RCLONE_VERSION-linux-amd64.rpm" && \
     rm "rclone-$RCLONE_VERSION-linux-amd64.rpm"
 
-# Set up any additional configurations if needed
-# ...
+# Download and install AWS CLI
+RUN echo "Downloading AWS CLI package..." && \
+    curl "hhttps://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    echo "Unzipping package..." && \
+    unzip awscliv2.zip && \
+    echo "Installing AWS CLI..." && \
+    ./aws/install && \
+    # Clean up && \
+    rm -f awscliv2.zip && \
+    rm -rf aws
 
 # Entry point or command to run when the container starts
 CMD /sbin/crond -n 
