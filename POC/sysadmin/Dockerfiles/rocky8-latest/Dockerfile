@@ -33,7 +33,7 @@ RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[
 
 # Download and install AWS CLI
 RUN echo "Downloading AWS CLI package..." && \
-    curl "hhttps://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     echo "Unzipping package..." && \
     unzip awscliv2.zip && \
     echo "Installing AWS CLI..." && \
@@ -41,6 +41,8 @@ RUN echo "Downloading AWS CLI package..." && \
     # Clean up && \
     rm -f awscliv2.zip && \
     rm -rf aws
+
+ENV RCS3_PSTORE=$HOME/.rcs3
 
 # Entry point or command to run when the container starts
 CMD /sbin/crond -n 
