@@ -4,6 +4,7 @@ import platform
 import psutil
 import math
 import os
+import distro
 
 def detect_system_info():
     # Detect operating system
@@ -24,8 +25,9 @@ def detect_system_info():
 
     # Additional details for Linux distributions
     distribution = ""
+    
     if operating_system == "Linux":
-        distribution = platform.linux_distribution()
+        distribution = (distro.name(),distro.version(),distro.codename())
 
     # Check if running inside a Docker container
     inside_docker = "Yes" if os.path.exists("/.dockerenv") else "No"

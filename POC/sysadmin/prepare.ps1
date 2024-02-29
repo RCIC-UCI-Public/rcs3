@@ -34,7 +34,7 @@ if (!(Test-Path $path/$PYDIR/python.exe -PathType Leaf))
    echo "Setting up $PYDIR\$PYDIR._pth"
    Add-Content -Path $PYDIR\$PYDIR._pth -Value "./Lib/site-packages"
    echo "installing pyyaml and boto3"
-   & $PYDIR\python.exe -m pip install pyyaml boto3
+   & $PYDIR\python.exe -m pip install pyyaml boto3 psutil distro
 }
 
 
