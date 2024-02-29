@@ -18,10 +18,12 @@ $topupDays = 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 # Backup command with commonly-used flags
 $backupCmd = "$GENBACKUP  --parallel=1 --threads=4 --checkers=64 --rclonecmd=$RCLONE --lockfile=$LOCKFILE run" 
 
+# Find the principal and 
+$principal = New-ScheduledTaskPrincipal -UserId "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 # Create the Weekly full sync
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek $syncDay -At 12:30am
 $action = New-ScheduledTaskAction -WorkingDirectory "$CWD\.." -Execute powershell.exe -Argument "$COMMONARGS -command $backupCmd >> $LOGFILE 2>&1" 
-Register-ScheduledTask -TaskName 'Backup Weekly Sync' -Action $action -Trigger $trigger
+Register-ScheduledTask -TaskName 'Backup Weekly Sync' -Principal $principal -Action $action -Trigger $trigger
 echo $action
 
 #
@@ -29,5 +31,5 @@ echo $action
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek $topupDays -At 12:30am
 $topupCmd = $backupCmd + " --top-up=24h"
 $action = New-ScheduledTaskAction -WorkingDirectory "$CWD\.." -Execute powershell.exe -Argument "$COMMONARGS -command $topupCmd >> $LOGFILE 2>&1" 
-Register-ScheduledTask -TaskName 'Backup Daily Top-up' -Action $action -Trigger $trigger
+Register-ScheduledTask -TaskName 'Backup Daily Top-up' -Principal $principal -Action $action -Trigger $trigger
 echo $action
