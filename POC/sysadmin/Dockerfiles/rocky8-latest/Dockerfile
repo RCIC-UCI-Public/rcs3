@@ -49,6 +49,6 @@ RUN echo "Downloading AWS CLI package..." && \
 # 
 ENV RCS3_ROOT=/.rcs3
 ENV AWS_SHARED_CREDENTIALS_FILE=/.rcs3/.aws/credentials
-
+ENV PS1="RCS3 Docker \w> ' 
 # Entry point or command to run when the container starts
 CMD /sbin/crond -n 
