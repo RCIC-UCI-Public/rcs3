@@ -45,8 +45,10 @@ RUN echo "Downloading AWS CLI package..." && \
     rm -f awscliv2.zip && \
     rm -rf aws
 
-# Set environment variable for RCS3 persistent store
-ENV RCS3_PSTORE=$HOME/.rcs3
+# Set environment variable for RCS3_ROOT (persistent storage) and AWS_SHARED_CREDENTIALS_FILE
+# 
+ENV RCS3_ROOT=/.rcs3
+ENV AWS_SHARED_CREDENTIALS_FILE=/.rcs3/.aws/credentials
 
 # Entry point or command to run when the container starts
 CMD /sbin/crond -n 
