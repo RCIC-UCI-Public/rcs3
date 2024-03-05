@@ -38,21 +38,14 @@ session = boto3.Session( profile_name=aws[ "profile" ] )
 
 # s3 bucket cleanup
 s3_client = session.client( "s3" )
-try:
-    s3_client.delete_bucket( Bucket=primarybucket )
-except s3_client.exceptions.NoSuchBucket:
-    print( "Bucket does not exist:", primarybucket )
-except botocore.exceptions.ClientError as error:
-    print( "Skipping:", primarybucket )
-    print( error )
-
-try:
-    s3_client.delete_bucket( Bucket=inventorybucket )
-except s3_client.exceptions.NoSuchBucket:
-    print( "Bucket does not exist:", inventorybucket )
-except botocore.exceptions.ClientError as error:
-    print( "Skipping:", inventorybucket )
-    print( error )
+for b in [ primarybucket, inventorybucket ]:
+    try:
+        s3_client.delete_bucket( Bucket=b )
+    except s3_client.exceptions.NoSuchBucket:
+        print( "Bucket does not exist:", b )
+    except botocore.exceptions.ClientError as error:
+        print( "Skipping:", b )
+        print( error )
 
 # user account cleanup
 iam_client = session.client( "iam" )
