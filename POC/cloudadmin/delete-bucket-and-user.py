@@ -2,6 +2,7 @@
 
 import argparse
 import boto3
+import botocore
 import os
 import sys
 import yaml
@@ -41,10 +42,17 @@ try:
     s3_client.delete_bucket( Bucket=primarybucket )
 except s3_client.exceptions.NoSuchBucket:
     print( "Bucket does not exist:", primarybucket )
+except botocore.exceptions.ClientError as error:
+    print( "Skipping:", primarybucket )
+    print( error )
+
 try:
     s3_client.delete_bucket( Bucket=inventorybucket )
 except s3_client.exceptions.NoSuchBucket:
     print( "Bucket does not exist:", inventorybucket )
+except botocore.exceptions.ClientError as error:
+    print( "Skipping:", inventorybucket )
+    print( error )
 
 # user account cleanup
 iam_client = session.client( "iam" )
