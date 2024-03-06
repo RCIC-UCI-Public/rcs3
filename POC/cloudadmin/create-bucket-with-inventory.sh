@@ -7,11 +7,43 @@ source $MYDIR/functions.sh
 # READ in the variables in the $CONFIG_DIR/aws-settings.yaml and present as bash variables 
 source  <($COMMON_DIR/aws-settings-to-bash.py)
 
+function helptext
+{
+      echo "create-bucket-with-inventory.sh [-h] [-n <networks>] <user> <host>"
+      echo "    -h    help"
+      echo "    -n <networks>  - valid network(s) that can access bucket"
+      echo "                     e.g., 192.168.0.0/16" 
+      echo "                     e.g., 192.168.0.0/16,10.10.0.1/24" 
+}
+# Define options
+optstring="hn:"
+
+while getopts ${optstring} arg; do
+  case $arg in
+    h)
+      helptext
+      exit 0
+      ;;
+    n)
+      # Overwrite IPRESTRICTIONS in aws-settings.yaml
+      RCS3_IPRESTRICTIONS=$OPTARG
+      ;;
+    ?)
+      echo "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+  esac
+done
+
+# Access remaining arguments after processing options
+shift $((OPTIND-1))  # Shift remaining arguments after processed options
+
 if [ $# -ne 2 ] ; then
-    echo $0 user host
-    exit 0
+    helptext
+    exit 1 
 fi
 
+######################  INPUTS READ, CREATE BUCKETS, APPLY POLICIES ####################
 outputs=$OUTPUTS_DIR
 templates=$TEMPLATES_DIR
 
