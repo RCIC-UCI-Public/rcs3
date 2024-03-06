@@ -58,7 +58,8 @@ my_vars = {
     "xxxregionxxx": aws[ "region" ],
     "xxxinstancetypexxx": aws[ "instancetype" ],
     "xxxkeypairxxx": aws[ "keypair" ],
-    "xxxvpcidxxx": aws[ "vpcid" ]
+    "xxxvpcidxxx": aws[ "vpcid" ],
+    "xxxiprestrictionsxxx": transform.createPolicyIpCondition( aws[ "iprestrictions" ] )
 }
 json_policy = transform.template_to_string( input_template, my_vars )
 
