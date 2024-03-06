@@ -1,0 +1,15 @@
+{
+    "Rules": [
+        {
+            "Expiration": {
+                "Days": 1
+            },
+            "ID": "delete bucket",
+            "Filter": {},
+            "Status": "Enabled",
+            "NoncurrentVersionExpiration": {
+                "NoncurrentDays": 1
+            }
+        }
+    ]
+}
