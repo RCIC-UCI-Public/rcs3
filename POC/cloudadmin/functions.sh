@@ -16,12 +16,15 @@ function localize {
 # localize <inputputfile> <outputfile>
    local input=$1
    local output=$2
+   # format the IP restrictions so that localize can replace properly
+   local IPrestrictions=$(echo $RCS3_IPRESTRICTIONS | sed -e 's/^/"/' -e 's/$/"/' -e 's/,/","/g')   
    cat $input | \
    sed s/xxxawsacctxxx/$RCS3_ACCOUNTID/ | \
    sed -e s/xxxbucketxxx/$RCS3_BUCKET_POSTFIX/g -e s/xxxinventoryxxx/$RCS3_INVENTORY_POSTFIX/g | \
    sed -e s/xxxpolicyxxx/$RCS3_POLICY_POSTFIX/g  | \
    sed -e s/xxxlensxxx/$RCS3_LENS/g -e s/xxxlensbucketxxx/$RCS3_LENSBUCKET/g | \
    sed -e s/xxxregionxxx/$RCS3_REGION/g  | \
+   sed -e s^xxxiprestrictionsxxx^$IPrestrictions^g  | \
    sed s/xxxuserxxx/$user/ | \
    sed s/xxxhostxxx/$host/ > $output
 }

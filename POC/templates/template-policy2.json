@@ -39,7 +39,14 @@
             "Resource": [
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx",
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
-            ]
+            ],
+            "Condition": {
+                 "IpAddress": {
+                   "aws:SourceIp": [
+                        xxxiprestrictionsxxx
+                                   ]
+                              }
+            }
         },
         {
             "Effect": "Allow",
