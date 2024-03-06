@@ -16,16 +16,15 @@ templatedir=os.path.normpath(os.path.join(scriptdir, "..","templates","alarms-bu
 aws=rcs3.read_aws_settings()
 
 
-usage="Create an SNS topic for email notifications related to a specific S3 bucket. The default action is to add user@uci.edu.  Repeated calls add addresses to the SNS topic.  AWS checks for duplicate addresses.  The subscribed address must confirm by responding to AWS confirmation message."
+usage="""Create an SNS topic for email notifications related to a specific S3 bucket. Repeated calls add addresses to the SNS topic.  
+AWS checks for duplicate addresses.  The subscribed address must confirm by responding to AWS confirmation message."""
 p = argparse.ArgumentParser( description=usage )
-p.add_argument( "user",
-        help="user UCInetID" )
+p.add_argument( "owner",
+        help="user ID of ownser" )
 p.add_argument( "host",
         help="hostname" )
 p.add_argument( "-e", "--email", nargs="+",
-        help="list of emails to add in addition to the PI" )
-p.add_argument( "-x", "--exclude", action="store_true",
-        help="do not include the PI email" )
+        help="list of emails to add" )
 args = p.parse_args()
 
 
@@ -38,7 +37,7 @@ session = boto3.Session( profile_name=aws[ "profile" ] )
 
 # check if associated S3 bucket exists
 s3_client = session.client( "s3" )
-bucket = args.user + "-" + args.host + "-" + aws['bucket_postfix'] 
+bucket = args.owner + "-" + args.host + "-" + aws['bucket_postfix'] 
 try:
     s3_client.head_bucket( Bucket=bucket )
 except s3_client.exceptions.ClientError:
@@ -48,8 +47,6 @@ except s3_client.exceptions.ClientError:
 
 # create list of emails to subscribe to SNS topic
 maillist=[]
-if not args.exclude:
-    maillist.append( "{}@uci.edu".format( args.user ) )
 if args.email:
     maillist += args.email
 
@@ -58,7 +55,7 @@ sns_client = session.client( "sns" )
 
 # no error if topic already exists
 response = sns_client.create_topic(
-    Name="{}-{}-{}".format( args.user, args.host,aws['owner_notify'] )
+    Name="{}-{}-{}".format( args.owner, args.host,aws['owner_notify'] )
 )
 
 for m in maillist:
