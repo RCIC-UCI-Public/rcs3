@@ -41,11 +41,7 @@
                 "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxbucketxxx/*"
             ],
             "Condition": {
-                 "IpAddress": {
-                   "aws:SourceIp": [
-                        xxxiprestrictionsxxx
-                                   ]
-                              }
+                xxxiprestrictionsxxx
             }
         },
         {

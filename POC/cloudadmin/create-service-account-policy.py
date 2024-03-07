@@ -21,6 +21,8 @@ p.add_argument( "user",
         help="user UCInetID" )
 p.add_argument( "host",
         help="hostname" )
+p.add_argument( "-i", "--iprestrictions", nargs="*",
+        help="override iprestrictions list in config file" )
 p.add_argument( "-t", "--policy_template",
         help="override policy_template in config file" )
 p.add_argument( "-v", "--verbose", action="store_true",
@@ -67,16 +69,17 @@ my_vars = {
     "xxxbucketxxx": aws[ "bucket_postfix" ],
     "xxxinventoryxxx": aws[ "inventory_postfix" ],
     "xxxreportsxxx": aws[ "reports" ].removeprefix( "s3://"),
-    "xxxs3endpointxxx": aws[ "storagegateway" ],
     "xxxaccountidxxx": aws[ "accountid" ],
-    "xxxregionxxx": aws[ "region" ],
-    "xxxinstancetypexxx": aws[ "instancetype" ],
-    "xxxkeypairxxx": aws[ "keypair" ],
-    "xxxvpcidxxx": aws[ "vpcid" ],
-    "xxxiprestrictionsxxx": transform.createPolicyIpCondition( aws[ "iprestrictions" ] )
+    "xxxregionxxx": aws[ "region" ]
 }
+if args.iprestrictions is None:
+    if "iprestrictions" in aws.keys():
+        my_vars[ "xxxiprestrictionsxxx" ] = transform.createPolicyIpCondition( aws[ "iprestrictions" ] )
+    else:
+        my_vars[ "xxxiprestrictionsxxx" ] = ""
+else:
+    my_vars[ "xxxiprestrictionsxxx" ] = transform.createPolicyIpCondition( args.iprestrictions )
 json_policy = transform.template_to_string( input_template, my_vars )
-
 
 # create the EC2 policy or lookup an existing policy
 try:
