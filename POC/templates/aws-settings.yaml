@@ -45,6 +45,7 @@ configfile: "config/aws-admin"
 lifecyclejson: "templates/lifecycle-all.json"
 commandfile: "templates/ec2-after-boot-commands.txt"
 schemafile: "templates/template-athena-schema.txt"
+policy_template: "template-json2.json"
 
 ## Alarm Setup
 bucket_alarm_templates:
