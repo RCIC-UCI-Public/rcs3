@@ -1,0 +1,6 @@
+{
+    "DashboardName": "System-Alarms",
+    "widgets": [
+%WIDGETS%
+    ]
+}

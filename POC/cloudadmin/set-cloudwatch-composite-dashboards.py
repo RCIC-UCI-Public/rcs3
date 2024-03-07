@@ -56,13 +56,26 @@ def main(argv):
         wrapper = dashboard["wrapper"]
         inner = dashboard["inner"]
         replacevar = dashboard["replacevar"]
-        height = dashboard["height"]
-        systemplates = '{ "type":"text", "height": 1, "properties": { "markdown" : "**Systems Protected: %COUNT%**" }},\n'
+        try:
+            height = dashboard["height"]
+        except:
+            height = 1
+        try:
+            height2 = dashboard["height2"]
+        except:
+            height2 = 0
+        systemplates = '{ "type":"text", "height": 1, "x": 0, "y": 0, "properties": { "markdown" : "**Systems Protected: %COUNT%**" }},\n'
         # Iterate through the system to build out the array of inner templates
-        height = 4
         nsys = 0
+        curY = 1
+
         for [owner,system] in systems:
             nsys += 1
+            # HEIGHT and HEIGHT2 are how "tall" two different widgets are
+            # The Y-location is computed
+            #     Y first widget = curY
+            #     Y of second widget = curY + height
+            # curY += height+height2 after each iteration
             rvalues = { 
                 "%LENS%" : aws["lens"],
                 "%REGION%" : aws["region"],
@@ -70,8 +83,12 @@ def main(argv):
                 "%BUCKET%" :  aws["bucket_postfix"],
                 "%OWNER%" : owner,
                 "%SYSTEM%" : system,
-                "%HEIGHT%" : str(height)}
+                "%HEIGHT%" : str(height),
+                "%HEIGHT2%" : str(height2),
+                "%YLOC%" : str(curY),
+                "%YLOC2%" : str(curY + height) }
   
+            curY += height2 + height
             # read the inner template file and string replace using the rvalues dictionary
             # Append to the systemplates  string
 
@@ -92,7 +109,11 @@ def main(argv):
 
         ## String replacements done, convert to json and upload the dashboard
         fulljson = json.loads("".join(fullfile))
-        put_dashboard(cw_client,fulljson)
+        if args.dryrun:
+           for x in fullfile:
+               print (x)
+        else:
+           put_dashboard(cw_client,fulljson)
  
 def put_dashboard(cw,DASH):
     print("Putting Dashboard: ",DASH['DashboardName'], "into cloudwatch")

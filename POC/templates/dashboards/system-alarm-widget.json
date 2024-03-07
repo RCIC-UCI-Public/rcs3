@@ -1,0 +1,83 @@
+        {
+            "height": %HEIGHT%,
+            "width": 16,
+            "y": %YLOC%,
+            "x": 0,
+            "type": "text",
+            "properties": {
+                "markdown": "## %OWNER%-%SYSTEM%",
+                "background": "transparent"
+            }
+        },
+        {
+            "height": %HEIGHT2%,
+            "width": 4,
+            "y": %YLOC2%,
+            "x": 0,
+            "type": "metric",
+            "properties": {
+                "title": "Storage Quota",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% exceeded storage quota"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "height": %HEIGHT2%,
+            "width": 4,
+            "y": %YLOC2%,
+            "x": 4,
+            "type": "metric",
+            "properties": {
+                "title": "Object Quota",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% exceeded number objects quota"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "height": %HEIGHT2%,
+            "width": 4,
+            "y": %YLOC2%,
+            "x": 8,
+            "type": "metric",
+            "properties": {
+                "title": "Requests:Objects Ratio",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% excessive daily activity"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        },
+        {
+            "height": %HEIGHT2%,
+            "width": 4,
+            "y": %YLOC2%,
+            "x": 12,
+            "type": "metric",
+            "properties": {
+                "title": "Bucket Activity",
+                "annotations": {
+                    "alarms": [
+                        "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% no activity"
+                    ]
+                },
+                "view": "timeSeries",
+                "stacked": false,
+                "type": "chart"
+            }
+        }

@@ -62,3 +62,8 @@ cloudwatch_dashboard_array:
     inner: bucket-storage.json
     replacevar: "%WIDGETS%"
     height: 4
+  - wrapper: system-alarms.json
+    inner: system-alarm-widget.json
+    replacevar: "%WIDGETS%"
+    height: 1
+    height2: 3
