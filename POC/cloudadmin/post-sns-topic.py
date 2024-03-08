@@ -24,6 +24,8 @@ p.add_argument( "host",
         help="hostname" )
 p.add_argument( "-m", "--message", dest="message", default="default SNS message",
         help="message to send" )
+p.add_argument( "-s", "--subject", dest="subject", default="RCS3 Host Message",
+        help="message to send" )
 args = p.parse_args()
 
 
@@ -41,7 +43,7 @@ topic="{}-{}-{}".format( args.owner, args.host,aws['owner_notify'] )
 try:
     mytopics = list(filter(lambda x: x['TopicArn'].endswith(topic), sns_client.list_topics()['Topics']))
     myArn = mytopics[0]['TopicArn']
-    response = sns_client.publish( TopicArn=myArn, Message=args.message )
+    response = sns_client.publish( TopicArn=myArn, Message=args.message, Subject=args.subject )
 except sns_client.exceptions.InvalidParameterException:
     print( "Invalid parameter, skipping: {}".format( m ) )
         
