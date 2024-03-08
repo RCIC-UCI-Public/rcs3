@@ -11,12 +11,15 @@ function helptext
 {
       echo "create-bucket-with-inventory.sh [-h] [-n <networks>] <user> <host>"
       echo "    -h    help"
-      echo "    -n <networks>  - valid network(s) that can access bucket"
+      echo "    -i <networks>  - valid network(s) that can access bucket"
       echo "                     e.g., 192.168.0.0/16" 
       echo "                     e.g., 192.168.0.0/16,10.10.0.1/24" 
 }
+
+OVERRIDE_NETWORKS=""
+
 # Define options
-optstring="hn:"
+optstring="hi:"
 
 while getopts ${optstring} arg; do
   case $arg in
@@ -24,9 +27,8 @@ while getopts ${optstring} arg; do
       helptext
       exit 0
       ;;
-    n)
-      # Overwrite IPRESTRICTIONS in aws-settings.yaml
-      RCS3_IPRESTRICTIONS=$OPTARG
+    i)
+      OVERRIDE_NETWORKS="--iprestrictions=$OPTARG"
       ;;
     ?)
       echo "Invalid option: -$OPTARG"
@@ -72,8 +74,7 @@ $AWS s3api put-bucket-inventory-configuration --bucket $user-$host-$RCS3_BUCKET_
 $AWS s3api put-bucket-lifecycle-configuration --bucket $user-$host-$RCS3_BUCKET_POSTFIX --lifecycle-configuration file://$templates/lifecycle-all.json
 
 # create service account access policy, service account, and attach policy
-localize $templates/template-policy2.json $outputs/$user-$host-policy.json
-$AWS iam create-policy --policy-name $user-$host-$RCS3_POLICY_POSTFIX  --policy-document file://$outputs/$user-$host-policy.json
+$MYDIR/create-service-account-policy.py $OVERRIDE_NETWORKS $user $host
 
 $AWS iam create-user --user-name $user-$host-sa
 
