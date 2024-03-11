@@ -19,7 +19,7 @@
             "Metrics": [
                 {
                     "Id": "e1",
-                    "Expression": "SUM([m2,m3,m4])",
+                    "Expression": "SUM([FILL(m2,REPEAT),FILL(m3,REPEAT),FILL(m4,REPEAT)])",
                     "Label": "All Requests",
                     "ReturnData": true
                 },
