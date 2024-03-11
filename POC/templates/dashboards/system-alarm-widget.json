@@ -23,7 +23,7 @@
                     ]
                 },
                 "view": "timeSeries",
-                "stacked": false,
+                "stacked": true,
                 "type": "chart"
             }
         },
@@ -41,7 +41,7 @@
                     ]
                 },
                 "view": "timeSeries",
-                "stacked": false,
+                "stacked": true,
                 "type": "chart"
             }
         },
@@ -59,7 +59,7 @@
                     ]
                 },
                 "view": "timeSeries",
-                "stacked": false,
+                "stacked": true,
                 "type": "chart"
             }
         },
@@ -77,7 +77,7 @@
                     ]
                 },
                 "view": "timeSeries",
-                "stacked": false,
+                "stacked": true,
                 "type": "chart"
             }
         }

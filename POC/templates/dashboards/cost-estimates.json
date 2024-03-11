@@ -15,8 +15,8 @@
                     "label": "0%"
                 },
                 {
-                    "value": "0.17",
-                    "label": "17%"
+                    "value": "0.18",
+                    "label": "18%"
                 },
                 {
                     "value": "0.45",
@@ -68,17 +68,24 @@
             "pattern": "S3GLACIER",
             "inputType": "select",
             "id": "S3GlacierStorageCost",
-            "label": "S3 glacier",
+            "label": "S3 Glacier Class",
             "defaultValue": "0.0036",
-            "visible": false,
+            "visible": true,
             "values": [
                 {
+                    "value": "0.0040",
+                    "label": "GLACIER INSTANT"
+                },
+                {
                     "value": "0.0036",
-                    "label": "web"
+                    "label": "GLACIER FLEXIBLE"
+                },
+                {
+                    "value": "0.00099",
+                    "label": "GLACIER DEEP"
                 }
             ]
         }
-
     ],
     "widgets": [
         {
