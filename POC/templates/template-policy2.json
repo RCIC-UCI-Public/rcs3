@@ -80,6 +80,22 @@
                 "s3:PutBucketAcl"
             ],
             "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "sns:Publish",
+            "Resource": "arn:aws:sns:xxxregionxxx:xxxaccountidxxx:xxxuserxxx-xxxhostxxx-xxxowner-notifyxxx",
+            "Condition": {
+                xxxiprestrictionsxxx
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": "sns:ListTopics",
+            "Resource": "arn:aws:sns:xxxregionxxx:xxxaccountidxxx:*",
+            "Condition": {
+                xxxiprestrictionsxxx
+            }
         }
     ]
 }

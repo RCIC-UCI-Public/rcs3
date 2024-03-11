@@ -70,7 +70,9 @@ my_vars = {
     "xxxinventoryxxx": aws[ "inventory_postfix" ],
     "xxxreportsxxx": aws[ "reports" ].removeprefix( "s3://"),
     "xxxaccountidxxx": aws[ "accountid" ],
-    "xxxregionxxx": aws[ "region" ]
+    "xxxregionxxx": aws[ "region" ],
+    "xxxowner-notifyxxx": aws[ "owner_notify" ],
+    "xxxadmin-notifyxxx": aws[ "admin_notify" ]
 }
 if args.iprestrictions is None:
     if "iprestrictions" in aws.keys():
