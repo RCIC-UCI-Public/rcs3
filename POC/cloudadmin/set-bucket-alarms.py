@@ -72,7 +72,7 @@ def main(argv):
 
     for f in aws["bucket_alarm_templates"]:
         with open(os.path.join(templatedir,f),"r") as tf:
-            replaced = [ rcs3.replace_all(x,rvalues) for x in tf.readlines()] 
+            replaced = [ rcs3.replace_all(x,rvalues,comment='//') for x in tf.readlines()] 
             output = json.loads("".join(replaced))
             # make call cloudwatch 
             for MA in output['MetricAlarms']:

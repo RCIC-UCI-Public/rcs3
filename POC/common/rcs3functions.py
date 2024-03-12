@@ -5,6 +5,7 @@ import sys
 import yaml
 import json
 import io
+import re
 
 
 class TextIgnoreCommentsWrapper(io.TextIOWrapper):
@@ -53,10 +54,13 @@ def read_aws_settings(settings=None,configdir=None):
         sys.exit(-1) 
     return aws
 
-def replace_all(text, dic):
-    """ replace text with (key,value) (key is not regex).  """
+def replace_all(text, dic, comment=None):
+    """ replace text with (key,value) (key is not regex). 
+        will return '' if text begins with comment delimiter  """
     for target in dic.keys():
         text = text.replace(target, dic[target])
+        if comment is not None and re.match("^\s*%s" % comment,text) is not None:
+            text=''
     return text
 
 
