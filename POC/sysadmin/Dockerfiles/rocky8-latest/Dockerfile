@@ -28,7 +28,7 @@ RUN yum -y install \
     curl \
     wget
 
-# Get the latest version of rclone - v1.65.2 as of this writing
+# Get the latest version of rclone - v1.66.0 as of this writing - released 2024-03-10
 RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[ \t]+' '{print $2}') && \
     curl -O "https://downloads.rclone.org/$RCLONE_VERSION/rclone-$RCLONE_VERSION-linux-amd64.rpm" && \
     yum localinstall -y "rclone-$RCLONE_VERSION-linux-amd64.rpm" && \
