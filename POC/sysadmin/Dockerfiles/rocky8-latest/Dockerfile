@@ -10,9 +10,11 @@ RUN yum -y install \
 RUN yum -y install alternatives python39
 RUN alternatives --set python3 /usr/bin/python3.9
 RUN alternatives --set python /usr/bin/python3.9
-RUN python3 -m ensurepip --upgrade  # Upgrade pip and setuptools
-RUN python3 -m pip install --upgrade pip setuptools  # Upgrade pip and setuptools explicitly
-RUN python3 -m install pyyaml boto3 psutil distro 
+# Upgrade pip and setuptools
+RUN python3 -m ensurepip --upgrade
+# Upgrade pip and setuptools explicitly
+RUN python3 -m pip install --upgrade pip setuptools
+RUN python3 -m pip install pyyaml boto3 psutil distro
 
 RUN yum -y install \
     git \
