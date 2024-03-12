@@ -15,6 +15,9 @@ push:
 	docker push $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC)
 	docker push $(IMAGE_NAME):$(TAG_LATEST)
 
+# Make "all" the default target
+        .DEFAULT_GOAL := all
+
 # Target to clean up intermediate containers
 clean:
 	docker container prune -f
