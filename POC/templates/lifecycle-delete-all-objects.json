@@ -4,12 +4,20 @@
             "Expiration": {
                 "Days": 1
             },
-            "ID": "delete bucket",
+            "ID": "delete all objects",
             "Filter": {},
             "Status": "Enabled",
             "NoncurrentVersionExpiration": {
                 "NoncurrentDays": 1
             }
+        },
+        {
+            "Expiration": {
+                "ExpiredObjectDeleteMarker": true
+            },
+            "ID": "expired delete markers",
+            "Filter": {},
+            "Status": "Enabled"
         }
     ]
 }
