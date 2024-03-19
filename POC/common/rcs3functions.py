@@ -9,9 +9,10 @@ import re
 
 
 class TextIgnoreCommentsWrapper(io.TextIOWrapper):
-    """ Wrap a file to filter out lines STARTING with '#' when reading"""
-    def __init__(self, filename, mode='r', encoding='utf-8'):
+    """ Wrap a file to filter out lines STARTING with '#' when reading, skip 'empty' lines if skipblank is true"""
+    def __init__(self, filename, mode='r', encoding='utf-8',skipblank=True):
         file = open(filename, mode + 'b')  # Open in binary mode
+        self.skip=skipblank
         super().__init__(file, encoding=encoding)
 
     def __iter__(self):
@@ -19,7 +20,7 @@ class TextIgnoreCommentsWrapper(io.TextIOWrapper):
 
     def __next__(self):
         line = super().readline()
-        while line and line.startswith("#"):
+        while line and ( (re.match('\s*#',line) is not None) or (self.skip and re.match('\s',line) is not None)):
             line = super().readline()
         if not line:
             raise StopIteration
