@@ -30,6 +30,7 @@ RUN yum -y install \
     cargo \
     cronie \
     curl \
+    tcpdump \
     wget
 
 # Get the latest version of rclone - v1.66.0 as of this writing - released 2024-03-10
