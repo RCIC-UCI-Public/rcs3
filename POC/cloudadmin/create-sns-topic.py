@@ -32,11 +32,21 @@ args = p.parse_args()
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
+# when run from AWS services, profile is not used
+if "profile" in aws:
+    session = boto3.Session( profile_name=aws[ "profile" ] )
+else:
+    session = boto3
 
-session = boto3.Session( profile_name=aws[ "profile" ] )
+if "region" in aws:
+    s3_client = session.client( "s3", region_name=aws[ "region" ] )
+    sns_client = session.client( "sns", region_name=aws[ "region" ] )
+else:
+    s3_client = session.client( "s3" )
+    sns_client = session.client( "sns" )
+
 
 # check if associated S3 bucket exists
-s3_client = session.client( "s3" )
 bucket = args.owner + "-" + args.host + "-" + aws['bucket_postfix'] 
 try:
     s3_client.head_bucket( Bucket=bucket )
@@ -50,8 +60,6 @@ maillist=[]
 if args.email:
     maillist += args.email
 
-
-sns_client = session.client( "sns" )
 
 # no error if topic already exists
 response = sns_client.create_topic(
