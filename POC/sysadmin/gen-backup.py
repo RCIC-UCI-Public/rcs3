@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Generate rclone synchronization command lines based on yaml-formatted jobs files 
 # Author: Philip Papadopoulos (ppapadop@uci.edu)
-# (C) UC Regents 2023
+# (C) UC Regents 2023 - 2024
 import yaml 
 import re
 import sys
@@ -14,19 +14,24 @@ import pdb
 import time
 import subprocess
 from multiprocessing import Pool
+import boto3
+import platform
 
 class runBackup(object):
    
     def run_backup(job):
         sync = "sync" if "sync" in job.cmd else "top-up"
-        print("=== %s %s started at %s" % (job.name,sync,datetime.datetime.now()))
+        msg = "=== %s %s started at %s" % (job.name,sync,datetime.datetime.now())
+        print(msg)
         sys.stdout.flush()
+        if job.notify and job.system is not None:
+            notify_sns(job.owner, job.system, "RCS3: Backup Job Start from %s" % job.system, msg)
         # Write the filter file for the job
         with open(job.filterfile,"w") as f:
             f.writelines(job.filters)
         process = subprocess.Popen(job.cmd)
         process.wait()
-        return job.name
+        return job
 
     def __init__(self,alljobs,parallel=2,lockfile="/var/lock/gen-backup.lock"):
         self._lockfile = lockfile 
@@ -43,8 +48,11 @@ class runBackup(object):
         with Pool(self._parallel) as pool:
             try:
                 for finished in pool.imap_unordered(runBackup.run_backup, self._alljobs):
-                    print("=== %s completed at %s" % (finished,datetime.datetime.now()))
+                    msg = "=== %s completed at %s" % (finished.name,datetime.datetime.now())
+                    print(msg)
                     sys.stdout.flush()
+                    if finished.notify and finished.system is not None:
+                        notify_sns(finished.owner, finished.system, "RCS3: Backup Job End from %s" % finished.system, msg)
                 print("All tasks completed.")
             except:
                 pass
@@ -52,7 +60,7 @@ class runBackup(object):
             os.unlink(self._lockfile)
 
 class backupJob(object):
-    def __init__(self,name,path):
+    def __init__(self,name,path,owner=None,system=None):
         self._name = str(name)
         self._destprefix = str(name)
         self._path = path
@@ -69,6 +77,9 @@ class backupJob(object):
         self._cmd = list()
         self._extra = list()
         self._rclonecmd = "rclone"
+        self._owner = owner
+        self._system = system
+        self._notify = False 
 
     ## Standard Setters and Getters for various components of a backup job object
     @property
@@ -163,22 +174,47 @@ class backupJob(object):
 
   
     @property
-    def extra(self):
-        return self._extra
-
-    @property
     def rclonecmd(self):
         return self._rclonecmd
 
-    @extra.setter
+    @rclonecmd.setter
     def rclonecmd(self,value):
         """Set Rclone cmd to override ENV """
         self._rclonecmd = value 
+
+    @property
+    def extra(self):
+        return self._extra
 
     @extra.setter
     def extra(self,value):
         """Set Rclone extra arguments"""
         self._extra = re.split('\s+',value)
+
+    @property
+    def notify(self):
+        return self._notify
+
+    @notify.setter
+    def notify(self,value):
+        """Set Notify T/F"""
+        self._notify = value 
+
+    @property
+    def owner(self):
+        return self._owner
+
+    @owner.setter
+    def owner(self,value):
+        self._owner = value
+
+    @property
+    def system(self):
+        return self._system
+
+    @system.setter
+    def system(self,value):
+        self._system = value
 
     @property
     def cmd(self):
@@ -328,8 +364,8 @@ class backupJob(object):
 
 class restoreJob(backupJob):
     """ Similar to a backupUp job but order is reversed """
-    def __init__(self,name,archivepath):
-       super().__init__(name, archivepath)
+    def __init__(self,name,archivepath,owner=None,system=None):
+       super().__init__(name, archivepath,owner,system)
        self._archivepath=archivepath
        self._mode = "copy"
 
@@ -343,6 +379,42 @@ class restoreJob(backupJob):
         rval.extend([self._mode,"%s:%s" % (endpoint,self._archivepath),self._destpath])
         return rval
 
+## Post to the SNS topic
+
+def notify_sns(owner,system, subject, msg):
+
+    if owner is None or system is None:
+        return
+
+    scriptdir=os.path.realpath(os.path.dirname(__file__))
+    sys.path.append(os.path.join(scriptdir,"..","common"))
+    import rcs3functions as rcs3
+
+    configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
+    aws=rcs3.read_aws_settings()
+    try:
+        x = os.environ['AWS_SHARED_CREDENTIALS_FILE']
+    except:
+        os.environ['AWS_SHARED_CREDENTIALS_FILE'] = os.path.join(configdir,'credentials')
+
+    try:
+        session = boto3.Session() 
+        sns_client = session.client( "sns" )
+    except:
+        return # Fail silently
+
+    # find the right SNS topic
+
+    topic="{}-{}-{}".format( owner, system, aws['owner_notify'] )
+
+    try:
+        mytopics = list(filter(lambda x: x['TopicArn'].endswith(topic), sns_client.list_topics()['Topics']))
+        # Select the first topic that matches
+        myArn = mytopics[0]['TopicArn']
+        response = sns_client.publish( TopicArn=myArn, Message=msg, Subject=subject)
+    except Exception as m:
+        print( "Could not use SNS notify. Error: {}".format(str(m)) )
+        
 ## *****************************
 ## main routine
 ## *****************************
@@ -385,6 +457,10 @@ def main(argv):
     parser.add_argument("-p", "--parallel",   dest="parallel",  default=2,help="how many backup jobs to run in parallel (2)")
     parser.add_argument("-K", "--checkers",  dest="checkers", default=32,help="how many checkers to run in parallel (32)")
     parser.add_argument("--rclonecmd",  dest="rclonecmd", default=None, help="Full path to rclone executable")
+    parser.add_argument("--skipnotify",  dest="skipnotify", default=False, action='store_true', help="Do not notify when sync jobs have completed")
+    parser.add_argument("--owner",  dest="owner", default=None, help="Owner of system. Must be specified if notifications sent")
+    sysname = platform.node()
+    parser.add_argument("--system",  dest="system", default=sysname, help="Override default name (%s) of system" % sysname)
     parser.add_argument("--lockfile",  dest="lockfile", default="/var/lock/gen-backup.lock",help="Alternate location for lockfile (default: /var/lock/gen-backup.lock)")
 
     parser.add_argument('command', metavar='command',choices=['list','run','detail','rclone'], nargs=1,
@@ -410,7 +486,7 @@ def main(argv):
     yamlbackup = None
     if not args.restore:
        # Always backup up the job file (usually ../config/jobs.yaml)
-       yamlbackup = backupJob('rcs3config',os.path.dirname(args.jobsfile))
+       yamlbackup = backupJob('rcs3config',os.path.dirname(args.jobsfile),args.owner,args.system)
        yamlbackup.includefiles = [os.path.basename(args.jobsfile)]
        alljobs = [yamlbackup] 
        mode = yamlbackup
@@ -480,6 +556,13 @@ def main(argv):
         os.sys.stdout.write(str(yamlbackup))
 
     elif command == 'run':
+        for job in alljobs:
+           job.owner = args.owner
+           job.system = args.system
+           if 'sync' in job.cmd:
+               if job != yamlbackup and args.skipnotify is False:
+                   job.notify = True
+
         runner = runBackup(alljobs,parallel=int(args.parallel),lockfile=args.lockfile)
         runner.run_jobs()
 
