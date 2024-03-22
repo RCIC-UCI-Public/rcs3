@@ -1,5 +1,6 @@
 # Use the latest version of Rocky Linux 8 as the base image
-FROM rockylinux/rockylinux:8
+FROM rockylinux/rockylinux:8.9
+# all supported tags @ https://hub.docker.com/_/rockylinux
 
 # Install desired packages via yum
 RUN yum -y update
