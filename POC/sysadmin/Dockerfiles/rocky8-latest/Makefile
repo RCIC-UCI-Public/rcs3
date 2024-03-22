@@ -26,6 +26,6 @@ clean:
 	docker container prune -f
 
 # Make "all" the default target
-#	.DEFAULT_GOAL := all
+.DEFAULT_GOAL := all
 
 .PHONY: build push clean all
