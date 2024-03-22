@@ -1,2 +1,5 @@
-0 11 * * 0 (/root/rcs3/POC/sysadmin/gen-backup.py run >> /var/log/gen-backup.log 2>&1) &
+# Run a full sync Sunday (Day 0) and 11am 
+0 11 * * 0 (/root/rcs3/POC/sysadmin/gen-backup.py --owner=panteater --system=labstorage run >> /var/log/gen-backup.log 2>&1) &
+
+# run top syncs M-Sa (Days 1-6)at 11am
 0 11 * * 1-6 (/root/rcs3/POC/sysadmin/gen-backup.py --top-up=24h run >> /var/log/gen-backup.log 2>&1) &
