@@ -1,5 +1,22 @@
 # Powershell Script that Sets Up Scheduled Tasks
 # 
+# Call as
+#    scheduled-tasks.ps1 -owner <owner> -system <systemname>
+# This will create top-up and sync scheduled tasks 
+#
+# Check the parameters
+param(
+    [Parameter(Mandatory=$true)]
+    [string] $owner,
+    [Parameter(Mandatory=$true)]
+    [string] $system
+)
+
+if (-not $owner -or -not $system) {
+  Write-Host "Usage: ./scheduled-tasks.ps1 -owner <owner> -system <systemname>"
+  exit /b 1
+}
+
 $CURRENTCMD=$MyInvocation.MyCommand.Path
 $CWD=Split-Path -Parent $CURRENTCMD
 $RCS3ROOT="$CWD\..\.."
@@ -16,14 +33,15 @@ $syncDay = 'Sunday'
 $topupDays = 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 
 # Backup command with commonly-used flags
-$backupCmd = "$GENBACKUP  --parallel=1 --threads=4 --checkers=64 --rclonecmd=$RCLONE --lockfile=$LOCKFILE run" 
+$backupCmd = "$GENBACKUP  --parallel=1 --threads=4 --checkers=64 --rclonecmd=$RCLONE --lockfile=$LOCKFILE --owner=$owner --system=$system run" 
 
 # Find the principal and 
 $principal = New-ScheduledTaskPrincipal -UserId "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 # Create the Weekly full sync
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek $syncDay -At 12:30am
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable
 $action = New-ScheduledTaskAction -WorkingDirectory "$CWD\.." -Execute powershell.exe -Argument "$COMMONARGS -command $backupCmd >> $LOGFILE 2>&1" 
-Register-ScheduledTask -TaskName 'Backup Weekly Sync' -Principal $principal -Action $action -Trigger $trigger
+Register-ScheduledTask -TaskName 'Backup Weekly Sync' -Principal $principal -Action $action -Trigger $trigger -Settings $settings
 echo $action
 
 #
