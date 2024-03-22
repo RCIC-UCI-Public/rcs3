@@ -1,3 +1,6 @@
+# Define the repo name
+REPO_NAME=rcs3uci
+
 # Define the base image name
 IMAGE_NAME=rcs3-rocky8
 
@@ -5,21 +8,24 @@ IMAGE_NAME=rcs3-rocky8
 TAG_VERSION_SPECIFIC=8.9
 TAG_LATEST=latest
 
-# Target to build the image
+# Target to build the image - once
 build:
-	docker build --no-cache -t $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC) .
-	docker build -t $(IMAGE_NAME):$(TAG_LATEST) .
+	docker build --no-cache .
 
-# Target to push all built images
+# Target to tag & push images - twice - using version specific and latest tag
 push:
-	docker push $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC)
-	docker push $(IMAGE_NAME):$(TAG_LATEST)
+	docker tag $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC) $(REPO_NAME)/$(IMAGE_NAME):$(TAG_VERSION_SPECIFIC)
+	docker push $(REPO_NAME)/$(IMAGE_NAME):$(TAG_VERSION_SPECIFIC)
+	docker tag $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC) $(REPO_NAME)/$(IMAGE_NAME):$(TAG_LATEST)
+	docker push $(REPO_NAME)/$(IMAGE_NAME):$(TAG_LATEST)
 
-# Make "all" the default target
-        .DEFAULT_GOAL := all
+all: build push
 
 # Target to clean up intermediate containers
 clean:
 	docker container prune -f
 
-.PHONY: build push clean
+# Make "all" the default target
+#	.DEFAULT_GOAL := all
+
+.PHONY: build push clean all
