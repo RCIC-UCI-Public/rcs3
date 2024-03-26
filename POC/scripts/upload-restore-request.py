@@ -8,6 +8,7 @@ import sys
 import yaml
 import tempfile
 import urllib.parse
+from datetime import date
 
 
 execdir = os.path.dirname(os.path.abspath(__file__))
@@ -80,7 +81,7 @@ try:
     response = s3.put_object(
         Body=uploadfile,
         Bucket=rbucket,
-        Key= args.user + "/" + args.host + "-restore-list"
+        Key= args.user + "/" + args.host + "-restore-" + date.today().isoformat()
     )
     if args.verbose:
         print(response)
