@@ -47,7 +47,7 @@ def main(argv):
     account=aws["accountid"]
     notify_list = [ '"arn:aws:sns:%s:%s:%s"' % (region,account,aws["admin_notify"])] 
     pi_topic = "arn:aws:sns:%s:%s:%s-%s-%s" % (region,account,args.owner,args.host,aws["owner_notify"])
-    sns_client = session.client( "sns" )
+    sns_client = session.client( "sns", region_name=aws[ "region" ] )
     try:
         sns_client.get_topic_attributes( TopicArn=pi_topic )
         notify_list.append( '"%s"' % pi_topic )
@@ -68,7 +68,7 @@ def main(argv):
                 "%NOTIFY%" : notify }
     # Open each template file (which will be invalid json with %XYZ% replacements), read and replace.
     # then load the string as json
-    cw_client = session.client( "cloudwatch" )
+    cw_client = session.client( "cloudwatch", region_name=aws[ "region" ] )
 
     for f in aws["bucket_alarm_templates"]:
         with open(os.path.join(templatedir,f),"r") as tf:

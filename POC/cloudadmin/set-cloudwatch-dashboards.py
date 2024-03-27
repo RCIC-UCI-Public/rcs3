@@ -49,7 +49,7 @@ def main(argv):
 
     # Open each template file (which will be invalid json with %XYZ% replacements), read and replace.
     # then load the string as json
-    cw_client = session.client( "cloudwatch" )
+    cw_client = session.client( "cloudwatch", region_name=aws[ "region" ] )
 
     for f in aws["cloudwatch_dashboard_templates"]:
         with open(os.path.join(templatedir,f),"r") as tf:

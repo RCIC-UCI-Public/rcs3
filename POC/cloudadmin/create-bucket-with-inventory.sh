@@ -55,7 +55,7 @@ host=$2
 # AWS account
 awsacct=$RCS3_ACCOUNTID
 awsprofile=$RCS3_PROFILE
-AWS="aws --profile $awsprofile"
+AWS="aws --profile $awsprofile --region=$RCS3_REGION"
 
 for bucketname in $user-$host-$RCS3_BUCKET_POSTFIX $user-$host-$RCS3_INVENTORY_POSTFIX
 do

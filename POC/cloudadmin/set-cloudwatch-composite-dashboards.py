@@ -49,7 +49,7 @@ def main(argv):
         os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
     
     session = boto3.Session( profile_name=aws[ "profile" ] )
-    cw_client = session.client( "cloudwatch" )
+    cw_client = session.client( "cloudwatch",region_name=aws[ "region" ] )
 
     ## Construct each composite dashboard
     for dashboard in aws["cloudwatch_dashboard_array"]:
