@@ -199,11 +199,13 @@
             "type": "metric",
             "properties": {
                 "metrics": [
-                    [ { "expression": "SUM([g_bytes,s_bytes,d_bytes])", "label": "Total Storage", "id": "e1", "region": "%REGION%" } ],
+                    [ { "expression": "SUM([g_bytes,s_bytes,d_bytes])/1.073", "label": "Total Storage", "id": "total_bytes", "region": "%REGION%" } ],
                     [ { "expression": "SUM([s_obj,g_obj,d_obj])", "label": "Objects", "id": "e9", "region": "%REGION%" } ],
                     [ { "expression": "SUM([stor_cost,costs_api])", "label": "Total Cost (mean: $ ${AVG})", "id": "e5", "region": "%REGION%" } ],
-                    [ { "expression": "SUM([g_bytes,d_bytes])", "label": "Archive Storage", "id": "e3", "region": "%REGION%" } ],
-                    [ { "expression": "SUM([s_ncv_bytes,d_dm_bytes,g_ncv_bytes,g_dm_bytes,d_ncv_bytes,d_dm_bytes])", "label": "Snapshot Bytes", "id": "e7", "region": "%REGION%" } ],
+                    [ { "expression": "SUM([g_bytes,d_bytes])/1.073", "label": "Archive Storage", "id": "arch_bytes", "region": "%REGION%" } ],
+                    [ { "expression": "total_bytes - arch_bytes", "label": "STD Storage", "id": "std_bytes", "region": "%REGION%" } ],
+                    [ { "expression": "SUM([s_ncv_bytes,d_dm_bytes,g_ncv_bytes,g_dm_bytes,d_ncv_bytes,d_dm_bytes])/1.073", "label": "Snapshot Bytes", "id": "e7", "region": "%REGION%" } ],
+                    [ { "expression": "(e7/total_bytes)*100.0", "label": "Snap Overhead % (mean: ${AVG}%", "id": "snap_overhead", "region": "%REGION%" } ],
                     [ { "expression": "SUM([g_post_r,g_put_r,g_list_r])", "label": "Glacier-Put-Post-List-Requests (mean: ${AVG})", "id": "g_sumppl_r", "region": "%REGION%", "visible":false } ],
                     [ { "expression": "SUM([d_post_r,d_put_r,d_list_r])", "label": "Deep-Put-Post-List-Requests (mean: ${AVG})", "id": "d_sumppl_r", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "SUM([s_list_r,b_list_r,b_put_r,s_put_r,b_post_r,s_post_r])", "label": "Bucket-Standard-Put-Post-List-Requests (mean: ${AVG})", "id": "sb_sumppl_r", "region": "%REGION%", "visible": false } ],
