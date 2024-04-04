@@ -11,6 +11,7 @@ function helptext
 {
       echo "create-bucket-with-inventory.sh [-h] [-g] [-n <networks>] <user> <host>"
       echo "    -h    help"
+      echo "    -d    dryrun. Just print commands that would be executed " 
       echo "    -g    tier to glacier instead of deep archive"
       echo "    -i <networks>  - valid network(s) that can access bucket"
       echo "                     e.g., 192.168.0.0/16" 
@@ -19,15 +20,19 @@ function helptext
 
 OVERRIDE_NETWORKS=""
 TIERCLASS="deeparchive"
+DRYRUN=""
 
 # Define options
-optstring="hi:"
+optstring="dghi:"
 
 while getopts ${optstring} arg; do
   case $arg in
     h)
       helptext
       exit 0
+      ;;
+    d)
+      DRYRUN="echo"
       ;;
     g)
       TIERCLASS="glacier"
@@ -60,11 +65,11 @@ host=$2
 # AWS account
 awsacct=$RCS3_ACCOUNTID
 awsprofile=$RCS3_PROFILE
-AWS="aws --profile $awsprofile --region=$RCS3_REGION"
+AWS="$DRYRUN aws --profile $awsprofile --region=$RCS3_REGION"
 
 for bucketname in $user-$host-$RCS3_BUCKET_POSTFIX $user-$host-$RCS3_INVENTORY_POSTFIX
 do
-    createbucket $bucketname "$AWS"
+    $DRYRUN createbucket $bucketname "$AWS"
 done
 
 # put bucket policy for inventory bucket
@@ -79,7 +84,7 @@ $AWS s3api put-bucket-inventory-configuration --bucket $user-$host-$RCS3_BUCKET_
 $AWS s3api put-bucket-lifecycle-configuration --bucket $user-$host-$RCS3_BUCKET_POSTFIX --lifecycle-configuration file://$templates/lifecycle-all-$TIERCLASS.json
 
 # create service account access policy, service account, and attach policy
-$MYDIR/create-service-account-policy.py $OVERRIDE_NETWORKS $user $host
+$DRYRUN $MYDIR/create-service-account-policy.py $OVERRIDE_NETWORKS $user $host
 
 $AWS iam create-user --user-name $user-$host-sa
 
