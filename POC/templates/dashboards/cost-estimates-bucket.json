@@ -1,5 +1,6 @@
 {
     "DashboardName": "Cost-Estimates-Bucket",
+    "start": "-PT672H",
     "variables": [
         {
             "type": "pattern",
@@ -46,7 +47,7 @@
         {
             "type": "pattern",
             "pattern": "S3STD",
-            "inputType": "select",
+            "inputType": "radio",
             "id": "S3StorageCost",
             "label": "S3 standard",
             "defaultValue": "0.021",
@@ -58,6 +59,7 @@
                 }
             ]
         },
+
         {
             "type": "pattern",
             "pattern": "S3GLACIER",
@@ -74,10 +76,36 @@
                 {
                     "value": "0.0036",
                     "label": "GLACIER FLEXIBLE"
-                },
+                }
+            ]
+        },
+        {
+            "type": "pattern",
+            "pattern": "S3DEEP",
+            "inputType": "radio",
+            "id": "S3DeepStorageCost",
+            "label": "S3 Deep Class",
+            "defaultValue": "0.00099",
+            "visible": false,
+            "values": [
                 {
                     "value": "0.00099",
                     "label": "GLACIER DEEP"
+                }
+            ]
+        },
+        {
+            "type": "pattern",
+            "pattern": "DAY2GBMO",
+            "inputType": "radio",
+            "id": "B20GBMO",
+            "label": "B20GBMO",
+            "defaultValue": "3.0080213e-11",
+            "visible": false,
+            "values": [
+                {
+                    "value": "3.0080213e-11",
+                    "label": "3.0080213e-11"
                 }
             ]
         }
