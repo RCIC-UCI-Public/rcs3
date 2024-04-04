@@ -1,0 +1,37 @@
+{
+    "Rules": [
+        {
+            "Filter": {
+                "ObjectSizeGreaterThan": 131072
+            }, 
+            "Status": "Enabled", 
+            "Transitions": [
+                {
+                    "Days": 3, 
+                    "StorageClass": "DEEP_ARCHIVE"
+                }
+            ], 
+            "NoncurrentVersionTransitions": [
+                {
+                    "NoncurrentDays": 3, 
+                    "StorageClass": "DEEP_ARCHIVE"
+                }
+            ], 
+            "ID": "Tiered-Storage"
+        }, 
+        {
+            "Status": "Enabled", 
+            "NoncurrentVersionExpiration": {
+                "NoncurrentDays": 180
+            }, 
+            "Filter": {}, 
+            "Expiration": {
+                "ExpiredObjectDeleteMarker": true
+            }, 
+            "AbortIncompleteMultipartUpload": {
+                "DaysAfterInitiation": 3
+            }, 
+            "ID": "Delayed-Delete"
+        }
+    ]
+}

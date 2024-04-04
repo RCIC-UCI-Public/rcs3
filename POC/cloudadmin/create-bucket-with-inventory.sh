@@ -9,14 +9,16 @@ source  <($COMMON_DIR/aws-settings-to-bash.py)
 
 function helptext
 {
-      echo "create-bucket-with-inventory.sh [-h] [-n <networks>] <user> <host>"
+      echo "create-bucket-with-inventory.sh [-h] [-g] [-n <networks>] <user> <host>"
       echo "    -h    help"
+      echo "    -g    tier to glacier instead of deep archive"
       echo "    -i <networks>  - valid network(s) that can access bucket"
       echo "                     e.g., 192.168.0.0/16" 
       echo "                     e.g., 192.168.0.0/16,10.10.0.1/24" 
 }
 
 OVERRIDE_NETWORKS=""
+TIERCLASS="deeparchive"
 
 # Define options
 optstring="hi:"
@@ -26,6 +28,9 @@ while getopts ${optstring} arg; do
     h)
       helptext
       exit 0
+      ;;
+    g)
+      TIERCLASS="glacier"
       ;;
     i)
       OVERRIDE_NETWORKS="--iprestrictions=$OPTARG"
@@ -71,7 +76,7 @@ localize $templates/template-inventory-configuration.json $outputs/$user-$host-i
 $AWS s3api put-bucket-inventory-configuration --bucket $user-$host-$RCS3_BUCKET_POSTFIX --id $user-$host-daily --inventory-configuration file://$outputs/$user-$host-inv-cfg.json
 
 # put the lifecycle policy into the bucket for storage transititions and permanent deletions
-$AWS s3api put-bucket-lifecycle-configuration --bucket $user-$host-$RCS3_BUCKET_POSTFIX --lifecycle-configuration file://$templates/lifecycle-all.json
+$AWS s3api put-bucket-lifecycle-configuration --bucket $user-$host-$RCS3_BUCKET_POSTFIX --lifecycle-configuration file://$templates/lifecycle-all-$TIERCLASS.json
 
 # create service account access policy, service account, and attach policy
 $MYDIR/create-service-account-policy.py $OVERRIDE_NETWORKS $user $host
