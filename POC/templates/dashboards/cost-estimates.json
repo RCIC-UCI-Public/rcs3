@@ -1,5 +1,5 @@
 {
-    "DashboardName": "Cost-Estimates2",
+    "DashboardName": "Cost-Estimates",
     "start": "-PT672H",
     "variables": [
         {
@@ -16,8 +16,8 @@
                     "label": "0%"
                 },
                 {
-                    "value": "0.18",
-                    "label": "18%"
+                    "value": "0.40",
+                    "label": "40%"
                 },
                 {
                     "value": "0.45",
