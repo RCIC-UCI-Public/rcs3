@@ -96,16 +96,16 @@
         },
         {
             "type": "pattern",
-            "pattern": "DAY2GBMO",
+            "pattern": "BYTES2GB",
             "inputType": "radio",
-            "id": "B20GBMO",
-            "label": "B20GBMO",
-            "defaultValue": "3.0080213e-11",
+            "id": "BYTES2GB",
+            "label": "BYTES2GB",
+            "defaultValue": "9.313225746e-10",
             "visible": false,
             "values": [
                 {
-                    "value": "3.0080213e-11",
-                    "label": "3.0080213e-11"
+                    "value": "9.313225746e-10",
+                    "label": "9.313225746e-10"
                 }
             ]
         }

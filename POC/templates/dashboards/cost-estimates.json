@@ -100,16 +100,16 @@
         },
         {
             "type": "pattern",
-            "pattern": "DAY2GBMO",
+            "pattern": "BYTES2GB",
             "inputType": "radio",
-            "id": "B20GBMO",
-            "label": "B20GBMO",
-            "defaultValue": "3.0080213e-11",
+            "id": "BYTES2GB",
+            "label": "BYTES2GB",
+            "defaultValue": "9.313225746e-10",
             "visible": false,
             "values": [
                 {
-                    "value": "3.0080213e-11",
-                    "label": "3.0080213e-11"
+                    "value": "9.313225746e-10",
+                    "label": "9.313225746e-10"
                 }
             ]
         }
@@ -175,9 +175,10 @@
                 "metrics": [
                     [ { "expression": "RUNNING_SUM(stor_cost)", "label": "Total Cost ($ ${MAX})", "id": "e2", "yAxis": "right", "region": "%REGION%", "color": "#98df8a" } ],
                     [ { "expression": "(1-SDISCOUNT)*((s_gb_mo*S3STD) + (g_gb_mo*S3GLACIER)) + d_gb_mo*S3DEEP", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "stor_cost", "yAxis": "right", "region": "%REGION%", "color": "#45fc45" } ],
-                    [ { "expression": "s_bytes*DAY2GBMO", "label": "GB-Months-Standard", "id": "s_gb_mo", "region": "%REGION%", "color" : "#45c7fc" } ],
-                    [ { "expression": "g_bytes*DAY2GBMO", "label": "GB-Months-Glacier", "id": "g_gb_mo", "region": "%REGION%", "color" : "#b745fc" } ],
-                    [ { "expression": "d_bytes*DAY2GBMO", "label": "GB-Months-Deep", "id": "d_gb_mo", "region": "%REGION%", "color" : "#fc45af" } ],
+                    [ { "expression": "s_bytes*BYTES2GB/days", "label": "GB-Months-Standard", "id": "s_gb_mo", "region": "%REGION%", "color" : "#45c7fc" } ],
+                    [ { "expression": "g_bytes*BYTES2GB/days", "label": "GB-Months-Glacier", "id": "g_gb_mo", "region": "%REGION%", "color" : "#b745fc" } ],
+                    [ { "expression": "d_bytes*BYTES2GB/days", "label": "GB-Months-Deep", "id": "d_gb_mo", "region": "%REGION%", "color" : "#fc45af" } ],
+                    [ { "expression": "IF(MONTH(s_bytes) == 2, 28.0, IF(MONTH(s_bytes)==4 || MONTH(s_bytes)==6 || MONTH(s_bytes)==9 || MONTH(s_bytes)==11,30.0,31.0))", "label": "days in month", "id": "days", "region": "%REGION%", "visible": false } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "id": "s_bytes", "region": "%REGION%", "color": "#a2e3fc" } ],
                     [ ".", "DeleteMarkerStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "s_dm_bytes", "region": "%REGION%", "color": "#ffbb78", "visible" : false } ],
                     [ ".", "NonCurrentVersionStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "s_ncv_bytes", "region": "%REGION%", "color": "#dbdb8d", "visible" : false } ],
@@ -248,9 +249,11 @@
                     [ "...", "DEEP_ARCHIVE", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "d_obj", "region": "%REGION%", "visible": false } ],
                     [ { "expression": "(1-SDISCOUNT)*((s_gb_mo*S3STD) + (g_gb_mo*S3GLACIER)) + d_gb_mo*S3DEEP", "label": "Daily Storage Cost (mean: $ ${AVG})", "id": "stor_cost", "yAxis": "right", "region": "%REGION%", "color": "#2ca02c", "visible": false } ],
                     [ { "expression": "RUNNING_SUM(stor_cost)", "label": "Total Cost ($ ${MAX})", "id": "e2", "yAxis": "right", "region": "%REGION%", "color": "#98df8a", "visible" : false } ],
-                    [ { "expression": "s_bytes*DAY2GBMO", "label": "GB-Months-Standard", "id": "s_gb_mo", "region": "%REGION%","visible" : false } ],
-                    [ { "expression": "g_bytes*DAY2GBMO", "label": "GB-Months-Glacier", "id": "g_gb_mo", "region": "%REGION%", "visible" : false } ],
-                    [ { "expression": "d_bytes*DAY2GBMO", "label": "GB-Months-Deep", "id": "d_gb_mo", "region": "%REGION%", "visible" : false } ],
+                    [ { "expression": "s_bytes*BYTES2GB/days", "label": "GB-Months-Standard", "id": "s_gb_mo", "region": "%REGION%","visible" : false } ],
+                    [ { "expression": "g_bytes*BYTES2GB/days", "label": "GB-Months-Glacier", "id": "g_gb_mo", "region": "%REGION%", "visible" : false } ],
+                    [ { "expression": "d_bytes*BYTES2GB/days", "label": "GB-Months-Deep", "id": "d_gb_mo", "region": "%REGION%", "visible" : false } ],
+                    
+                    [ { "expression": "IF(MONTH(s_bytes) == 2, 28.0, IF(MONTH(s_bytes)==4 || MONTH(s_bytes)==6 || MONTH(s_bytes)==9 || MONTH(s_bytes)==11,30.0,31.0))", "label": "days in month", "id": "days", "region": "%REGION%", "visible": false } ],
                     [ "AWS/S3/Storage-Lens", "StorageBytes", "metrics_version", "1.0", "storage_class", "STANDARD", "aws_region", "%REGION%", "aws_account_number", "%ACCOUNT%", "configuration_id", "%LENS%", "record_type", "ACCOUNT", { "id": "s_bytes", "region": "%REGION%", "color": "#bcbd22", "visible" : false } ],
                     [ ".", "DeleteMarkerStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "s_dm_bytes", "region": "%REGION%", "color": "#ffbb78", "visible" : false } ],
                     [ ".", "NonCurrentVersionStorageBytes", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", { "id": "s_ncv_bytes", "region": "%REGION%", "color": "#dbdb8d", "visible" : false } ],
