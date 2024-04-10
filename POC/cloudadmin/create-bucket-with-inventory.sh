@@ -84,7 +84,7 @@ $AWS s3api put-bucket-inventory-configuration --bucket $user-$host-$RCS3_BUCKET_
 $AWS s3api put-bucket-lifecycle-configuration --bucket $user-$host-$RCS3_BUCKET_POSTFIX --lifecycle-configuration file://$templates/lifecycle-all-$TIERCLASS.json
 
 # create service account access policy, service account, and attach policy
-$DRYRUN $MYDIR/create-service-account-policy.py $OVERRIDE_NETWORKS $user $host
+$DRYRUN $MYDIR/create-service-account-policy.py $user $host $OVERRIDE_NETWORKS
 
 $AWS iam create-user --user-name $user-$host-sa
 
