@@ -1,9 +1,9 @@
-## This is a sample jobs.yaml the defines four backup jobs on a single path
-## Job names must be distinct (not checked, yet)
+## This is a sample jobs.yaml the defines a single backup job
+## relative to the root "/" path
 ## Path is commmon to the jobs relative to the path
 ---
 srcpaths:
-- path: /datadir
+- path: /
   ## Local decision to exclude .git subdirs
   exclude_global:
     - .git/**
@@ -11,14 +11,17 @@ srcpaths:
   ## Patterns from a file to exclude
   exclude_file: common_excludes.yaml
 
+## Job names must be distinct (not checked, yet)
+## job "backup1" 
+##   copies everything in /volume1 (the '/' comes from path: above)
+##   excludes any subdirectory starting with 'backup-config' (At any depth in /volume1)  
   jobs:
-    - name: backup1
+    - name: backup1 
       subdirectories:
-        - DataImages
+        - volume1 
+      excludes:
+        - backup-config/**
 
-    - name: backup2 
-      subdirectories:
-        - commondata 
 
 
 
