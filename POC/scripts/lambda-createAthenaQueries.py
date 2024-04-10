@@ -1,12 +1,36 @@
+import boto3
 import json
+import datetime
 
 def lambda_handler(event, context):
+    # create the SQL query to load a specific S3 inventory
+    # expects TableName, BucketName, and HiveDir as inputs
+    hivedate = datetime.date.today()
+    hivedir = event[ "HiveDir" ].format( str( hivedate ) )
+    # it is possible today's inventory run has not completed yet
+    # if hivedir/symlink.txt does not exist, then use previous day's inventory run
+    hivesym = "{}symlink.txt".format( hivedir )
+    s3 = boto3.client( "s3" )
+    try:
+        s3.head_object(
+            Bucket=event[ "BucketName" ],
+            Key=hivesym
+        )
+    except s3.exceptions.ClientError:
+        yesterday = hivedate - datetime.timedelta( days=1 )
+        hivedir = event[ "HiveDir" ].format( str( yesterday ) )
+    
+    loadschema = "CREATE EXTERNAL TABLE {} ( bucketname string, filename string, version_id string, is_latest boolean, is_delete_marker boolean, filesize bigint, last_modified_date string, storage_class string ) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat' OUTPUTFORMAT  'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat' LOCATION 's3://{}/{}' ;"
+    QuerySchema=loadschema.format( event[ "TableName" ], event[ "BucketName" ], hivedir )
+    
     # create the SQL queries for a specific S3 inventory in Athena
     # expects TableName, BucketName, and RestoreList as inputs
     a = []
     for request in event[ "RestoreList" ]:
         s = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}'".format( event[ "BucketName" ], event[ "TableName" ], request )
         a.append( { "SearchString": s } )
+    
     return {
-        "AthenaQueries": a
+        "QuerySchema": QuerySchema,
+        "QueryInventory": a
     }
