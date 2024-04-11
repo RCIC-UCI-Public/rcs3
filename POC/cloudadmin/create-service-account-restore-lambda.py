@@ -86,6 +86,10 @@ try:
         )
     if args.verbose:
         print( response )
+except lambda_client.exceptions.ResourceConflictException:
+    print( "Lambda function already exists: {}".format( args.purpose ) )
+    print( "Either delete it and re-create or use one of lambda update methods" )
+    sys.exit( 1 )
 except Exception as error:
     print( type(error).__name__ )
     print( error )
