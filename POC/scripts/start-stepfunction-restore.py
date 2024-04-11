@@ -8,8 +8,7 @@ import sys
 import yaml
 import tempfile
 import urllib.parse
-from datetime import date
-
+import json
 
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
@@ -48,21 +47,17 @@ def fix_wildcard_characters( rawstr ):
         rs = tmpstr
     return rs
 
-if args.skipencoding:
-    uploadfile = args.glacierlist
-else:
-    with open( args.glacierlist, "r" ) as gf:
-        tmpprefix = args.user + "-" + args.host + "-"
-        savedir = basedir + "/" + aws[ "outputdir" ]
-        ( wd, uploadfile ) = tempfile.mkstemp( prefix=tmpprefix, dir=savedir, text=True )
-        print( "Creating temporary file: {}".format( uploadfile ) )
-        with open( wd, "w" ) as wf:
-            for restorefilename in gf.readlines():
-                tmpstring = urllib.parse.quote( restorefilename.strip() )
-                encodedfilename = fix_wildcard_characters( tmpstring )
-                if args.verbose:
-                    print( "{}".format(encodedfilename) )
-                wf.write( "{}\n".format(encodedfilename) )
+restoreList = []
+with open( args.glacierlist, "r" ) as gf:
+    for restorefilename in gf.readlines():
+        if args.skipencoding:
+            restoreList.append( restorefilename.strip() )
+        else:
+            tmpstring = urllib.parse.quote( restorefilename.strip() )
+            encodedfilename = fix_wildcard_characters( tmpstring )
+            restoreList.append( encodedfilename )
+if args.verbose:
+    print( restoreList )
 
 # when run from AWS services, profile is not used
 if "profile" in aws:
@@ -71,17 +66,21 @@ else:
     session = boto3
 
 if "region" in aws:
-    s3 = session.client( "s3", region_name=aws[ "region" ] )
+    sfn = session.client( "stepfunctions", region_name=aws[ "region" ] )
 else:
-    s3 = session.client( "s3" )
+    sfn = session.client( "stepfunctions" )
 
-# remove s3:// prefix from reports bucket
-rbucket = aws[ "reports" ].replace( "s3://", "" )
+sfnArn = "arn:aws:states:{}:{}:stateMachine:{}-{}-sfn-test-stage-one"\
+    .format( aws[ "region" ], aws[ "accountid" ], args.user, args.host )
+sfnInput = json.dumps( { "RestoreList": restoreList } )
+if args.verbose:
+    print( "Calling ARN: {}".format( sfnArn ) )
+    print( "Using input: {}".format( sfnInput ) )
+
 try:
-    response = s3.put_object(
-        Body=uploadfile,
-        Bucket=rbucket,
-        Key= args.user + "/" + args.host + "-restore-" + date.today().isoformat()
+    response = sfn.start_execution(
+        stateMachineArn=sfnArn,
+        input=sfnInput,
     )
     if args.verbose:
         print(response)
