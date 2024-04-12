@@ -89,12 +89,12 @@ try:
     if args.verbose:
         print( response )
     try:
-        # aws/lambda is the default prefix for lambda logs
-        logsGroupName = "/aws/lambda/{}".format( args.purpose )
+        logsGroupName = aws[ "lambda_log_nameprefix ] + args.purpose
         logs.create_log_group( logGroupName=logsGroupName )
         logs.put_retention_policy(
             logGroupName=logsGroupName,
-            retentionInDays=28
+            retentionInDays=aws[ "lambda_log_retention" ]
+
         )
     except logs.exceptions.ResourceAlreadyExistsException:
         # not an error if CloudWatch log group already exists

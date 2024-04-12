@@ -23,13 +23,8 @@ admin_notify: "rcic-team-notify"
 owner_notify: "uci-notify"
 
 # 5. Settings needed to allow end-user to self-service restores
-instancetype: "t2.micro"
-ami: "ami-dddddddddd"
-vpcid: "vpc-dddddddddd"
-subnetid: "subnet-xxxxxxxxxxx"
-securitygroupid: "sg-xxxxxxxxxxx"
-keypair: "admin-ssh"
-storagegateway: "vpce-dddddddddd"
+lambda_log_nameprefix: "/aws/lambda/"
+lambda_log_retention: 28
 
 # 6. Restrict service accounts to specific array of IP addresses using
 # condition statments in policy definiations. Expected format is d.d.d.d/d
