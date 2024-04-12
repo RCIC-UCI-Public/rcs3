@@ -50,9 +50,11 @@ else:
 if "region" in aws:
     iam = session.client( "iam", region_name=aws[ "region" ] )
     lambda_client = session.client( "lambda", region_name=aws[ "region" ] )
+    logs = session.client( "logs", region_name=aws[ "region" ] )
 else:
     iam = session.client( "iam" )
     lambda_client = session.client( "lambda" )
+    logs = session.client( "logs" )
 
 # verify role has been created
 roleName = "{}-{}-{}-role".format( args.user, args.host, args.purpose)
@@ -86,6 +88,23 @@ try:
         )
     if args.verbose:
         print( response )
+    try:
+        # aws/lambda is the default prefix for lambda logs
+        logsGroupName = "/aws/lambda/{}".format( args.purpose )
+        logs.create_log_group( logGroupName=logsGroupName )
+        logs.put_retention_policy(
+            logGroupName=logsGroupName,
+            retentionInDays=28
+        )
+    except logs.exceptions.ResourceAlreadyExistsException:
+        # not an error if CloudWatch log group already exists
+        if args.verbose:
+            print( "Using existing log group without changes: {}".format( logsGroupName ) )
+        pass
+    except Exception as error:
+        print( type(error).__name__ )
+        print( error )
+        print( "CloudWatch log group not created: {}".format( logsGroupName ) )
 except lambda_client.exceptions.ResourceConflictException:
     print( "Lambda function already exists: {}".format( args.purpose ) )
     print( "Either delete it and re-create or use one of lambda update methods" )
