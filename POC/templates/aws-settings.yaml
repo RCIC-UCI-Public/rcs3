@@ -23,6 +23,9 @@ admin_notify: "rcic-team-notify"
 owner_notify: "uci-notify"
 
 # 5. Settings needed to allow end-user to self-service restores
+lambda_timeout: 60
+lambda_runtime: "python3.12"
+lambda_handler: "lambda_function.lambda_handler"
 lambda_log_nameprefix: "/aws/lambda/"
 lambda_log_retention: 28
 

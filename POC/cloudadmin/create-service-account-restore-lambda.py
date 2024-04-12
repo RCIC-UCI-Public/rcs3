@@ -79,10 +79,10 @@ try:
         response = lambda_client.create_function(
             FunctionName="{}".format( args.purpose ),
             Description="{}-{}-{}".format( args.user, args.host, args.purpose ),
-            Timeout=60,
-            Runtime="python3.12",
+            Timeout=aws[ "lambda_timeout" ],
+            Runtime=aws[ "lambda_runtime" ],
             Role=roleArn,
-            Handler="lambda_function.lambda_handler",
+            Handler=aws[ "lambda_handler" ],
             Code={ "ZipFile": zipBinary.read() },
             Publish=True,
         )
