@@ -53,12 +53,8 @@ my_vars = {
     "xxxbucketxxx": aws[ "bucket_postfix" ],
     "xxxinventoryxxx": aws[ "inventory_postfix" ],
     "xxxreportsxxx": aws[ "reports" ].removeprefix( "s3://"),
-    "xxxs3endpointxxx": aws[ "storagegateway" ],
     "xxxaccountidxxx": aws[ "accountid" ],
     "xxxregionxxx": aws[ "region" ],
-    "xxxinstancetypexxx": aws[ "instancetype" ],
-    "xxxkeypairxxx": aws[ "keypair" ],
-    "xxxvpcidxxx": aws[ "vpcid" ],
     "xxxiprestrictionsxxx": transform.createPolicyIpCondition( aws[ "iprestrictions" ] )
 }
 json_policy = transform.template_to_string( input_template, my_vars )
