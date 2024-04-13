@@ -106,9 +106,20 @@ try:
         print( error )
         print( "CloudWatch log group not created: {}".format( logsGroupName ) )
 except lambda_client.exceptions.ResourceConflictException:
-    print( "Lambda function already exists: {}".format( args.purpose ) )
-    print( "Either delete it and re-create or use one of lambda update methods" )
-    sys.exit( 1 )
+    if args.verbose:
+        print( "Updating lambda code" )
+    try:
+        response = lambda_client.update_function_code(
+            FunctionName="{}".format( args.purpose ),
+            ZipFile=b'bytes',
+            Publish=True,
+        )
+    except Exception as error:
+        print( type(error).__name__ )
+        print( error )
+        sys.exit( -1 )
+    if args.verbose:
+        print( response )
 except Exception as error:
     print( type(error).__name__ )
     print( error )
