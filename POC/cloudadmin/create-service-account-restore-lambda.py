@@ -89,7 +89,7 @@ try:
     if args.verbose:
         print( response )
     try:
-        logsGroupName = aws[ "lambda_log_nameprefix ] + args.purpose
+        logsGroupName = aws[ "lambda_log_nameprefix" ] + args.purpose
         logs.create_log_group( logGroupName=logsGroupName )
         logs.put_retention_policy(
             logGroupName=logsGroupName,
@@ -109,11 +109,12 @@ except lambda_client.exceptions.ResourceConflictException:
     if args.verbose:
         print( "Updating lambda code" )
     try:
-        response = lambda_client.update_function_code(
-            FunctionName="{}".format( args.purpose ),
-            ZipFile=b'bytes',
-            Publish=True,
-        )
+        with open( zipName, 'rb' ) as zipUpdate:
+            response = lambda_client.update_function_code(
+                FunctionName="{}".format( args.purpose ),
+                ZipFile=zipUpdate.read(),
+                Publish=True
+            )
     except Exception as error:
         print( type(error).__name__ )
         print( error )
