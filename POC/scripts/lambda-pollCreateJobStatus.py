@@ -14,12 +14,13 @@ def lambda_handler(event, context):
     s3c = boto3.client( "s3control" )
     for n in event:
         jobid = n[ "JobId" ]
+        accountid = n[ "AccountId" ]
         response = s3c.describe_job(
-            AccountId="166566894905",
+            AccountId=accountid,
             JobId=jobid
         )
         jobstate = response[ "Job" ][ "Status" ]
-        if jobstate == "Complete":
+        if jobstate == "Completed":
             listready.append( jobid )
         elif jobstate == "Failed":
             listfail.append( jobid )
@@ -28,7 +29,7 @@ def lambda_handler(event, context):
         else:
             listrecheck.append( jobid )
     
-    if len( listready ) > 0:
+    if len( listrecheck ) > 0:
         # some jobs are still running, return array to sleep and retry
         return event
     else:
