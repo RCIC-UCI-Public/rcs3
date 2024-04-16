@@ -6,7 +6,10 @@ import os
 import sys
 import yaml
 
-with open( "config/aws-settings.yaml", "r" ) as f:
+execdir = os.path.dirname(os.path.abspath(__file__))
+basedir = os.path.dirname( execdir )
+
+with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
     aws = yaml.safe_load( f )
 
 
@@ -19,10 +22,6 @@ p.add_argument( "host",
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
-
-if not "schemafile" in aws:
-    print( "Missing schema file in configuation settings" )
-    sys.exit(1)
 
 # override location of .aws/config
 if "configfile" in aws:
@@ -40,7 +39,7 @@ else:
     athena = session.client( "athena" )
 # create the work group, okay if already exists
 try:
-    response = athena.create_work_group(
+    athena.create_work_group(
         Name=args.user,
         Configuration={
             'ResultConfiguration': {
@@ -51,4 +50,6 @@ try:
         }
     )
 except athena.exceptions.InvalidRequestException:
+    if args.verbose:
+        print( "Work group already exits: {}".format( args.user ) )
     pass    
