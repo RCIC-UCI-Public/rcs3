@@ -11,16 +11,20 @@ def lambda_handler(event, context):
     arnprefix = "arn:aws:s3:::"
     s3 = boto3.client( "s3" )
     for n in event:
-        m = re.match( '^s3://([^/]+)/(.+)', n[ "ResultsFile" ] )
-        if m:
-            r = s3.head_object( Bucket=m.group(1), Key=m.group(2) )
-            l.append( {
-                'ResultsFile': arnprefix + m.group(1) + "/" + m.group(2),
-                'ETag': r[ "ETag" ].strip( '\"' )
-            } )
+        if n[ "State" ] == "SUCCEEDED":
+            m = re.match( '^s3://([^/]+)/(.+)', n[ "ResultsFile" ] )
+            if m:
+                r = s3.head_object( Bucket=m.group(1), Key=m.group(2) )
+                l.append( {
+                    'ResultsFile': arnprefix + m.group(1) + "/" + m.group(2),
+                    'ETag': r[ "ETag" ].strip( '\"' )
+                } )
+            else:
+                l.append( {
+                    'ResultsFile': n[ "ResultsFile" ],
+                    'ETag': ""
+                } )
         else:
-            l.append( {
-                'ResultsFile': n[ "ResultsFile" ],
-                'ETag': ""
-            } )
+            # build list of problem files. drop for now
+            pass
     return { 'CreateJobItems': l }
