@@ -20,7 +20,7 @@ def lambda_handler(event, context):
             JobId=jobid
         )
         jobstate = response[ "Job" ][ "Status" ]
-        if jobstate == "Completed":
+        if jobstate == "Complete":
             listready.append( jobid )
         elif jobstate == "Failed":
             listfail.append( jobid )
