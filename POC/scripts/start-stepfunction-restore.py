@@ -21,6 +21,8 @@ p.add_argument( "user",
         help="user UCInetID" )
 p.add_argument( "host",
         help="hostname" )
+p.add_argument( "purpose",
+        help="which step function to start" )
 p.add_argument( "glacierlist",
         help="files to restore from Glacier, one-per-line" )
 p.add_argument( "-v", "--verbose", action="store_true",
@@ -70,8 +72,8 @@ if "region" in aws:
 else:
     sfn = session.client( "stepfunctions" )
 
-sfnArn = "arn:aws:states:{}:{}:stateMachine:{}-{}-sfn-test-stage-one"\
-    .format( aws[ "region" ], aws[ "accountid" ], args.user, args.host )
+sfnArn = "arn:aws:states:{}:{}:stateMachine:{}-{}-sfn-{}"\
+    .format( aws[ "region" ], aws[ "accountid" ], args.user, args.host, args.purpose )
 sfnInput = json.dumps( { "RestoreList": restoreList } )
 if args.verbose:
     print( "Calling ARN: {}".format( sfnArn ) )
