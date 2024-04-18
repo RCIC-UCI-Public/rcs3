@@ -20,14 +20,14 @@ def lambda_handler(event, context):
         yesterday = hivedate - datetime.timedelta( days=1 )
         hivedir = event[ "HiveDir" ].format( str( yesterday ) )
     
-    loadschema = "CREATE EXTERNAL TABLE {} ( bucketname string, filename string, version_id string, is_latest boolean, is_delete_marker boolean, filesize bigint, last_modified_date string, storage_class string ) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat' OUTPUTFORMAT  'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat' LOCATION 's3://{}/{}' ;"
+    loadschema = "CREATE EXTERNAL TABLE {} ( bucketname string, filename string, version_id string, is_latest boolean, is_delete_marker boolean, filesize string, last_modified_date string, storage_class string ) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat' OUTPUTFORMAT  'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat' LOCATION 's3://{}/{}' ;"
     QuerySchema=loadschema.format( event[ "TableName" ], event[ "InventoryBucket" ], hivedir )
     
     # create the SQL queries for a specific S3 inventory in Athena
     # expects TableName, BackupBucket, and RestoreList as inputs
     a = []
     for request in event[ "RestoreList" ]:
-        s = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}'".format( event[ "BackupBucket" ], event[ "TableName" ], request )
+        s = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and storage_class like 'GLACIER'".format( event[ "BackupBucket" ], event[ "TableName" ], request )
         a.append( { "SearchString": s } )
     
     return {
