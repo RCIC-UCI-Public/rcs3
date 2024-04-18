@@ -27,7 +27,7 @@ def lambda_handler(event, context):
     # expects TableName, BackupBucket, and RestoreList as inputs
     a = []
     for request in event[ "RestoreList" ]:
-        s = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and storage_class like 'GLACIER'".format( event[ "BackupBucket" ], event[ "TableName" ], request )
+        s = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and (storage_class = 'GLACIER' or storage_class = 'DEEP_ARCHIVE')".format( event[ "BackupBucket" ], event[ "TableName" ], request )
         a.append( { "SearchString": s } )
     
     return {
