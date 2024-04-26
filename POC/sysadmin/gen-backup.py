@@ -399,7 +399,7 @@ def notify_sns(owner,system, subject, msg):
 
     try:
         session = boto3.Session() 
-        sns_client = session.client( "sns" )
+        sns_client = session.client( "sns" , region_name=aws[ "region" ] )
     except:
         return # Fail silently
 
