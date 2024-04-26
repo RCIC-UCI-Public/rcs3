@@ -392,10 +392,10 @@ def notify_sns(owner,system, subject, msg):
 
     configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
     aws=rcs3.read_aws_settings()
-    try:
-        x = os.environ['AWS_SHARED_CREDENTIALS_FILE']
-    except:
-        os.environ['AWS_SHARED_CREDENTIALS_FILE'] = os.path.join(configdir,'credentials')
+    #try:
+    #    x = os.environ['AWS_SHARED_CREDENTIALS_FILE']
+    #except:
+    os.environ['AWS_SHARED_CREDENTIALS_FILE'] = os.path.join(configdir,'credentials')
 
     try:
         session = boto3.Session() 
