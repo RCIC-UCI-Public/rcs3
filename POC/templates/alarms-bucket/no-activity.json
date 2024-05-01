@@ -21,7 +21,7 @@
                     "Id": "e1",
                     // The fill value should be identical to threshold
                     // These keep the alarm from tripping while metrics are "in flux". m2,m3,m4 are not updated atomically by AWS
-                    "Expression": "SUM([FILL(m2,9),FILL(m3,9),FILL(m4,9)])",
+                    "Expression": "SUM([FILL(m2,1),FILL(m3,1),FILL(m4,1),FILL(m5,1)])",
                     "Label": "All Requests",
                     "ReturnData": true
                 },
@@ -111,8 +111,52 @@
                     "Label": "Requests - Glacier",
                     "ReturnData": false
                 },
+
                 {
                     "Id": "m4",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3/Storage-Lens",
+                            "MetricName": "AllRequests",
+                            "Dimensions": [
+                                {
+                                    "Name": "metrics_version",
+                                    "Value": "1.0"
+                                },
+                                {
+                                    "Name": "storage_class",
+                                    "Value": "DEEP_ARCHIVE"
+                                },
+                                {
+                                    "Name": "aws_region",
+                                    "Value": "%REGION%"
+                                },
+                                {
+                                    "Name": "bucket_name",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                },
+                                {
+                                    "Name": "aws_account_number",
+                                    "Value": "%ACCOUNT%"
+                                },
+                                {
+                                    "Name": "configuration_id",
+                                    "Value": "%LENS%"
+                                },
+                                {
+                                    "Name": "record_type",
+                                    "Value": "BUCKET"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "Label": "Requests - Deep",
+                    "ReturnData": false
+                },
+                {
+                    "Id": "m5",
                     "MetricStat": {
                         "Metric": {
                             "Namespace": "AWS/S3/Storage-Lens",

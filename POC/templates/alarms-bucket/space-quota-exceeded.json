@@ -67,6 +67,29 @@
                         "Stat": "Sum"
                     },
                     "ReturnData": false
+                },
+
+                {
+                    "Id": "m3",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3",
+                            "MetricName": "BucketSizeBytes",
+                            "Dimensions": [
+                                {
+                                    "Name": "StorageType",
+                                    "Value": "DeepArchiveStorage"
+                                },
+                                {
+                                    "Name": "BucketName",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "ReturnData": false
                 }
             ]
         }

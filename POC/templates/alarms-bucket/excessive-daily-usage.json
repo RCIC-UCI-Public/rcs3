@@ -25,7 +25,7 @@
                 },
                 {
                     "Id": "e1",
-                    "Expression": "SUM([m2,m3,m4])",
+                    "Expression": "SUM([m2,m3,m4,m5])",
                     "Label": "All Requests",
                     "ReturnData": false
                 },
@@ -117,6 +117,49 @@
                 },
                 {
                     "Id": "m4",
+                    "MetricStat": {
+                        "Metric": {
+                            "Namespace": "AWS/S3/Storage-Lens",
+                            "MetricName": "AllRequests",
+                            "Dimensions": [
+                                {
+                                    "Name": "metrics_version",
+                                    "Value": "1.0"
+                                },
+                                {
+                                    "Name": "storage_class",
+                                    "Value": "DEEP_ARCHIVE"
+                                },
+                                {
+                                    "Name": "aws_region",
+                                    "Value": "%REGION%"
+                                },
+                                {
+                                    "Name": "bucket_name",
+                                    "Value": "%OWNER%-%SYSTEM%-%BUCKET%"
+                                },
+                                {
+                                    "Name": "aws_account_number",
+                                    "Value": "%ACCOUNT%"
+                                },
+                                {
+                                    "Name": "configuration_id",
+                                    "Value": "%LENS%"
+                                },
+                                {
+                                    "Name": "record_type",
+                                    "Value": "BUCKET"
+                                }
+                            ]
+                        },
+                        "Period": 86400,
+                        "Stat": "Sum"
+                    },
+                    "Label": "Requests - Deep",
+                    "ReturnData": false
+                },
+                {
+                    "Id": "m5",
                     "MetricStat": {
                         "Metric": {
                             "Namespace": "AWS/S3/Storage-Lens",
