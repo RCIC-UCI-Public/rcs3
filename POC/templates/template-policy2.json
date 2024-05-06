@@ -96,6 +96,19 @@
             "Condition": {
                 xxxiprestrictionsxxx
             }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListAccessKeys",
+                "iam:CreateAccessKey",
+                "iam:DeleteAccessKey"
+            ],
+            "Resource": "arn:aws:iam::xxxaccountidxxx:user/xxxuserxxx-xxxhostxxx-sa",
+            "Condition": {
+                xxxiprestrictionsxxx
+            }
         }
+
     ]
 }
