@@ -16,6 +16,8 @@ import subprocess
 from multiprocessing import Pool
 import boto3
 import platform
+import tempfile
+import stat
 
 class runBackup(object):
    
@@ -46,6 +48,7 @@ class runBackup(object):
               exit(-1)
                
         with Pool(self._parallel) as pool:
+            finaljob = None
             try:
                 for finished in pool.imap_unordered(runBackup.run_backup, self._alljobs):
                     msg = "=== %s completed at %s" % (finished.name,datetime.datetime.now())
@@ -53,7 +56,15 @@ class runBackup(object):
                     sys.stdout.flush()
                     if finished.notify and finished.system is not None:
                         notify_sns(finished.owner, finished.system, "RCS3: Backup Job End from %s" % finished.system, msg)
+                    finaljob = finished
+
+                # All Jobs done. Rotate the access key
+                if finaljob is not None:
+                    print ("rotatng access key for " ,finaljob.owner,finaljob.system)     
+                    rotate_access_key(finaljob.owner,finaljob.system)     
                 print("All tasks completed.")
+                
+                
             except:
                 pass
             os.close(lckfile)
@@ -414,6 +425,71 @@ def notify_sns(owner,system, subject, msg):
         response = sns_client.publish( TopicArn=myArn, Message=msg, Subject=subject)
     except Exception as m:
         print( "Could not use SNS notify. Error: {}".format(str(m)) )
+        
+## Rotate Credentials 
+
+def rotate_access_key(owner,system):
+
+    if owner is None or system is None:
+        return
+
+    scriptdir=os.path.realpath(os.path.dirname(__file__))
+    sys.path.append(os.path.join(scriptdir))
+    sys.path.append(os.path.join(scriptdir,"..","common"))
+    import rcs3functions as rcs3
+    from credentials import Credentials
+
+    configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
+    aws=rcs3.read_aws_settings()
+    credfile = os.path.join(configdir,'credentials')
+    os.environ['AWS_SHARED_CREDENTIALS_FILE'] = credfile 
+
+    try:
+        session = boto3.Session() 
+        iam_client = session.client( "iam" , region_name=aws[ "region" ] )
+    except:
+        return # Fail silently
+
+    # Generate a new set of access keys for the service account
+    SA = "{}-{}-sa".format(owner,system)
+
+    try:
+        response = iam_client.create_access_key(UserName=SA)
+        access_key_id = response['AccessKey']['AccessKeyId']
+        secret_access_key_id = response['AccessKey']['SecretAccessKey']
+        newCreds = Credentials(access_key=access_key_id, secret_access_key=secret_access_key_id)
+    except Exception as m:
+        print( "Could not create new access key for {}. Error: {}".format(SA,str(m)) )
+ 
+    ## Create a temporary file for the new credentials.
+    try:
+        (fd,tmpPath) = tempfile.mkstemp(dir=configdir, text=True)
+        with open(tmpPath,'w') as fh:
+            fh.write(str(newCreds))
+        os.close(fd)
+        os.chmod(tmpPath, stat.S_IREAD | stat.S_IWRITE)
+    except Exception as m:
+        print( "Could not create new credentials file for {}. Error: {}".format(SA,str(m)) )
+        return
+
+    # Move the temporary file to the old credfile name (on windows have to delete old file first)
+    try:
+        os.rename(credfile,tmpPath+"rcs3")
+        os.rename(tmpPath,credfile)
+        os.remove(tmpPath+"rcs3")
+    except Exception as m:
+        print( "Could not rename credentials file ({}) for {}. Error: {}".format(tmpPath,SA,str(m)) )
+        return
+
+    # List access keys for user, delete any that do not match the new access key
+    try:
+        response = iam_client.list_access_keys(UserName=SA)
+        for key in response['AccessKeyMetadata']:
+            if key['AccessKeyId'] != access_key_id:
+                 dresponse = iam_client.delete_access_key(UserName=SA,AccessKeyId=key['AccessKeyId'])
+    except Exception as m:
+        print( " Error deleting unused access keys for {}. Error: {}".format(SA,str(m)) )
+        return
         
 ## *****************************
 ## main routine

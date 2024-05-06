@@ -12,9 +12,15 @@ import rcs3functions as rcs3
 
 class Credentials(object):
 
-    def __init__(self):
-        self._access_key = input("Enter AWS Access Key: ")
-        self._secret_access_key = input("Enter AWS Secret Access Key: ")
+    def __init__(self,access_key=None,secret_access_key=None):
+        if access_key is None:
+            self._access_key = input("Enter AWS Access Key: ")
+        else:
+            self._access_key=access_key
+        if secret_access_key is None:
+            self._secret_access_key = input("Enter AWS Secret Access Key: ")
+        else:
+            self._secret_access_key=secret_access_key
         self._configdir=os.path.normpath(os.path.join(scriptdir, "..","config"))
         self._templatedir=os.path.normpath(os.path.join(scriptdir, "..","templates"))
         self.customize()
