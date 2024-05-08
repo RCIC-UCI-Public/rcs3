@@ -39,7 +39,6 @@ class Credentials(object):
 
 class Updater(Credentials):
 
-
     def __init__(self,owner,system,credfile=None):
         if owner is None or system is None:
            raise Exception("owner or system is None when attempting to update credentials") 
@@ -62,6 +61,10 @@ class Updater(Credentials):
             print( "Could not create iam client for {}. Error: {}".format(self.SA,str(m)) )
             return
 
+        # Clean out any old before making a new one, can only have one active at a time
+
+        self.clean_keys(self.session.get_credentials().access_key)
+
         # Generate a new set of access keys for the service account
         try:
             response = self.iam_client.create_access_key(UserName=self.SA)
@@ -71,6 +74,17 @@ class Updater(Credentials):
             print( "Could not create new access key for {}. Error: {}".format(self.SA,str(m)) )
         super().__init__(access_key=access_key_id, secret_access_key=secret_access_key_id)
      
+    def clean_keys(self,keepkey):
+        # List access keys for user, delete any that do not match the new access key
+        try:
+            response = self.iam_client.list_access_keys(UserName=self.SA)
+            for key in response['AccessKeyMetadata']:
+                if key['AccessKeyId'] != keepkey: 
+                     dresponse = self.iam_client.delete_access_key(UserName=self.SA,AccessKeyId=key['AccessKeyId'])
+        except Exception as m:
+            print( " Error deleting unused access keys for {}. Error: {}".format(self.SA,str(m)) )
+            return
+
     def rotate(self):
         ## Create a temporary file for the new credentials.
         try:
@@ -91,16 +105,10 @@ class Updater(Credentials):
         except Exception as m:
             print( "Could not rename credentials file ({}) for {}. Error: {}".format(tmpPath,self.SA,str(m)) )
             return
+
+        # Clean out the old key, should only have one active at a time
+        self.clean_keys(self._access_key)
     
-        # List access keys for user, delete any that do not match the new access key
-        try:
-            response = self.iam_client.list_access_keys(UserName=self.SA)
-            for key in response['AccessKeyMetadata']:
-                if key['AccessKeyId'] != self._access_key:
-                     dresponse = self.iam_client.delete_access_key(UserName=self.SA,AccessKeyId=key['AccessKeyId'])
-        except Exception as m:
-            print( " Error deleting unused access keys for {}. Error: {}".format(self.SA,str(m)) )
-            return
 
 def main():
     usage="AWS credentials file from template."
