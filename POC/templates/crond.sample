@@ -2,4 +2,4 @@
 0 1 * * 0 (/.rcs3/rcs3/POC/sysadmin/gen-backup.py --threads=2 --checkers=32 --owner=panteater --system=labstorage run >> /var/log/gen-backup.log 2>&1) &
 
 # run top syncs M-Sa (Days 1-6)at 1am
-0 1 * * 1-6 (/.rcs3/rcs3/POC/sysadmin/gen-backup.py --top-up=24h run >> /var/log/gen-backup.log 2>&1) &
+0 1 * * 1-6 (/.rcs3/rcs3/POC/sysadmin/gen-backup.py --owner=panteater --system=labstorage --top-up=24h run >> /var/log/gen-backup.log 2>&1) &
