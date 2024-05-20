@@ -39,7 +39,7 @@ RUN dnf -y install \
 
 # Get the latest version of rclone - v1.66.0 as of this writing - released 2024-03-10
 RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[ \t]+' '{print $2}') && \
-    if [ "$(arch)" == "aarch64" ]; then PKGARCH="arm64"; else PKGARCH="x86_64"; fi && \
+    if [ "$(arch)" == "aarch64" ]; then PKGARCH="arm64"; else PKGARCH="amd64"; fi && \
     curl -O "https://downloads.rclone.org/$RCLONE_VERSION/rclone-$RCLONE_VERSION-linux-$PKGARCH.rpm" && \
     dnf localinstall -y "rclone-$RCLONE_VERSION-linux-$PKGARCH.rpm" && \
     rm "rclone-$RCLONE_VERSION-linux-$PKGARCH.rpm"
