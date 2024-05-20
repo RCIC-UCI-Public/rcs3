@@ -9,7 +9,7 @@ RUN dnf -y install \
     epel-release
 
 # Python3.9 and selected packages
-RUN dnf -y install alternatives python39
+RUN dnf -y install alternatives python39 gcc python39-devel
 RUN alternatives --set python3 /usr/bin/python3.9
 RUN alternatives --set python /usr/bin/python3.9
 
@@ -39,13 +39,14 @@ RUN dnf -y install \
 
 # Get the latest version of rclone - v1.66.0 as of this writing - released 2024-03-10
 RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[ \t]+' '{print $2}') && \
-    curl -O "https://downloads.rclone.org/$RCLONE_VERSION/rclone-$RCLONE_VERSION-linux-amd64.rpm" && \
-    dnf localinstall -y "rclone-$RCLONE_VERSION-linux-amd64.rpm" && \
-    rm "rclone-$RCLONE_VERSION-linux-amd64.rpm"
+    if [ "$(arch)" == "aarch64" ]; then PKGARCH="arm64"; else PKGARCH="x86_64"; fi && \
+    curl -O "https://downloads.rclone.org/$RCLONE_VERSION/rclone-$RCLONE_VERSION-linux-$PKGARCH.rpm" && \
+    dnf localinstall -y "rclone-$RCLONE_VERSION-linux-$PKGARCH.rpm" && \
+    rm "rclone-$RCLONE_VERSION-linux-$PKGARCH.rpm"
 
-# Download and install AWS CLI
+## Download and install AWS CLI
 RUN echo "Downloading AWS CLI package..." && \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-$(arch).zip" -o "awscliv2.zip" && \
     echo "Unzipping package..." && \
     unzip awscliv2.zip && \
     echo "Installing AWS CLI..." && \
@@ -53,6 +54,10 @@ RUN echo "Downloading AWS CLI package..." && \
     echo "Clean up ..." && \
     rm -f awscliv2.zip && \
     rm -rf aws
+
+
+# python39-devel not needed
+RUN dnf -y erase python39-devel && dnf -y clean all
 
 # Set environment variable for RCS3_ROOT (persistent storage) and AWS_SHARED_CREDENTIALS_FILE
 #
