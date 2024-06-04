@@ -52,8 +52,7 @@ RUN echo "Downloading AWS CLI package..." && \
     echo "Installing AWS CLI..." && \
     ./aws/install && \
     echo "Clean up ..." && \
-    rm -f awscliv2.zip && \
-    rm -rf aws
+    rm -f awscliv2.zip && rm -rf aws
 
 
 # python39-devel not needed

@@ -10,7 +10,9 @@ TAG_LATEST=latest
 
 # Target to build the image - once
 build:
-	docker build --no-cache .
+	#docker build --no-cache .
+	#docker build --no-cache -t $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC) .
+	docker build -t $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC) .
 
 # Target to tag & push images - twice - using version specific and latest tag
 push:
