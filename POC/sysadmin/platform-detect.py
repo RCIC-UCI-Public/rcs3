@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
 import platform
 import psutil
@@ -25,7 +25,7 @@ def detect_system_info():
 
     # Additional details for Linux distributions
     distribution = ""
-    
+
     if operating_system == "Linux":
         distribution = (distro.name(),distro.version(),distro.codename())
 
