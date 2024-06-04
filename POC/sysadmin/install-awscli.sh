@@ -23,7 +23,7 @@ echo "Downloading AWS CLI package..."
 curl "$package_url" -o "awscliv2.zip"
 
 echo "Unzipping package..."
-unzip awscliv2.zip
+unzip -o awscliv2.zip
 
 echo "Installing AWS CLI..."
 ./aws/install
