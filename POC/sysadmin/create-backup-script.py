@@ -3,15 +3,20 @@
 import argparse
 import os
 import subprocess
+import platform
 
-BACKUP_SCRIPT_PATH = "/.rcs3/rcs3/POC/sysadmin/gen-backup.py"
+scriptdir=os.path.realpath(os.path.dirname(__file__))
+
+#sys.path.append(scriptdir)
+
+BACKUP_SCRIPT_PATH = os.path.join(scriptdir,"gen-backup.py")
 
 def get_system_name():
-    try:
-        result = subprocess.run(['uname', '-n'], capture_output=True, text=True, check=True)
-        return result.stdout.strip()
-    except subprocess.CalledProcessError:
-        raise RuntimeError("Unable to determine system name using 'uname -n'")
+ 
+    if platform.system() == "Windows":
+        return platform.uname().node
+    else:
+        return os.uname()[1]
 
 def generate_cron_script(backup_type, threads, checkers, owner, system, log):
     if backup_type == 'weekly':
@@ -27,9 +32,10 @@ def main():
     parser = argparse.ArgumentParser(description='Create a backup script')
     parser.add_argument('--daily', action='store_true', help='Generate a daily backup script')
     parser.add_argument('--weekly', action='store_true', help='Generate a weekly backup script')
-    parser.add_argument('--threads', type=int, required=True, help='Number of threads')
-    parser.add_argument('--checkers', type=int, required=True, help='Number of checkers')
+    parser.add_argument('--threads', type=int, required=False, default=2, help='Number of threads (2)')
+    parser.add_argument('--checkers', type=int, required=False,default=32, help='Number of checkers (32)')
     parser.add_argument('--owner', type=str, required=True, help='Owner name')
+    parser.add_argument('--system', type=str, required=False, default=None, help='Name of System (%s)' % get_system_name())
     parser.add_argument('--log', type=str, default='/var/log/gen-backup.log', help='Log file path')
 
     args = parser.parse_args()
@@ -41,12 +47,17 @@ def main():
         print("Please choose either --daily or --weekly.")
         return
 
-    system_name = get_system_name()
+    system_name = args.system
+    if system_name is None:
+        system_name = get_system_name()
     backup_type = 'daily' if args.daily else 'weekly'
     cron_script = generate_cron_script(backup_type, args.threads, args.checkers, args.owner, system_name, args.log)
 
-    output_file = '../config/daily-backup' if backup_type == 'daily' else '../config/weekly-backup'
-
+    if backup_type == 'daily':
+        output_file = os.path.join(scriptdir,"..","config","daily-backup")
+    else:
+        output_file = os.path.join(scriptdir,"..","config","weekly-backup")
+       
     with open(output_file, 'w') as file:
         file.write(cron_script + '\n')
 
