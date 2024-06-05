@@ -248,7 +248,7 @@ class backupJob(object):
         else:
            chkcount = self._checkers
 
-        rc_global =  ["--metadata", "--links", "--transfers", "%d" % tcount, "--checkers" , "%d" % chkcount]
+        rc_global =  ["--stats-one-line-date", "--metadata", "--links", "--transfers", "%d" % tcount, "--checkers" , "%d" % chkcount]
         if dryrun:
             rc_global.extend(["--dry-run"])
         self._build_filters()
