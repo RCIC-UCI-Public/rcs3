@@ -24,6 +24,9 @@
 - iPhoto Library/iPod Photo Cache/**
 - Mozilla/Firefox/.*cache.*
 - Music/Subscription/.*
+## RCS3 common configuration for docker containers mapping .rcs3
+- backup-config
+- backup-config/**
 
 ## Unix/Linux System Paths
 ## These exclusions are important if the path to backup is "/". 
