@@ -6,6 +6,7 @@
 - .zfs/**
 - .snapshot/**
 - .vscode/**
+- .DS_Store
 - .DS_Store/**
 - '#snapshot/**'
 - '#recycle/**'
