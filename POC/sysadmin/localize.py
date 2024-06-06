@@ -8,9 +8,11 @@ import stat
 sys.path.append(os.path.realpath(os.path.dirname(__file__)))
 from rclone_conf import RcloneConf
 from credentials import Credentials
+from backupScript import ScriptGen
 
 def main():
-    usage="Create localize rclone-conf and aws credentials. Does NOT overwrite existing files"
+    usage="Create localize rclone-conf and aws credentials. Create Backup Scripts"
+    usage+="\nDoes NOT overwrite existing files"
     p = argparse.ArgumentParser( description=usage )
     p.add_argument( "owner", help="ID of onwer (e.g., UCInetID)" )
     p.add_argument( "host", help="hostname" )
@@ -34,6 +36,13 @@ def main():
            f.write(str(creds))
            os.chmod(credfile, stat.S_IREAD | stat.S_IWRITE)
            sys.stderr.write("Wrote AWS Credentials file: %s\n" % credfile)
+
+    # Generate the basic backup scripts
+    sc = ScriptGen(args.owner, args.host)
+    sc.write_syncScript()
+    sc.write_topupScript()
+
+    
 
 if __name__ == "__main__":
    main()
