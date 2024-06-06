@@ -5,3 +5,5 @@ jobs.yaml
 aws-settings.yaml
 restore.yaml
 quotas.csv
+daily-backup*
+weekly-backup*
