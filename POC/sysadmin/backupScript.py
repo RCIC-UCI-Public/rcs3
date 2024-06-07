@@ -89,7 +89,7 @@ class ScriptGen:
         self.write_script(self._daily,defFileName,filename,force)
 
     def write_script(self,basecmd,defFileName,filename,force):
-        commandline=f"{basecmd} >> {self._logfile} 2>&1 &\n"
+        commandline=f"{basecmd} >> {self._logfile} 2>&1\n"
         scontents="".join([self._header,commandline])
         if filename is None:
            filename = os.path.join(scriptdir,"..","config",defFileName)
