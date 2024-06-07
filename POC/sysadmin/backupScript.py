@@ -68,8 +68,10 @@ class ScriptGen:
         pythonpath = ""
         if self._platform == WINDOWS: 
             pythonpath=self._PYTHON
-            winextra = f" --rclonecmd={self._RCLONE} --lockfile={self._LOCKFILE}"
+            winextra = f" --rclonecmd={self._RCLONE} --lockfile={self._LOCKFILE} $($args[0..$($args.length - 1)])"
             pextra += winextra
+        else:
+            pextra += " $@"
 
         self._weekly=template.format(pythonpath=pythonpath,script=BACKUP_SCRIPT_PATH, \
                       owner=self._owner,system=self._system, \
