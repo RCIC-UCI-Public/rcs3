@@ -5,10 +5,10 @@
 ID,SYSTEM,QUOTA_OBJECT,QUOTA_STORAGE
 cestark, bmc,4,12 
 cestark,fibre-data,12,11
-cestark,hippocampus,50,120
+cestark,hippocampus,50,145
 medhap,rivendell,4,100
-xiangmix,cncm,60,1200
-xiangmix,xuisebnas,18,180
+xiangmix,cncm,60,1300
+xiangmix,xuisebnas,22,180
 xiangmix,brain,10,130
 xiangmix,xuoffice,1,2
 kbeier,balbina,3,110
@@ -16,16 +16,16 @@ kbeier,csaba,3,70
 kbeier,emem,3,120
 kbeier,apollon,3,50
 kbeier,faye,3,130
-kbeier,beier1,3,150
+kbeier,beier1,3,200
 mfrose,morandi1,3,90
-lwagar,wagarlab,1,28
+lwagar,wagarlab,1,38
 fmarango,f-ivm,4,14
-lewell,cedar,1,44
+lewell,cedar,1,54
 blsemler,littlebird,1,2
 mingt,chlamydia,1,10
 xiangmix,cncmviruscore,1,1
 xiangmix,xulabtissuecyte,12,25
-xiangmix,xu160,9,25
+xiangmix,xu160,11,25
 ppapadop,laguna,1,1
 rfrostig,sharat,3,15
 kngreen,model-ad,4,35
