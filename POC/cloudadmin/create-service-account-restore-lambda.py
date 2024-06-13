@@ -10,10 +10,10 @@ import zipfile
 
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
-sys.path.append( basedir  + "/common" )
+sys.path.append( os.path.join( basedir, "common" ) )
 import transform
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
+with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
     aws = yaml.safe_load( f )
 
 usage="Create or update lambda restore function"
@@ -26,14 +26,19 @@ p.add_argument( "purpose",
         help="which permissions to apply" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
+g = p.add_mutually_exclusive_group()
+g.add_argument( "-p", "--policy_postfix",
+        help="override policy postix, substitute for purpose" )
+g.add_argument( "-n", "--policy_name",
+        help="override policy name, ignoring user, host, and purpose" )
 args = p.parse_args()
 
-scriptName = basedir + "/scripts/lambda-{}.py".format( args.purpose )
+scriptName = os.path.join( basedir, "scripts", "lambda-{}.py".format( args.purpose ) )
 if not os.path.isfile( scriptName ):
     print( "Missing script: {}".format( scriptName ) )
     sys.exit( 1 )
 # create zip file from script file
-zipName = basedir + "/outputs/" + args.purpose + ".zip"
+zipName = os.path.join( basedir, "outputs", args.purpose, ".zip" )
 with zipfile.ZipFile( zipName, "w" ) as z:
     z.write( scriptName, "lambda_function.py" )
 
@@ -57,7 +62,13 @@ else:
     logs = session.client( "logs" )
 
 # verify role has been created
-roleName = "{}-{}-{}-role".format( args.user, args.host, args.purpose)
+if args.policy_name is None:
+    if args.policy_prefix is None:
+        roleName = "{}-{}-{}-role".format( args.user, args.host, args.purpose )
+    else:
+        roleName = "{}-{}-{}-role".format( args.user, args.host, args.policy_prefix )
+else:
+    roleName = args.policy_name
 try:
     response = iam.get_role(
         RoleName = roleName
