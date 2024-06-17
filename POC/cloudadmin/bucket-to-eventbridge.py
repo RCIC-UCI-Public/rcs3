@@ -28,8 +28,8 @@ p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
 
-if not aws[ "state" ] in [ "enable", "disable" ]:
-    print( "Unknown state: %s".format( aws[ "state" ] ) )
+if not args.state in [ "enable", "disable" ]:
+    print( "Exitting, unknown state: {}".format( args.state ) )
     sys.exit(0)
 
 # override location of .aws/config
@@ -48,15 +48,17 @@ else:
     s3 = session.client( "s3" )
 
 bucketname = "{}-{}-{}".format( args.user, args.host, aws[ "bucket_postfix" ] )
-if aws[ "state" ] is "enable":
+if args.state == "enable":
     response = s3.put_bucket_notification_configuration(
         Bucket = bucketname,
         NotificationConfiguration = {
             "EventBridgeConfiguration": {}
         }
+    )
 
 # assumes previous state was completely empty, otherwise need to save and restore prior state
-if aws[ "state" ] is "disable":
+if args.state == "disable":
     response = s3.put_bucket_notification_configuration(
         Bucket = bucketname,
         NotificationConfiguration = {}
+    )
