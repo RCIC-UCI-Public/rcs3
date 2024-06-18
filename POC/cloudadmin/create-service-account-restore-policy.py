@@ -43,7 +43,7 @@ else:
     iam = session.client( "iam" )
 
 # load the template which allows launching EC2 instance
-input_template = basedir + "/templates/template-service-account-{}-policy.json".format( args.purpose )
+input_template = basedir + "/templates/self-service/{}-policy.json".format( args.purpose )
 if not os.path.isfile( input_template ):
     print( "Not found: {}".format( input_template ) )
     sys.exit( -1 )
