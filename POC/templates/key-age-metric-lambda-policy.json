@@ -1,0 +1,43 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListUsers",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListUsers",
+                "iam:ListAccessKeys"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "PublishMetrics",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:PutMetricData"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
