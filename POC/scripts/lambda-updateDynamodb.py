@@ -5,7 +5,7 @@ import datetime
 def lambda_handler(event, context):
     bucket = event['detail']['bucket']['name']
     filename = event['detail']['object']['key']
-    versionId = event['detail']['object']['version-id']
+    version_id = event['detail']['object']['version-id']
     eventtime = event['time']
 
     dynamodb = boto3.resource( "dynamodb" )
@@ -13,7 +13,7 @@ def lambda_handler(event, context):
     table = dynamodb.Table( bucket )
 
     get_response = table.get_item(
-        Key={ 'filename': filename, 'versionId': versionId},
+        Key={ 'filename': filename, 'version_id': version_id},
         )
         
     if len(get_response) == 1:
@@ -25,8 +25,8 @@ def lambda_handler(event, context):
         restore_duration = restore_delta.total_seconds()/60
 
         update_response =  table.update_item(
-            Key={ 'filename': filename, 'versionId': versionId},
+            Key={ 'filename': filename, 'version_id': version_id},
             UpdateExpression="set restore_completed = :s, restore_comp_time = :c, restore_duration = :e, object_accessible = :val1",
             ExpressionAttributeValues={':s': "yes", ':c': eventtime, ':e': int(restore_duration), ':val1': "yes"},
-            ConditionExpression='attribute_exists(filename) and attribute_exists(versionId)',
+            ConditionExpression='attribute_exists(filename) and attribute_exists(version_id)',
             ReturnValues="UPDATED_NEW")
