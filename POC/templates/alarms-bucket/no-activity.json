@@ -21,7 +21,7 @@
                     "Id": "e1",
                     // The fill value should be identical to threshold
                     // These keep the alarm from tripping while metrics are "in flux". m2,m3,m4 are not updated atomically by AWS
-                    "Expression": "SUM([FILL(m2,1),FILL(m3,1),FILL(m4,1),FILL(m5,1)])",
+                    "Expression": "SUM([FILL(m2,3),FILL(m3,3),FILL(m4,3),FILL(m5,3)])",
                     "Label": "All Requests",
                     "ReturnData": true
                 },

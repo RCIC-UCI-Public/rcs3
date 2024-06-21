@@ -28,7 +28,7 @@ p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 g = p.add_mutually_exclusive_group()
 g.add_argument( "-p", "--policy_postfix",
-        help="override policy postix, substitute for purpose" )
+        help="override policy postfix, substitute for purpose" )
 g.add_argument( "-n", "--policy_name",
         help="override policy name, ignoring user, host, and purpose" )
 args = p.parse_args()
@@ -63,10 +63,10 @@ else:
 
 # verify role has been created
 if args.policy_name is None:
-    if args.policy_prefix is None:
+    if args.policy_postfix is None:
         roleName = "{}-{}-{}-role".format( args.user, args.host, args.purpose )
     else:
-        roleName = "{}-{}-{}-role".format( args.user, args.host, args.policy_prefix )
+        roleName = "{}-{}-{}-role".format( args.user, args.host, args.policy_postfix )
 else:
     roleName = args.policy_name
 try:
