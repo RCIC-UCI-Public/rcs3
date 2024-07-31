@@ -18,6 +18,9 @@
 - .tmp
 - .cache/**
 - .Trash*/**
+- '.snapshots/**'
+- '.snapshots/*'
+- '.snapshots'
 ## Common Browser Caches
 - Google/Chrome/.*cache.*
 - Google/Chrome/Safe Browsing.*
