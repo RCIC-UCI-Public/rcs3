@@ -58,8 +58,10 @@ def createDB ( dbname ):
                 OBJECTS INNER JOIN ALLFILES WHERE OBJECTS.FILEID=ALLFILES.ID;"""
     
     cursor_obj.execute(allobjectsview)
+    cursor_obj.execute("CREATE INDEX DIRNAMES on FOLDERS(folder)")
+    cursor_obj.execute("PRAGMA journal_mode=memory")
+    cursor_obj.execute("PRAGMA synchronous=off")
     cursor_obj.execute("PRAGMA foreign_keys=on")
-    
     print("Tables are Ready")
     # Close the connection
     connection_obj.close()

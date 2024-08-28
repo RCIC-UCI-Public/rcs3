@@ -2,6 +2,7 @@
 import json
 import sys
 import os
+import urllib.parse as parse
 
 def parse_json_from_stdin():
     """Parses JSON input from stdin one record at a time.
@@ -27,7 +28,11 @@ def parse_json_from_stdin():
 if __name__ == "__main__":
     rootdir =  sys.argv[1]
     # Need a record for the root directory
-    stats=os.stat(rootdir)
+    try:
+        stats=os.stat(rootdir)
+    except:
+        stats=os.stat('.')
+
     print('insert into folders(folder,uid,gid,mode) values("%s",%d,%d,%d);' % (rootdir,stats.st_uid,stats.st_gid,stats.st_mode))
 
     for record in parse_json_from_stdin():
@@ -36,8 +41,8 @@ if __name__ == "__main__":
         uid=int(metadata['uid'],10)
         gid=int(metadata['gid'],10)
         mode=int(metadata['mode'],8)
-        pathname=os.path.join(rootdir,record['Path'])
-        basename=record['Name']
+        pathname=parse.quote(os.path.join(rootdir,record['Path']))
+        basename=parse.quote(record['Name'])
         isDir=record['IsDir']
         
         if isDir:
