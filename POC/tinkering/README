@@ -1,0 +1,15 @@
+
+
+DB=dfs4-bsg.db
+JSONFILE=$TMPDIR/dfs4-bsg.json.gz
+PATHINVENTORY=/dfs4/bsg
+BASEDB=$(basename $DB)
+
+# Create a new DB if needed
+if [ ! -f $DB ]; then
+   ./createdb.py $DB
+fi
+
+# Ingesting lsjson output into a sqlite DB (DB should be on /dev/shm or on nvme)
+echo "Ingesting $JSONFILE into $DB.  Monitor progress in /tmp/${BASEDB}-ingest.out"
+(time zcat $JSONFILE | ./filterjson.py $PATHINVENTORY | sqlite3 -cmd "PRAGMA journal_mode=memory; PRAGMA synchronous=off" $DB) &> /tmp/${BASEDB}-ingest.out &

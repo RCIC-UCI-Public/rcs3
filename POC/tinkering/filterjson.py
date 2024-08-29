@@ -28,6 +28,8 @@ def parse_json_from_stdin():
 if __name__ == "__main__":
     records = 0
     processed=100000
+    processedHuman=1000000
+    phCount=0
     rootdir =  sys.argv[1]
     rtd_len = len(rootdir.split(os.path.sep))+1
     # Need a record for the root directory
@@ -37,12 +39,22 @@ if __name__ == "__main__":
         stats=os.stat('.')
 
     print('insert into folders(folder,uid,gid,mode) values("%s",%d,%d,%d);' % (rootdir,stats.st_uid,stats.st_gid,stats.st_mode))
+  
+
+    # Write out some debugging information
+    sys.stderr.write("Record Progress every %d records\n" % processed)
+    sys.stderr.write("  0M ")
+    sys.stderr.flush()
 
     for record in parse_json_from_stdin():
         records += 1
         if records % processed == 0:
              sys.stderr.write('.')
              sys.stderr.flush()
+             if records % processedHuman == 0:
+                 phCount += 1
+                 sys.stderr.write("\n%3dM "% phCount)
+
         # Process each record here
         metadata=record['Metadata']
         uid=int(metadata['uid'],10)
