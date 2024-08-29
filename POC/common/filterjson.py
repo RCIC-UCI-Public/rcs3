@@ -26,7 +26,10 @@ def parse_json_from_stdin():
             print(f"Error parsing JSON: {e}")
 
 if __name__ == "__main__":
+    records = 0
+    processed=100000
     rootdir =  sys.argv[1]
+    rtd_len = len(rootdir.split(os.path.sep))+1
     # Need a record for the root directory
     try:
         stats=os.stat(rootdir)
@@ -36,12 +39,17 @@ if __name__ == "__main__":
     print('insert into folders(folder,uid,gid,mode) values("%s",%d,%d,%d);' % (rootdir,stats.st_uid,stats.st_gid,stats.st_mode))
 
     for record in parse_json_from_stdin():
+        records += 1
+        if records % processed == 0:
+             sys.stderr.write('.')
+             sys.stderr.flush()
         # Process each record here
         metadata=record['Metadata']
         uid=int(metadata['uid'],10)
         gid=int(metadata['gid'],10)
         mode=int(metadata['mode'],8)
         pathname=parse.quote(os.path.join(rootdir,record['Path']))
+        labname=os.path.sep.join(pathname.split(os.path.sep)[0:rtd_len])
         basename=parse.quote(record['Name'])
         isDir=record['IsDir']
         
@@ -50,5 +58,6 @@ if __name__ == "__main__":
         else:
             size=record['Size']
             subselect='(select ID from FOLDERS where folder="%s")' % os.path.dirname(pathname)
-            print('insert into files(folderid,filename,uid,gid,mode,size) values(%s,"%s",%d,%d,%d,%d);' % 
-                    (subselect,basename,uid,gid,mode,size))
+            subselect2='(select ID from FOLDERS where folder="%s")' % labname
+            print('insert into files(ancestorid,folderid,filename,uid,gid,mode,size) values(%s,%s,"%s",%d,%d,%d,%d);' % 
+                    (subselect2,subselect,basename,uid,gid,mode,size))

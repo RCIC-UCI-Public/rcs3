@@ -31,6 +31,7 @@ def createDB ( dbname ):
     filetable = """ CREATE TABLE FILES (
                 ID INTEGER PRIMARY KEY NOT NULL,
                 FILENAME VARCHAR(512) NOT NULL,
+                ANCESTORID INTEGER NOT NULL,
                 FOLDERID INTEGER NOT NULL,
                 UID INTEGER DEFAULT -1,
                 GID INTEGER DEFAULT -1,
@@ -50,7 +51,7 @@ def createDB ( dbname ):
     # FILE/FOLDER VIEW
     cursor_obj.execute("DROP VIEW IF EXISTS ALLFILES")
     allfilesview = """ CREATE VIEW ALLFILES AS 
-                SELECT fi.ID,fo.FOLDER,fi.FILENAME,fi.UID,fi.GID,fi.MODE,fi.SIZE from FILES fi INNER JOIN FOLDERS fo WHERE fi.FOLDERID=fo.ID;"""
+                SELECT fi.ID,fo.FOLDER,fi.ancestorid,fi.FILENAME,fi.UID,fi.GID,fi.MODE,fi.SIZE from FILES fi INNER JOIN FOLDERS fo WHERE fi.FOLDERID=fo.ID;"""
     cursor_obj.execute(allfilesview)
     cursor_obj.execute("DROP VIEW IF EXISTS ALLOBJECTS")
     allobjectsview = """ CREATE VIEW ALLOBJECTS AS 
