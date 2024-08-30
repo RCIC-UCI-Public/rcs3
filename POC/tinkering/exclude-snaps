@@ -4,3 +4,6 @@
 .dpack
 .dpack/*
 .dpack/**
+.zfs
+.zfs/*
+.zfs/**
