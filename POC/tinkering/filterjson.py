@@ -60,16 +60,18 @@ if __name__ == "__main__":
         uid=int(metadata['uid'],10)
         gid=int(metadata['gid'],10)
         mode=int(metadata['mode'],8)
+        mtime=metadata['mtime']
+        atime=metadata['atime']
         pathname=parse.quote(os.path.join(rootdir,record['Path']))
         labname=os.path.sep.join(pathname.split(os.path.sep)[0:rtd_len])
         basename=parse.quote(record['Name'])
         isDir=record['IsDir']
         
         if isDir:
-            print('insert into folders(folder,uid,gid,mode) values("%s",%d,%d,%d);' % (pathname,uid,gid,mode))
+            print('insert into folders(folder,uid,gid,mode,jmtime,jatime) values("%s",%d,%d,%d,julianday("%s"),julianday("%s"));' % (pathname,uid,gid,mode,mtime,atime))
         else:
             size=record['Size']
             subselect='(select ID from FOLDERS where folder="%s")' % os.path.dirname(pathname)
             subselect2='(select ID from FOLDERS where folder="%s")' % labname
-            print('insert into files(ancestorid,folderid,filename,uid,gid,mode,size) values(%s,%s,"%s",%d,%d,%d,%d);' % 
-                    (subselect2,subselect,basename,uid,gid,mode,size))
+            print('insert into files(ancestorid,folderid,filename,uid,gid,mode,size,jmtime,jatime) values(%s,%s,"%s",%d,%d,%d,%d,julianday("%s"),julianday("%s"));' % 
+                    (subselect2,subselect,basename,uid,gid,mode,size,mtime,atime))

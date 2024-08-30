@@ -23,6 +23,8 @@ def createDB ( dbname ):
                 FOLDER VARCHAR(512) NOT NULL UNIQUE,
                 UID INTEGER DEFAULT -1,
                 GID INTEGER DEFAULT -1,
+                JMTIME REAL,
+                JATIME REAL,
                 MODE INTEGER DEFAULT 0x1C0 );"""
     cursor_obj.execute(foldertable)
     
@@ -36,6 +38,8 @@ def createDB ( dbname ):
                 UID INTEGER DEFAULT -1,
                 GID INTEGER DEFAULT -1,
                 MODE INTEGER DEFAULT 0x1C0,
+                JMTIME REAL,
+                JATIME REAL,
                 SIZE INTEGER DEFAULT 0);"""
                                                             
     cursor_obj.execute(filetable)
@@ -51,7 +55,7 @@ def createDB ( dbname ):
     # FILE/FOLDER VIEW
     cursor_obj.execute("DROP VIEW IF EXISTS ALLFILES")
     allfilesview = """ CREATE VIEW ALLFILES AS 
-                SELECT fi.ID,fo.FOLDER,fi.ancestorid,fi.FILENAME,fi.UID,fi.GID,fi.MODE,fi.SIZE from FILES fi INNER JOIN FOLDERS fo WHERE fi.FOLDERID=fo.ID;"""
+                SELECT fi.ID,fo2.FOLDER as LEVEL1,fo.FOLDER,fi.FILENAME,fi.UID,fi.GID,fi.MODE,fi.SIZE,fi.jmtime,fi.jatime from FILES fi INNER JOIN FOLDERS fo ON fi.FOLDERID=fo.ID INNER JOIN FOLDERS fo2 on fo2.ID=fi.ancestorid;""" 
     cursor_obj.execute(allfilesview)
     cursor_obj.execute("DROP VIEW IF EXISTS ALLOBJECTS")
     allobjectsview = """ CREATE VIEW ALLOBJECTS AS 
