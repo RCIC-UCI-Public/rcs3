@@ -1,0 +1,6 @@
+.snapshots
+.snapshots/*
+.snapshots/**
+.dpack
+.dpack/*
+.dpack/**
