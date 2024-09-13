@@ -13,7 +13,7 @@
 #    ./createdb.py <sqlite.db>
 #    rclone lsjson --metadata --exclude-from exclude-snaps <pathroot> | ./filterjson.py <pathroot> | sqlite3 <sqlite.db>
 #                                                  OR
-#    retrieve-manifest.py -o OWNER -s SYSTEM -c | filtercsv.py | sqlite3 <sqlite.db>
+#    retrieve-manifest.py -o OWNER -s SYSTEM -c | gunzip -c | filtercsv.py | sqlite3 <sqlite.db>
 #
 # You can save the raw files and then "cat" them through the filter. The inventory files from AWS are already compressed. You
 # should explicitly compress the output of lsjson by using gzip.
@@ -63,9 +63,14 @@
 #    ./createdb.py $DB
 # fi
 #
+# Download the files locally then ingest
 # ./retrieve-manifest.py -o ${OWNER} -s ${SYSTEM} -D ${TMPDIR}/${OWNER}-${SYSTEM}
 # 
 # time (zcat ${TMPDIR?}/${OWNER}-${SYSTEM}/*.csv.gz | ./filtercsv.py | sqlite3 ${DB}) &> ${TMPDIR}/${OWNER}-${SYSTEM}-ingest.out &
+#
+# ===  OR ===  Stream download the manifest and ingest in one pipeline
+#
+# time (./retrieve-manifest.py -o ${OWNER} -s ${SYSTEM} -c | gunzip -c | ./filtercsv.py | sqlite3 ${DB}) &> ${TMPDIR}/${OWNER}-${SYSTEM}-ingest.out &
 
 
 # Some interesting queries (If the data is large, like SOM, some of these queuries can take 1-2 minutes)

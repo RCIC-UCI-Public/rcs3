@@ -72,18 +72,20 @@ def main(argv):
         else:
             sys.stderr.write("%s exists but is not a directory" % directory)
 
+    # if writing to stdout create the outputfile (ofile)
+    if args.stdout:
+        ofile = open(sys.stdout.fileno(), 'wb')
+
     for file in allfiles:
         key = file['key']
         size = file['size']
         fname = os.path.basename(key)
         chunk_size = 64*1024*1024
-        sys.stderr.write(f"retrieving {key} ({size} bytes)\n")
+        sys.stderr.write(f"\n == retrieving {key} ({size} bytes) ==\n")
         response = s3_client.get_object(Bucket=manifestbucket, Key=key)
         body = response['Body']
         outputfile = os.path.join(directory,fname)
-        if args.stdout:
-            ofile = open(sys.stdout.fileno(), 'wb')
-        else:
+        if not args.stdout:
             ofile = open(outputfile,'wb')
         while True:
             data = body.read(chunk_size)
