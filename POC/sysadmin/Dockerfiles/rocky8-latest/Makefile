@@ -21,6 +21,9 @@ push:
 	docker tag $(IMAGE_NAME):$(TAG_VERSION_SPECIFIC) $(REPO_NAME)/$(IMAGE_NAME):$(TAG_LATEST)
 	docker push $(REPO_NAME)/$(IMAGE_NAME):$(TAG_LATEST)
 
+clean:
+	docker image prune
+
 all: build push
 
 # Make "all" the default target
