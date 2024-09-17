@@ -40,17 +40,14 @@ def createDB ( dbname ):
                 MODE INTEGER DEFAULT 0x1C0,
                 JMTIME REAL,
                 JATIME REAL,
-                SIZE INTEGER DEFAULT 0);"""
-                                                            
-    cursor_obj.execute(filetable)
-    # Creating table OBJECTS
-    cursor_obj.execute("DROP TABLE IF EXISTS OBJECTS")
-    objecttable = """ CREATE TABLE OBJECTS (
-                OBJID VARCHAR(50) PRIMARY KEY NOT NULL,
-                FILEID INTEGER NOT NULL,
+                SIZE INTEGER DEFAULT 0,
+                OBJECTID VARCHAR(50) NOT NULL,
+                CURRENT INTEGER DEFAULT 1,
+                DELETEMARK INTEGER DEFAULT 1,
+                STORCLASS VARCHAR(16) DEFAULT 'LOCAL',
                 RESTORED INTEGER DEFAULT 0); """
                                                             
-    cursor_obj.execute(objecttable)
+    cursor_obj.execute(filetable)
     
     # FILE/FOLDER VIEW
     cursor_obj.execute("DROP VIEW IF EXISTS ALLFILES")
@@ -59,14 +56,10 @@ def createDB ( dbname ):
     cursor_obj.execute(allfilesview)
     cursor_obj.execute("DROP VIEW IF EXISTS ALLOBJECTS")
     allobjectsview = """ CREATE VIEW ALLOBJECTS AS 
-                SELECT OBJID,FOLDER,FILENAME,UID,GID,MODE,RESTORED from 
-                OBJECTS INNER JOIN ALLFILES WHERE OBJECTS.FILEID=ALLFILES.ID;"""
+                SELECT fi.ID,fi.OBJECTID,fo2.FOLDER as LEVEL1,fo.FOLDER,fi.FILENAME,fi.SIZE,fi.jmtime,fi.CURRENT,fi.DELETEMARK,fi.STORCLASS,fi.RESTORED from FILES fi INNER JOIN FOLDERS fo ON fi.FOLDERID=fo.ID INNER JOIN FOLDERS fo2 on fo2.ID=fi.ancestorid;""" 
     
     cursor_obj.execute(allobjectsview)
-    cursor_obj.execute("CREATE INDEX DIRNAMES on FOLDERS(folder)")
-    cursor_obj.execute("PRAGMA journal_mode=memory")
-    cursor_obj.execute("PRAGMA synchronous=off")
-    cursor_obj.execute("PRAGMA foreign_keys=on")
+
     print("Tables are Ready")
     # Close the connection
     connection_obj.close()

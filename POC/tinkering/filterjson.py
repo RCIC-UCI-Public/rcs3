@@ -46,6 +46,7 @@ if __name__ == "__main__":
     sys.stderr.write("  0M ")
     sys.stderr.flush()
 
+    print("BEGIN TRANSACTION;")
     for record in parse_json_from_stdin():
         records += 1
         if records % processed == 0:
@@ -75,3 +76,4 @@ if __name__ == "__main__":
             subselect2='(select ID from FOLDERS where folder="%s")' % labname
             print('insert into files(ancestorid,folderid,filename,uid,gid,mode,size,jmtime,jatime) values(%s,%s,"%s",%d,%d,%d,%d,julianday("%s"),julianday("%s"));' % 
                     (subselect2,subselect,basename,uid,gid,mode,size,mtime,atime))
+    print("END TRANSACTION");
