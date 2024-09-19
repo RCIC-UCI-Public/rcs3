@@ -1,0 +1,27 @@
+{
+
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "queryRestoreStatus",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:GetObjectVersion",
+                "s3:ListBucket"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "writeLogEvents",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:xxxregionxxx:xxxaccountidxxx:log-group:/aws/lambda/queryS3Restore:*"
+            ]
+        }
+    ]
+}
