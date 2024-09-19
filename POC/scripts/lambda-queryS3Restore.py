@@ -6,7 +6,15 @@ def lambda_handler(event, context):
     
     key = event[ "tasks" ][0][ "s3Key" ]
     versionId = event[ "tasks" ][0][ "s3VersionId" ]
-    bucketArn = event[ "tasks" ][0][ "s3BucketArn" ] 
+    schemaVersion = event[ "invocationSchemaVersion" ]
+    if schemaVersion == "1.0":
+        bucketArn = event[ "tasks" ][0][ "s3BucketArn" ]
+        bucketName = bucketArn.split(":")[-1]
+    elif schemaVersion == "2.0":
+        bucketName = event[ "tasks" ][0][ "s3Bucket" ]
+    else:
+        print( "unknown invocationSchemaVersion {}".format( schemaVersion ) )
+        return {}
     
     myresults = {}
     myresults[ "taskId" ] = event[ "tasks" ][0][ "taskId" ]
@@ -14,7 +22,6 @@ def lambda_handler(event, context):
         myresults[ "resultCode" ] = "Succeeded"
         myresults[ "resultString" ] = "ignore table header"
     else:
-        bucketName = bucketArn.split(":")[-1]
         filechk = s3.head_object( Bucket=bucketName, Key=key, VersionId=versionId )
         if filechk[ "StorageClass" ] == "GLACIER":
             myresults[ "resultCode" ] = "PermanentFailure"
