@@ -14,7 +14,7 @@ def lambda_handler(event, context):
         myresults[ "resultCode" ] = "Succeeded"
         myresults[ "resultString" ] = "ignore table header"
     else:
-        ( s_arn, s_aws, s_s3, s_region, s_acct, bucketName ) = bucketArn.split( ":" )
+        bucketName = bucketArn.split(":")[-1]
         filechk = s3.head_object( Bucket=bucketName, Key=key, VersionId=versionId )
         if filechk[ "StorageClass" ] == "GLACIER":
             myresults[ "resultCode" ] = "PermanentFailure"
