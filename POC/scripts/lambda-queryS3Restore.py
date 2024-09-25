@@ -22,12 +22,28 @@ def lambda_handler(event, context):
         myresults[ "resultCode" ] = "Succeeded"
         myresults[ "resultString" ] = "ignore table header"
     else:
-        filechk = s3.head_object( Bucket=bucketName, Key=key, VersionId=versionId )
-        if filechk[ "StorageClass" ] == "GLACIER":
+        try:
+            filechk = s3.head_object( Bucket=bucketName, Key=key, VersionId=versionId )
+            filemeta = response[ 'ResponseMetadata' ][ 'HTTPHeaders' ]
+            sclass = filemeta[ 'x-amz-storage-class' ]
+            if sclass == 'GLACIER' or sclass == 'DEEP_ARCHIVE':
+                if 'x-amz-restore' in filemeta:
+                    if 'ongoing-request="false"' in filemeta[ 'x-amz-restore' ]:
+                        myresults[ "resultCode" ] = "Succeeded"
+                        myresults[ "resultString" ] = "Restore ready"
+                    else:
+                        myresults[ "resultString" ] = "PermanentFailure"
+                        myresults[ "resultString" ] = "Restore in progress"
+                else:
+                    myresults[ "resultCode" ] = "PermanentFailure"
+                    myresults[ "resultString" ] = sclass
+            else:
+                # file already available for restore
+                myresults[ "resultCode" ] = "Succeeded"
+                myresults[ "resultString" ] = sclass
+        except Exception as error:
             myresults[ "resultCode" ] = "PermanentFailure"
-        else:
-            myresults[ "resultCode" ] = "Succeeded"
-        myresults[ "resultString" ] = ""
+            myresults[ "resultString" ] = type(error).__name__
     
     response = {
             "invocationSchemaVersion": event[ "invocationSchemaVersion" ],
@@ -38,7 +54,7 @@ def lambda_handler(event, context):
     
     return response
 
-  
+
 
 # input
 #{
