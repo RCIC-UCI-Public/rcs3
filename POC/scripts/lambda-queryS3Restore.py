@@ -26,7 +26,7 @@ def lambda_handler(event, context):
             filechk = s3.head_object( Bucket=bucketName, Key=key, VersionId=versionId )
             filemeta = response[ 'ResponseMetadata' ][ 'HTTPHeaders' ]
             sclass = filemeta[ 'x-amz-storage-class' ]
-            if sclass == 'GLACIER' or sclass == 'DEEP_ARCHIVE':
+            if sclass in [ 'GLACIER', 'DEEP_ARCHIVE' ]:
                 if 'x-amz-restore' in filemeta:
                     if 'ongoing-request="false"' in filemeta[ 'x-amz-restore' ]:
                         myresults[ "resultCode" ] = "Succeeded"
@@ -46,11 +46,11 @@ def lambda_handler(event, context):
             myresults[ "resultString" ] = type(error).__name__
     
     response = {
-            "invocationSchemaVersion": event[ "invocationSchemaVersion" ],
-            "treatMissingKeysAs" : "PermanentFailure",
-            "invocationId" : event[ "invocationId" ],
-            "results": [ myresults ]
-        }
+        "invocationSchemaVersion": event[ "invocationSchemaVersion" ],
+        "treatMissingKeysAs" : "PermanentFailure",
+        "invocationId" : event[ "invocationId" ],
+        "results": [ myresults ]
+    }
     
     return response
 
@@ -70,7 +70,7 @@ def lambda_handler(event, context):
 #            "s3VersionId": "1",
 #            "s3BucketArn": "arn:aws:s3:::amzn-s3-demo-bucket"
 #        }
-#    ]  
+#    ]
 #}
 
 # response
@@ -86,4 +86,4 @@ def lambda_handler(event, context):
 #    }
 #  ]
 #}
-  
+
