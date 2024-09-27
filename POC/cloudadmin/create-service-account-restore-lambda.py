@@ -38,7 +38,7 @@ if not os.path.isfile( scriptName ):
     print( "Missing script: {}".format( scriptName ) )
     sys.exit( 1 )
 # create zip file from script file
-zipName = os.path.join( basedir, "outputs", args.purpose, ".zip" )
+zipName = os.path.join( basedir, "outputs", args.purpose + ".zip" )
 with zipfile.ZipFile( zipName, "w" ) as z:
     z.write( scriptName, "lambda_function.py" )
 
