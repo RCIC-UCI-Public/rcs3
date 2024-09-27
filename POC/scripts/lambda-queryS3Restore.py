@@ -24,7 +24,7 @@ def lambda_handler(event, context):
     else:
         try:
             filechk = s3.head_object( Bucket=bucketName, Key=key, VersionId=versionId )
-            filemeta = response[ 'ResponseMetadata' ][ 'HTTPHeaders' ]
+            filemeta = filechk[ 'ResponseMetadata' ][ 'HTTPHeaders' ]
             sclass = filemeta[ 'x-amz-storage-class' ]
             if sclass in [ 'GLACIER', 'DEEP_ARCHIVE' ]:
                 if 'x-amz-restore' in filemeta:
