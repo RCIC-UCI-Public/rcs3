@@ -1,10 +1,12 @@
+from urllib.parse import unquote_plus
 import json
+import botocore
 import boto3
 
 def lambda_handler(event, context):
     s3 = boto3.client( "s3" )
     
-    key = event[ "tasks" ][0][ "s3Key" ]
+    key = unquote_plus( event[ "tasks" ][0][ "s3Key" ] )
     versionId = event[ "tasks" ][0][ "s3VersionId" ]
     schemaVersion = event[ "invocationSchemaVersion" ]
     if schemaVersion == "1.0":
@@ -41,9 +43,9 @@ def lambda_handler(event, context):
                 # file already available for restore
                 myresults[ "resultCode" ] = "Succeeded"
                 myresults[ "resultString" ] = sclass
-        except Exception as error:
+        except botocore.exceptions.ClientError as error:
             myresults[ "resultCode" ] = "PermanentFailure"
-            myresults[ "resultString" ] = type(error).__name__
+            myresults[ "resultString" ] = 'Error Message: {}'.format(error.response['Error']['Message'])
     
     response = {
         "invocationSchemaVersion": event[ "invocationSchemaVersion" ],
