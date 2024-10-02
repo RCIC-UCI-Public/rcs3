@@ -4,10 +4,10 @@
 # ID,Systems,Object Quota (Millions), Storage Quota (TB)
 ID,SYSTEM,QUOTA_OBJECT,QUOTA_STORAGE
 cestark, bmc,4,12 
-cestark,fibre-data,12,13
-cestark,hippocampus,50,145
-medhap,rivendell,4,115
-xiangmix,cncm,66,1300
+cestark,fibre-data,12,18
+cestark,hippocampus,70,170
+medhap,rivendell,6,115
+xiangmix,cncm,75,1600
 xiangmix,xuisebnas,22,180
 xiangmix,brain,10,130
 xiangmix,xuoffice,1,2
@@ -18,18 +18,18 @@ kbeier,apollon,3,50
 kbeier,faye,3,130
 kbeier,beier1,5,360
 mfrose,morandi1,3,90
-lwagar,wagarlab,1,38
+lwagar,wagarlab,1,45
 fmarango,f-ivm,4,14
 lewell,cedar,1,60
 blsemler,littlebird,1,2
 mingt,chlamydia,1,10
 xiangmix,cncmviruscore,1,1
 xiangmix,xulabtissuecyte,14,25
-xiangmix,xu160,17,44
+xiangmix,xu160,20,44
 ppapadop,laguna,1,1
 rfrostig,sharat,3,15
 kngreen,model-ad,4,35
-xiangmix,cncm2,10,200
+xiangmix,cncm2,20,500
 piomelli,piomellinas,6,2
 middlebj,middlab,1,1
 rcic-admin,crsp,70,1200
