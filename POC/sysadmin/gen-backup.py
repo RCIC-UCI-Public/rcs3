@@ -296,7 +296,7 @@ class backupJob(object):
         self._filters.extend(["- **\n"])
 
     def generate(self,jobsfile):
-        """ returns a list of backupJobs (or restoreJob) objects """ 
+        """ returns a list of backupJobs (or recoveryJob) objects """ 
     
         alljobs = [] 
         jobscriptdir=os.path.realpath(os.path.dirname(jobsfile))
@@ -305,7 +305,7 @@ class backupJob(object):
             jobdefs = yaml.safe_load( f )
         
         for paths in jobdefs['srcpaths']:
-            # Can read path or archivepath. Archivepath is a syntactic-sugar for restore jobs
+            # Can read path or archivepath. Archivepath is a syntactic-sugar for recover jobs
             try:
                 path=paths['path']
             except:
@@ -332,7 +332,7 @@ class backupJob(object):
                 pass 
                       
             for jobs in paths['jobs']:
-               # Creates either a backupjob or a restore job
+               # Creates either a backupjob or a recover job
                # python-fu to create a new object that is the same class as this one
                bupJob = object.__new__(type(self))
                bupJob.__init__(jobs['name'],path)
@@ -375,7 +375,7 @@ class backupJob(object):
     
         return alljobs 
 
-class restoreJob(backupJob):
+class recoveryJob(backupJob):
     """ Similar to a backupUp job but order is reversed """
     def __init__(self,name,archivepath,owner=None,system=None):
        super().__init__(name, archivepath,owner,system)
@@ -464,7 +464,7 @@ def main(argv):
     parser.add_argument("-t", "--threads",   dest="threads",  default=None,help="Override #threads")
     parser.add_argument("-j", "--jobs",   dest="joblist",  default=None,help=helpjob)
     parser.add_argument("-x", "--extra",   dest="xrclone",  default=None,help=helpextra)
-    parser.add_argument("-R", "--restore",   dest="restore",  default=False, action='store_true',help="Restore instead of backup")
+    parser.add_argument("-R", "--recover",   dest="recover",  default=False, action='store_true',help="Recover instead of backup")
     parser.add_argument("-S", "--timestamp", dest="timestamp",  default=None,help=helptimestamp)
     parser.add_argument("--sync-jobs",   dest="syncjobs",  default=None,help=helpsyncjob)
     parser.add_argument("--topup-jobs",   dest="topupjobs",  default=None,help=helptopupjob)
@@ -496,9 +496,9 @@ def main(argv):
        sys.exit(-1)
 
     # Build the jobs
-    # Are we restoring or backing up?
+    # Are we recovering or backing up?
     yamlbackup = None
-    if not args.restore:
+    if not args.recover:
        # Always backup up the job file (usually ../config/jobs.yaml)
        yamlbackup = backupJob('rcs3config',os.path.dirname(args.jobsfile),args.owner,args.system)
        yamlbackup.includefiles = [os.path.basename(args.jobsfile)]
@@ -506,7 +506,7 @@ def main(argv):
        mode = yamlbackup
     else:
        alljobs = []
-       mode = restoreJob('notused','notused')
+       mode = recoveryJob('notused','notused')
        
     alljobs.extend(mode.generate(args.jobsfile))
     if args.timestamp is not None:
