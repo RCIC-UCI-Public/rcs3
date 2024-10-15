@@ -26,6 +26,7 @@ def main(argv):
     p.add_argument("-s", "--system",   dest="system", default=None, help=helpsystem)
     p.add_argument("-D", "--directory",   dest="directory", default=None, help=helpoutputdir)
     p.add_argument("-c", "--stdout",   dest="stdout", default=False, help=helpstdout, action='store_true')
+    p.add_argument("-p", "--noprofile",   dest="noprofile",  default=False, action='store_true', help="Set to use [default] profile")
     p.add_argument("-d", "--dry-run",   dest="dryrun",  default=False, action='store_true')
     args = p.parse_args()
     
@@ -39,7 +40,11 @@ def main(argv):
     # Find the latest manifest file 
     if "configfile" in aws:
         os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
-    session = boto3.Session( profile_name=aws[ "profile" ])
+    if args.noprofile:
+        session = boto3.Session( profile_name="default")
+    else:
+        session = boto3.Session( profile_name=aws[ "profile" ])
+        
 
     region=aws["region"]
     manifestbucket="%s-%s-%s" % (owner,system,aws["inventory_postfix"])
