@@ -70,10 +70,10 @@
             "x": 12,
             "type": "metric",
             "properties": {
-                "title": "Bucket Activity",
+                "title": "Key Age Password Rotation",
                 "annotations": {
                     "alarms": [
-                        "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% no activity"
+                        "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM%-key-age-alarm"
                     ]
                 },
                 "view": "timeSeries",
