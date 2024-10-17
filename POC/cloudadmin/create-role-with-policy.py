@@ -18,6 +18,7 @@
 #   Add trust statement to the role so that it can be assumed by specific entities 
 #     
 import argparse
+import botocore
 import boto3
 import json
 import os
@@ -60,7 +61,7 @@ else:
 # load the policy template 
 input_policy = basedir + "/{}/{}-policy.json".format( args.templatedir,args.policy )
 if not os.path.isfile( input_policy ):
-    print( "Not found: {}".format( input_template ) )
+    print( "Not found: {}".format( input_policy ) )
     sys.exit( -1 )
 
 input_trust = basedir + "/{}/{}-trust.json".format( args.templatedir,args.policy )
@@ -112,13 +113,23 @@ if args.verbose:
 # lookup an existing policy
 try:
     role_name = "{}-role".format( args.policy )
-    response = iam.create_role(
-        RoleName=role_name,
-        AssumeRolePolicyDocument=json_trust,
-        Description="Allow {} to process requests".format( args.policy )
-    )
+    try:
+        response = iam.create_role(
+            RoleName=role_name,
+            AssumeRolePolicyDocument=json_trust,
+            Description="Allow {} to process requests".format( args.policy )
+        )
+    except botocore.exceptions.ClientError as error:
+        if error.response['Error']['Code'] == 'EntityAlreadyExists':
+            policies = iam.list_attached_role_policies(RoleName=role_name)
+            for policy in policies['AttachedPolicies']:
+                iam.detach_role_policy(RoleName=role_name,PolicyArn=policy['PolicyArn'])
+            if ( args.verbose ):
+                print(policies)
+                
     if args.verbose:
         print( response )
+
     response = iam.attach_role_policy(
         RoleName=role_name,
         PolicyArn=policy_arn
