@@ -35,7 +35,8 @@ RUN dnf -y install \
     cronie \
     curl \
     tcpdump \
-    wget
+    wget \
+    sqlite
 
 # Get the latest version of rclone - v1.68.1 as of this writing - released 2024-09-24
 RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[ \t]+' '{print $2}') && \
