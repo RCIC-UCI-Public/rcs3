@@ -25,6 +25,8 @@ p.add_argument( "purpose",
         help="which trust relationship to apply" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
+p.add_argument( "-d", "--templatedir", dest="templatedir",default="templates/self-service",
+        help="base directory to load trust/policy templates" )
 args = p.parse_args()
 
 # override location of .aws/config
@@ -43,7 +45,7 @@ else:
     iam = session.client( "iam" )
 
 # load the template which allows launching EC2 instance
-input_template = basedir + "/templates/self-service/{}-trust.json".format( args.purpose )
+input_template = basedir + "/{}/{}-trust.json".format( args.templatedir, args.purpose )
 if not os.path.isfile( input_template ):
     print( "Not found: {}".format( input_template ) )
     sys.exit( -1 )

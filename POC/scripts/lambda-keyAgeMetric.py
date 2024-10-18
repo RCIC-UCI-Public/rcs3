@@ -40,9 +40,8 @@ def setMetricData(sa,now,hours):
     """ Publish how many hours old an active access key is for a particular owner-system """
     namespace="rcs3"
     comps = sa.split('-')
-    owner = comps[0]
-    system = comps[1]
-    metricName = f"{owner}_{system}_key_age"
+    ownerSystem =  "-".join(comps[:-1])
+    metricName = f"{ownerSystem}_key_age"
     metricData = [ { 'MetricName': metricName, 'Value': hours, 'Timestamp': now }]
     ## Publish the age of the key in hours
     cw_client.put_metric_data(Namespace=namespace, MetricData= metricData)
