@@ -160,6 +160,17 @@
             "Effect": "Allow",
             "Action": "iam:passRole",
             "Resource": "arn:aws:iam::xxxaccountidxxx:role/xxxuserxxx-xxxhostxxx-restore-s3batch-perms-role"
+        },
+        {
+            "Sid": "InvokeStepFunctionRestore",
+            "Effect": "Allow",
+            "Action": [
+                "states:StartExecution",
+                "states:StartSyncExecution"
+            ],
+            "Resource": [
+                "arn:aws:states:xxxregionxxx:xxxaccountidxxx:stateMachine:xxxuserxxx-xxxhostxxx-sfn-full-monty"
+            ]
         }
     ]
 }
