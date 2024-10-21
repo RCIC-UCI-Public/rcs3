@@ -62,7 +62,7 @@ RUN dnf -y erase python39-devel && dnf -y clean all
 # Set environment variable for RCS3_ROOT (persistent storage) and AWS_SHARED_CREDENTIALS_FILE
 #
 ENV RCS3_ROOT=/.rcs3
-ENV AWS_SHARED_CREDENTIALS_FILE=/.rcs3/.aws/credentials
+ENV AWS_SHARED_CREDENTIALS_FILE=/.rcs3/rcs3/POC/config/credentials
 ENV PS1='RCS3 Docker @\h \w> '
 
 # Entry point or command to run when the container starts
