@@ -1,15 +1,15 @@
 {
   "Comment": "Use Athena to query files in xxxuserxxx-xxxhostxxx-xxxbucketxxx that have been moved to Glacier",
-  "StartAt": "create database",
+  "StartAt": "create Athena queries",
   "States": {
     "create database": {
       "Type": "Task",
       "Resource": "arn:aws:states:::athena:startQueryExecution",
       "Parameters": {
-        "QueryString": "create database if not exists xxxuserxxx",
+        "QueryString.$": "States.Format( 'create database if not exists {}', $.QueryDatabase )",
         "WorkGroup": "xxxuserxxx"
       },
-      "Next": "create Athena queries",
+      "Next": "load schema",
       "ResultPath": null
     },
     "create Athena queries": {
@@ -17,11 +17,13 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload": {
-          "TableName": "xxxhostxxx",
+          "UserName": "xxxuserxxx",
+          "HostName": "xxxhostxxx",
           "BackupBucket": "xxxuserxxx-xxxhostxxx-xxxbucketxxx",
           "InventoryBucket": "xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
           "HiveDir": "xxxuserxxx-xxxhostxxx-xxxbucketxxx/xxxuserxxx-xxxhostxxx-daily/hive/dt={}-01-00/",
-          "RestoreList.$": "$.RestoreList"
+          "RestoreList.$": "$.RestoreList",
+          "ReportsDir": "xxxreportsxxx/xxxuserxxx/xxxhostxxx/"
         },
         "FunctionName": "arn:aws:lambda:xxxregionxxx:xxxaccountidxxx:function:createAthenaQueries:$LATEST"
       },
@@ -38,7 +40,7 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "load schema",
+      "Next": "create database",
       "Comment": "look for latest S3 inventory",
       "OutputPath": "$.Payload"
     },
@@ -47,7 +49,7 @@
       "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
       "Parameters": {
         "QueryExecutionContext": {
-          "Database": "xxxuserxxx"
+          "Database.$": "$.QueryDatabase"
         },
         "QueryString.$": "$.QuerySchema",
         "WorkGroup": "xxxuserxxx"
@@ -58,6 +60,7 @@
     },
     "iterate over each string": {
       "Type": "Map",
+      "ItemsPath": "$.QueryList",
       "ItemProcessor": {
         "ProcessorConfig": {
           "Mode": "INLINE"
@@ -69,7 +72,7 @@
             "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
             "Parameters": {
               "QueryExecutionContext": {
-                "Database": "xxxuserxxx"
+                "Database.$": "$.QueryDatabase"
               },
               "QueryString.$": "$.SearchString",
               "WorkGroup": "xxxuserxxx"
@@ -82,7 +85,8 @@
           }
         }
       },
-      "Next": "notify user search"
+      "Next": "notify user search",
+      "ResultPath": "$.taskresult"
     },
     "notify user search": {
       "Type": "Task",
@@ -90,20 +94,7 @@
       "Parameters": {
         "TopicArn": "arn:aws:sns:xxxregionxxx:xxxaccountidxxx:xxxuserxxx-xxxhostxxx-xxxowner_notifyxxx",
         "Subject": "search results ready",
-        "Message.$": "$"
-      },
-      "Next": "delete inventory table",
-      "ResultPath": null
-    },
-    "delete inventory table": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
-      "Parameters": {
-        "QueryExecutionContext": {
-          "Database": "xxxuserxxx"
-        },
-        "QueryString": "drop table xxxhostxxx",
-        "WorkGroup": "xxxuserxxx"
+        "Message.$": "$.taskresult"
       },
       "Next": "drop database",
       "ResultPath": null
@@ -112,11 +103,12 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::athena:startQueryExecution",
       "Parameters": {
-        "QueryString": "drop database xxxuserxxx",
+        "QueryString.$": "States.Format( 'drop database {} cascade', $.QueryList[0].QueryDatabase )",
         "WorkGroup": "xxxuserxxx"
       },
       "Next": "transform Athena output to S3 Batch input",
-      "ResultPath": null
+      "ResultPath": null,
+      "OutputPath": "$.taskresult"
     },
     "transform Athena output to S3 Batch input": {
       "Type": "Task",
