@@ -37,7 +37,7 @@ def lambda_handler(event, context):
     t = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and (storage_class = 'GLACIER' or storage_class = 'DEEP_ARCHIVE')"
     for request in event[ "RestoreList" ]:
         s = t.format( event[ "BackupBucket" ], QueryTable, request )
-        a.append( { "SearchString": s, "ResultsDir": savedir } )
+        a.append( { "QueryDatabase": QueryDatabase, "SearchString": s, "ResultsDir": savedir } )
     
     return {
         "QueryDatabase": QueryDatabase,
