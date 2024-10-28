@@ -4,7 +4,7 @@ import datetime
 
 def lambda_handler(event, context):
     # create the SQL query to load a specific S3 inventory
-    # expects UserName, HostName, BackupBucket, InventoryBucket, ReportsDir, and HiveDir as inputs
+    # expects UserName, HostName, BackupBucket, InventoryBucket, and HiveDir as inputs
     
     # convert hypens to underscores
     QueryDatabase = event[ "UserName" ].replace( "-", "_" )
@@ -30,7 +30,7 @@ def lambda_handler(event, context):
     QuerySchema=loadschema.format( QueryTable, event[ "InventoryBucket" ], hivedir )
     
     # need unique save location for dynamodb upload
-    savedir = "s3://" + event[ "ReportsDir" ] + stamp.strftime( "restore%Y%m%d-%H%M%S" )
+    savedir = "s3://" + event[ "InventoryBucket" ] + stamp.strftime( "/rcs3/restore%Y%m%d-%H%M%S" )
     
     # create the SQL queries for a specific S3 inventory in Athena
     a = []

@@ -34,18 +34,6 @@
             ]
         },
         {
-            "Sid": "reports",
-            "Action": [
-                "s3:GetBucketLocation",
-                "s3:ListBucket"
-            ],
-            "Effect": "Allow",
-            "Resource": [
-                "arn:aws:s3:::xxxreportsxxx"
-
-            ]
-        },
-        {
             "Sid": "AllowWrite2UserFolder",
             "Effect": "Allow",
             "Action": [
@@ -55,7 +43,7 @@
                 "s3:DeleteObject"
             ],
             "Resource": [
-                "arn:aws:s3:::xxxreportsxxx/xxxuserxxx/*"
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx/rcs3/*"
             ]
         },
         {
