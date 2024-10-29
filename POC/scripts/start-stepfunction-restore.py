@@ -86,8 +86,6 @@ if args.verbose:
     print( "Calling ARN: {}".format( sfnArn ) )
     print( "Using input: {}".format( sfnInput ) )
 
-sys.exit(0)
-
 try:
     response = sfn.start_execution(
         stateMachineArn=sfnArn,
