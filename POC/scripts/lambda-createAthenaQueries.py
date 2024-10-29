@@ -4,7 +4,8 @@ import datetime
 
 def lambda_handler(event, context):
     # create the SQL query to load a specific S3 inventory
-    # expects UserName, HostName, BackupBucket, InventoryBucket, and HiveDir as inputs
+    # expects UserName, HostName, BackupBucket, InventoryBucket, HiveDir, RestoreList,
+    # and ExpireDays as inputs
     
     # convert hypens to underscores
     QueryDatabase = event[ "UserName" ].replace( "-", "_" )
@@ -44,6 +45,6 @@ def lambda_handler(event, context):
         "QuerySchema": QuerySchema,
         "QueryInventory": {
           "QueryList": a,
-          
+          "ExpireDays": event[ "ExpireDays" ]
         }
     }
