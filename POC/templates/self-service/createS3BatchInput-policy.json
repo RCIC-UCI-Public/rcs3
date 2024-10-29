@@ -8,7 +8,7 @@
                 "s3:GetObject"
             ],
             "Resource": [
-                "arn:aws:s3:::xxxreportsxxx/*"
+                "arn:aws:s3:::*xxxinventory_postfixxxx/*"
             ]
         },
         {
