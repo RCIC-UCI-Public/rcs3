@@ -29,6 +29,8 @@ p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 p.add_argument( "-s", "--skipencoding", action="store_true",
         help="skip the urllib parse encoding" )
+p.add_argument( "-d", "--daystoretain", type=int,
+        help="number of days to retain restored files" )
 args = p.parse_args()
 
 with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
@@ -38,6 +40,10 @@ with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
+if args.daystoretain:
+    expireDays = args.daystoretain
+else:
+    expireDays = int( aws[ "s3_glacier_expire" ] )
 
 # simple replace of asterisk character with percentage character
 # (i.e. UNIX wildcard replaced with SQL wildcard) and
@@ -60,6 +66,7 @@ with open( args.glacierlist, "r" ) as gf:
             restoreList.append( encodedfilename )
 if args.verbose:
     print( restoreList )
+    print( "expireDays {}".format( expireDays ) )
 
 # when run from AWS services, profile is not used
 if "profile" in aws:
@@ -74,10 +81,12 @@ else:
 
 sfnArn = "arn:aws:states:{}:{}:stateMachine:{}-{}-sfn-{}"\
     .format( aws[ "region" ], aws[ "accountid" ], args.user, args.host, args.purpose )
-sfnInput = json.dumps( { "RestoreList": restoreList } )
+sfnInput = json.dumps( { "RestoreList": restoreList, "ExpireDays": expireDays } )
 if args.verbose:
     print( "Calling ARN: {}".format( sfnArn ) )
     print( "Using input: {}".format( sfnInput ) )
+
+sys.exit(0)
 
 try:
     response = sfn.start_execution(

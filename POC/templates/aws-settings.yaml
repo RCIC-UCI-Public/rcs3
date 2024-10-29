@@ -28,6 +28,7 @@ lambda_runtime: "python3.12"
 lambda_handler: "lambda_function.lambda_handler"
 lambda_log_nameprefix: "/aws/lambda/"
 lambda_log_retention: 30
+s3_glacier_expire: 7
 
 # 6. Restrict service accounts to specific array of IP addresses using
 # condition statments in policy definiations. Expected format is d.d.d.d/d
