@@ -10,8 +10,9 @@ def lambda_handler(event, context):
     # requires GetObject permissions on records bucket
     l = []
     arnprefix = "arn:aws:s3:::"
+    d = event[ "ExpireDays" ]
     s3 = boto3.client( "s3" )
-    for n in event:
+    for n in event[ "taskresult" ]:
         if n[ "State" ] == "SUCCEEDED":
             m = re.match( '^s3://([^/]+)/(.+)', n[ "ResultsFile" ] )
             if m:
@@ -19,7 +20,8 @@ def lambda_handler(event, context):
                 l.append( {
                     'ResultsFile': arnprefix + m.group(1) + "/" + m.group(2),
                     'ETag': r[ "ETag" ].strip( '\"' ),
-                    'FileToken': m.group(2)
+                    'FileToken': m.group(2),
+                    'ExpireDays': d
                 } )
                 metadata = m.group(2) + ".metadata"
                 r = s3.delete_object( Bucket=m.group(1), Key=metadata )
@@ -27,7 +29,8 @@ def lambda_handler(event, context):
                 l.append( {
                     'ResultsFile': n[ "ResultsFile" ],
                     'ETag': "",
-                    'FileToken': ""
+                    'FileToken': "",
+                    'ExpireDays': d
                 } )
         else:
             # build list of problem files. drop for now
