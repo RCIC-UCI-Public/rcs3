@@ -5,10 +5,11 @@
             "Sid": "retrieveETag",
             "Effect": "Allow",
             "Action": [
-                "s3:GetObject"
+                "s3:GetObject",
+                "s3:DeleteObject"
             ],
             "Resource": [
-                "arn:aws:s3:::*xxxinventory_postfixxxx/*"
+                "arn:aws:s3:::*xxxinventoryxxx/*"
             ]
         },
         {
