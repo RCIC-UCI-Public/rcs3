@@ -2,7 +2,7 @@
     "Version":"2012-10-17",
     "Statement":[
         {
-            "Sid": "target",
+            "Sid": "restoreObject2Bucket",
             "Effect":"Allow",
             "Action":[
                 "s3:RestoreObject"
@@ -12,24 +12,15 @@
             ]
         },
         {
-            "Sid": "manifest",
+            "Sid": "readManifestWriteReport",
             "Effect": "Allow",
             "Action": [
                 "s3:GetObject",
-                "s3:GetObjectVersion"
-            ],
-            "Resource": [
-                "arn:aws:s3:::xxxreportsxxx/xxxuserxxx/*"
-            ]
-        },
-        {
-            "Sid": "reports",
-            "Effect":"Allow",
-            "Action":[
+                "s3:GetObjectVersion",
                 "s3:PutObject"
             ],
-            "Resource":[
-                "arn:aws:s3:::xxxreportsxxx/xxxuserxxx/*"
+            "Resource": [
+                "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx/rcs3/*"
             ]
         }
     ]
