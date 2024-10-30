@@ -8,6 +8,7 @@ def lambda_handler(event, context):
     # remove metadata file before dynamodb import
     # expected format of ResultsFile is s3://bucketname/path-to-object/object
     # requires GetObject permissions on records bucket
+    # limit FileToken to 64 characters, needed for CreateJob idempotency
     l = []
     arnprefix = "arn:aws:s3:::"
     d = event[ "ExpireDays" ]
@@ -20,7 +21,7 @@ def lambda_handler(event, context):
                 l.append( {
                     'ResultsFile': arnprefix + m.group(1) + "/" + m.group(2),
                     'ETag': r[ "ETag" ].strip( '\"' ),
-                    'FileToken': m.group(2),
+                    'FileToken': m.group(2)[:64],
                     'ExpireDays': d
                 } )
                 metadata = m.group(2) + ".metadata"
