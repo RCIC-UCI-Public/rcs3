@@ -23,6 +23,7 @@
           "InventoryBucket": "xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
           "HiveDir": "xxxuserxxx-xxxhostxxx-xxxbucketxxx/xxxuserxxx-xxxhostxxx-daily/hive/dt={}-01-00/",
           "RestoreList.$": "$.RestoreList",
+          "ExpireDays.$": "$.ExpireDays"
         },
         "FunctionName": "arn:aws:lambda:xxxregionxxx:xxxaccountidxxx:function:createAthenaQueries:$LATEST"
       },
@@ -109,8 +110,7 @@
         "WorkGroup": "xxxuserxxx"
       },
       "Next": "transform Athena output to S3 Batch input",
-      "ResultPath": null,
-      "OutputPath": "$.taskresult"
+      "ResultPath": null
     },
     "transform Athena output to S3 Batch input": {
       "Type": "Task",
@@ -166,16 +166,16 @@
               },
               "Operation": {
                 "S3InitiateRestoreObject": {
-                  "ExpirationInDays": 7,
+                  "ExpirationInDays": 1,
                   "GlacierJobTier": "BULK"
                 }
               },
               "Priority": 10,
               "Report": {
-                "Bucket": "arn:aws:s3:::xxxreportsxxx",
-                "Prefix": "xxxuserxxx/xxxhostxxx",
+                "Bucket": "arn:aws:s3:::xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
+                "Prefix": "rcs3",
                 "Format": "Report_CSV_20180820",
-                "Enabled": "True",
+                "Enabled": true,
                 "ReportScope": "FailedTasksOnly"
               },
               "RoleArn": "arn:aws:iam::xxxaccountidxxx:role/xxxuserxxx-xxxhostxxx-restore-s3batch-perms-role"
@@ -189,11 +189,11 @@
         }
       },
       "ItemsPath": "$.CreateJobItems",
-      "Next": "wait 10 minutes"
+      "Next": "wait 2 minutes"
     },
-    "wait 10 minutes": {
+    "wait 2 minutes": {
       "Type": "Wait",
-      "Seconds": 600,
+      "Seconds": 120,
       "Next": "poll job status"
     },
     "poll job status": {
@@ -228,12 +228,7 @@
           "Next": "notify user finished"
         }
       ],
-      "Default": "wait 1 hour"
-    },
-    "wait 1 hour": {
-      "Type": "Wait",
-      "Seconds": 3600,
-      "Next": "poll job status"
+      "Default": "wait 2 minutes"
     },
     "notify user finished": {
       "Type": "Task",
