@@ -23,7 +23,7 @@ p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
+with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
     aws = yaml.safe_load( f )
 
 # override location of .aws/config
