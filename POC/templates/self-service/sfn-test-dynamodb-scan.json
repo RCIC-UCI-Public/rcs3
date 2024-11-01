@@ -10,7 +10,7 @@
     "Check Glacier Restore Completed": {
       "Type": "Task",
       "Parameters": {
-        "TableName": "xxxuserxxx-xxxhostxxx-s",
+        "TableName": "rcs3-xxxuserxxx-xxxhostxxx",
         "Select": "COUNT",
         "FilterExpression": "#v = :s",
         "ExpressionAttributeNames": {
