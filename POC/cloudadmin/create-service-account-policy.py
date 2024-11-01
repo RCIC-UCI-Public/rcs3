@@ -68,7 +68,6 @@ my_vars = {
     "xxxhostxxx": args.host,
     "xxxbucketxxx": aws[ "bucket_postfix" ],
     "xxxinventoryxxx": aws[ "inventory_postfix" ],
-    "xxxreportsxxx": aws[ "reports" ].removeprefix( "s3://"),
     "xxxaccountidxxx": aws[ "accountid" ],
     "xxxregionxxx": aws[ "region" ],
     "xxxowner-notifyxxx": aws[ "owner_notify" ],
