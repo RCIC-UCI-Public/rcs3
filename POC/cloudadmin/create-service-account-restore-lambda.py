@@ -96,6 +96,7 @@ try:
             Handler=aws[ "lambda_handler" ],
             Code={ "ZipFile": zipBinary.read() },
             Publish=True,
+            Tags={ 'RCS3': 'restore' }
         )
     if args.verbose:
         print( response )
@@ -136,3 +137,9 @@ except Exception as error:
     print( type(error).__name__ )
     print( error )
     sys.exit( -1 )
+
+# clean up the temporary zip file
+try:
+    os.remove( zipName )
+except OSError:
+    pass
