@@ -9,16 +9,14 @@ import yaml
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
+with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
     aws = yaml.safe_load( f )
 
 
-usage="Create Athena workgroup for user and host"
+usage="Create Athena workgroup for user"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
         help="user UCInetID" )
-p.add_argument( "host",
-        help="hostname" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
@@ -42,9 +40,6 @@ try:
     athena.create_work_group(
         Name=args.user,
         Configuration={
-            'ResultConfiguration': {
-                'OutputLocation': "{}/{}".format( aws[ "reports" ], args.user )
-            },
             'EnforceWorkGroupConfiguration': False,
             'PublishCloudWatchMetricsEnabled': True
         }
