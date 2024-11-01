@@ -52,7 +52,6 @@ my_vars = {
     "xxxhostxxx": args.host,
     "xxxbucketxxx": aws[ "bucket_postfix" ],
     "xxxinventoryxxx": aws[ "inventory_postfix" ],
-    "xxxreportsxxx": aws[ "reports" ].removeprefix( "s3://"),
     "xxxaccountidxxx": aws[ "accountid" ],
     "xxxregionxxx": aws[ "region" ],
     "xxxowner_notifyxxx": aws[ "owner_notify" ]
@@ -71,6 +70,11 @@ try:
         definition=sfnJson,
         roleArn=sfnRole,
         type='STANDARD',
+        tags=[
+            { 'key': 'RCS3', 'value': 'restore' },
+            { 'key': 'RCS3-User', 'value': args.user },
+            { 'key': 'RCS3-Host', 'value': args.host }
+        ],
         publish=True
     )
     if args.verbose:
