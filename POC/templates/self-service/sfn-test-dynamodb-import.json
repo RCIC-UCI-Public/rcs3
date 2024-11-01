@@ -1,0 +1,80 @@
+{
+  "Comment": "Test import of S3 Batch results for xxxuserxxx xxxhostxxx",
+  "StartAt": "ImportTable",
+  "States": {
+    "ImportTable": {
+      "Type": "Task",
+      "Parameters": {
+        "InputFormat": "CSV",
+        "S3BucketSource": {
+          "S3Bucket": "xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
+          "S3KeyPrefix.$": "$.DataDir"
+        },
+        "TableCreationParameters": {
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "filename",
+              "AttributeType": "S"
+            },
+            {
+              "AttributeName": "version_id",
+              "AttributeType": "S"
+            }
+          ],
+          "KeySchema": [
+            {
+              "AttributeName": "filename",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "version_id",
+              "KeyType": "RANGE"
+            }
+          ],
+          "ProvisionedThroughput": {
+            "ReadCapacityUnits": 5,
+            "WriteCapacityUnits": 5
+          },
+          "TableName": "rcs3-xxxuserxxx-xxxhostxxx"
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:importTable",
+      "Next": "Wait"
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Seconds": 120,
+      "Next": "DescribeTable"
+    },
+    "DescribeTable": {
+      "Type": "Task",
+      "Parameters": {
+        "TableName": "rcs3-xxxuserxxx-xxxhostxxx"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:describeTable",
+      "Next": "Choice"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Table.TableStatus",
+          "StringMatches": "ACTIVE",
+          "Next": "Success"
+        },
+        {
+          "Variable": "$.Table.TableStatus",
+          "StringMatches": "CREATING",
+          "Next": "Wait"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "Fail": {
+      "Type": "Fail"
+    },
+    "Success": {
+      "Type": "Succeed"
+    }
+  }
+}
