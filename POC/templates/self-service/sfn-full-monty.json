@@ -7,7 +7,10 @@
       "Resource": "arn:aws:states:::athena:startQueryExecution",
       "Parameters": {
         "QueryString.$": "States.Format( 'create database if not exists {}', $.QueryDatabase )",
-        "WorkGroup": "xxxuserxxx"
+        "ResultConfiguration": {
+          "OutputLocation.$": "$.ResultsDir"
+        },
+        "WorkGroup": "rcs3"
       },
       "Next": "load schema",
       "ResultPath": null
@@ -52,7 +55,10 @@
           "Database.$": "$.QueryDatabase"
         },
         "QueryString.$": "$.QuerySchema",
-        "WorkGroup": "xxxuserxxx"
+        "ResultConfiguration": {
+          "OutputLocation.$": "$.ResultsDir"
+        },
+        "WorkGroup": "rcs3"
       },
       "ResultPath": null,
       "OutputPath": "$.QueryInventory",
@@ -78,7 +84,7 @@
               "ResultConfiguration": {
                 "OutputLocation.$": "$.ResultsDir"
               },
-              "WorkGroup": "xxxuserxxx"
+              "WorkGroup": "rcs3"
             },
             "End": true,
             "ResultSelector": {
@@ -107,7 +113,10 @@
       "Resource": "arn:aws:states:::athena:startQueryExecution",
       "Parameters": {
         "QueryString.$": "States.Format( 'drop database {} cascade', $.QueryList[0].QueryDatabase )",
-        "WorkGroup": "xxxuserxxx"
+        "ResultConfiguration": {
+          "OutputLocation.$": "$.ResultsDir"
+        },
+        "WorkGroup": "rcs3"
       },
       "Next": "transform Athena output to S3 Batch input",
       "ResultPath": null
