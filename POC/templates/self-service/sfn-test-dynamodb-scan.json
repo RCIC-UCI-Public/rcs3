@@ -1,0 +1,49 @@
+{
+  "Comment": "Test polling dynamodb",
+  "StartAt": "Initial Wait 5 Hours Bulk",
+  "States": {
+    "Initial Wait 5 Hours Bulk": {
+      "Type": "Wait",
+      "Seconds": 18000,
+      "Next": "Check Glacier Restore Completed"
+    },
+    "Check Glacier Restore Completed": {
+      "Type": "Task",
+      "Parameters": {
+        "TableName": "xxxuserxxx-xxxhostxxx-s",
+        "Select": "COUNT",
+        "FilterExpression": "#v = :s",
+        "ExpressionAttributeNames": {
+          "#v": "restore_completed"
+        },
+        "ExpressionAttributeValues": {
+          ":s": {
+            "S": "yes"
+          }
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:scan",
+      "Next": "Choice"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Count",
+          "NumericEqualsPath": "$.ScannedCount",
+          "Next": "Success"
+        }
+      ],
+      "Default": "Wait 1 Hour"
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "Wait 1 Hour": {
+      "Type": "Wait",
+      "Seconds": 3600,
+      "Next": "Check Glacier Restore Completed"
+    }
+  },
+  "TimeoutSeconds": 46800
+}
