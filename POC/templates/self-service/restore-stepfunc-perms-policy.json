@@ -70,7 +70,7 @@
                 "athena:getDataCatalog"
             ],
             "Resource": [
-                "arn:aws:athena:xxxregionxxx:xxxaccountidxxx:workgroup/xxxuserxxx",
+                "arn:aws:athena:xxxregionxxx:xxxaccountidxxx:workgroup/rcs3",
                 "arn:aws:athena:xxxregionxxx:xxxaccountidxxx:datacatalog/*"
             ]
         },
