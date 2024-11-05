@@ -9,13 +9,13 @@ def lambda_handler(event, context):
     k = []
     d = []
     s3 = boto3.client( "s3" )
-    response = s3.list_object_versions( Bucket=b, Prefix=p )
+    response = s3.list_objects_v2( Bucket=b, Prefix=p )
     for obj in response[ "Contents" ]:
         key = obj[ "Key" ]
-        if re.search( "\.cvs$", key )
+        if re.search( "\.csv$", key ):
             # keep this file
             k.append( { "Key": key } )
-        else
+        else:
             # delete this file
             d.append( { "Key": key } )
     
