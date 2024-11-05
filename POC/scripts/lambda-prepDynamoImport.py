@@ -3,7 +3,7 @@ import boto3
 
 def lambda_handler(event, context):
     # remove .txt and .metadata files from directory
-    # remaining .cvs files will be imported by DynamoDB
+    # remaining .csv files will be imported by DynamoDB
     b = event[ "Bucket" ]
     p = event[ "DataDir" ]
     k = []
@@ -19,6 +19,9 @@ def lambda_handler(event, context):
             # delete this file
             d.append( { "Key": key } )
     
-    #s3.delete_objects( Bucket=b, Delete={ 'Objects': d, 'Quiet': True } )
+    if d:
+        # should we have an option to copy the files before deleting?
+        s3.delete_objects( Bucket=b, Delete={ 'Objects': d, 'Quiet': True } )
     
+    # should we raise an error if k is empty?
     return { "KeepFiles": k, "DeleteFiles": d }
