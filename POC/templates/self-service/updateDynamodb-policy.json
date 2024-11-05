@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "createLogGroup"
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:xxxregionxxx:xxxaccountidxxx:*"
+        },
+        {
+            "Sid": "printLogs"
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:xxxregionxxx:xxxaccountidxxx:log-group:/aws/lambda/updateDynamoTable:*"
+            ]
+        },
+        {
+            "Sid": "tableUpdate",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:xxxregionxxx:xxxaccountidxxx:table/*xxxbucketxxx"
+            ]
+        }
+    ]
+}
