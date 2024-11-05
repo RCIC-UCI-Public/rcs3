@@ -2,13 +2,13 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "createLogGroup"
+            "Sid": "createLogGroup",
             "Effect": "Allow",
             "Action": "logs:CreateLogGroup",
             "Resource": "arn:aws:logs:xxxregionxxx:xxxaccountidxxx:*"
         },
         {
-            "Sid": "printLogs"
+            "Sid": "printLogs",
             "Effect": "Allow",
             "Action": [
                 "logs:CreateLogStream",
