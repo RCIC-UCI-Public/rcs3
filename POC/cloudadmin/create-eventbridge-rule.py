@@ -18,6 +18,8 @@ with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
 
 usage="Create Eventbridge rule"
 p = argparse.ArgumentParser( description=usage )
+p.add_argument( "target",
+        help="lambda function to use as rule target" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
@@ -40,8 +42,9 @@ else:
 ruleName = "rcs3-object-restore-completed"
 ruleDesc = "capture S3 object restore completed events, Glacier to Standard transitions"
 eventPattern = "{ \"detail-type\": [ \"Object Restore Completed\" ], \"source\": [ \"aws.s3\" ] }"
+targetArn="arn:aws:lambda:{}:{}:function:{}".format( aws[ "region" ], aws[ "accountid" ], args.target )
 try:
-    # create rule
+    # create rule, updates if already exists
     response = eventbridge.put_rule(
         Name=ruleName,
         EventPattern=eventPattern,
@@ -52,14 +55,14 @@ try:
     )
     if args.verbose:
         print( response[ "RuleArn" ] )
-    # add target to rule
-    response = client.put_targets(
+    # add target to rule, updates if already exists
+    response = eventbridge.put_targets(
         Rule=ruleName,
         EventBusName='default',
         Targets=[
             {
-                'Id': 'updateDynamoDB',
-                'Arn': 'arn:aws:lambda:us-west-2:166566894905:function:updateDynamoDB'
+                'Id': args.target,
+                'Arn': targetArn
             }
         ]
     )
