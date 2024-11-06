@@ -18,10 +18,6 @@ with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
 
 usage="Create Eventbridge rule"
 p = argparse.ArgumentParser( description=usage )
-p.add_argument( "user",
-        help="user UCInetID" )
-p.add_argument( "host",
-        help="hostname" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
@@ -41,32 +37,35 @@ if "region" in aws:
 else:
     eventbridge = session.client( "events" )
 
-ruleName = "{}-{}-rule".format( args.user, args.host)
-eventPattern = "{ \"detail-type\": [ \"Object Restore Completed\" ], \"source\": [ \"aws.s3\" ], \"requester\": [ \"s3.amazonaws.com\" ] }"
+ruleName = "rcs3-object-restore-completed"
+ruleDesc = "capture S3 object restore completed events, Glacier to Standard transitions"
+eventPattern = "{ \"detail-type\": [ \"Object Restore Completed\" ], \"source\": [ \"aws.s3\" ] }"
 try:
+    # create rule
     response = eventbridge.put_rule(
         Name=ruleName,
         EventPattern=eventPattern,
-        State='DISABLED',
-        Description=ruleName,
-        EventBusName='default'
+        State='ENABLED',
+        Description=ruleDesc,
+        EventBusName='default',
+        Tags=[ { "Key": "RCS3", "Value": "restore" } ]
     )
     if args.verbose:
         print( response[ "RuleArn" ] )
+    # add target to rule
+    response = client.put_targets(
+        Rule=ruleName,
+        EventBusName='default',
+        Targets=[
+            {
+                'Id': 'updateDynamoDB',
+                'Arn': 'arn:aws:lambda:us-west-2:166566894905:function:updateDynamoDB'
+            }
+        ]
+    )
+    if args.verbose or response[ "FailedEntryCount" ] != 0:
+        print( response )
 except Exception as error:
     print( type(error).__name__ )
     print( error )
     sys.exit( -1 )
-
-
-#response = client.put_targets(
-#    Rule='string',
-#    EventBusName='string',
-#    Targets=[
-#        {
-#            'Id': 'string',
-#            'Arn': 'string',
-#            'RoleArn': 'string',
-#        },
-#    ]
-#)
