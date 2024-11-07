@@ -31,14 +31,15 @@ def lambda_handler(event, context):
     QuerySchema=loadschema.format( QueryTable, event[ "InventoryBucket" ], hivedir )
     
     # need unique save location for dynamodb upload
-    savedir = "s3://" + event[ "InventoryBucket" ] + stamp.strftime( "/rcs3/restore%Y%m%d-%H%M%S" )
+    savebucket = event[ "InventoryBucket" ]
+    saveprefix = stamp.strftime( "/rcs3/restore%Y%m%d-%H%M%S" )
     
     # create the SQL queries for a specific S3 inventory in Athena
     a = []
     t = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and (storage_class = 'GLACIER' or storage_class = 'DEEP_ARCHIVE')"
     for request in event[ "RestoreList" ]:
         s = t.format( event[ "BackupBucket" ], QueryTable, request )
-        a.append( { "QueryDatabase": QueryDatabase, "SearchString": s, "ResultsDir": savedir } )
+        a.append( { "QueryDatabase": QueryDatabase, "SearchString": s, "ResultsBucket": savebucket, "ResultsPrefix": saveprefix } )
     
     return {
         "QueryDatabase": QueryDatabase,

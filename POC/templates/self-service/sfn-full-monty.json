@@ -8,7 +8,7 @@
       "Parameters": {
         "QueryString.$": "States.Format( 'create database if not exists {}', $.QueryDatabase )",
         "ResultConfiguration": {
-          "OutputLocation.$": "$.ResultsDir"
+          "OutputLocation.$": "States.Format( 's3://{}{}', $.QueryInventory.QueryList[0].ResultsBucket, $.QueryInventory.QueryList[0].ResultsPrefix )"
         },
         "WorkGroup": "rcs3"
       },
@@ -56,7 +56,7 @@
         },
         "QueryString.$": "$.QuerySchema",
         "ResultConfiguration": {
-          "OutputLocation.$": "$.ResultsDir"
+          "OutputLocation.$": "States.Format( 's3://{}{}', $.QueryInventory.QueryList[0].ResultsBucket, $.QueryInventory.QueryList[0].ResultsPrefix )"
         },
         "WorkGroup": "rcs3"
       },
@@ -82,7 +82,7 @@
               },
               "QueryString.$": "$.SearchString",
               "ResultConfiguration": {
-                "OutputLocation.$": "$.ResultsDir"
+                "OutputLocation.$": "States.Format( 's3://{}{}', $.ResultsBucket, $.ResultsPrefix )"
               },
               "WorkGroup": "rcs3"
             },
@@ -114,7 +114,7 @@
       "Parameters": {
         "QueryString.$": "States.Format( 'drop database {} cascade', $.QueryList[0].QueryDatabase )",
         "ResultConfiguration": {
-          "OutputLocation.$": "$.ResultsDir"
+          "OutputLocation.$": "$.QueryList[0].ResultsDir"
         },
         "WorkGroup": "rcs3"
       },
