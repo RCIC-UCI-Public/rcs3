@@ -114,7 +114,7 @@
       "Parameters": {
         "QueryString.$": "States.Format( 'drop database {} cascade', $.QueryList[0].QueryDatabase )",
         "ResultConfiguration": {
-          "OutputLocation.$": "$.QueryList[0].ResultsDir"
+          "OutputLocation.$": "States.Format( 's3://{}{}', $.QueryList[0].ResultsBucket, $.QueryList[0].ResultsPrefix )"
         },
         "WorkGroup": "rcs3"
       },
