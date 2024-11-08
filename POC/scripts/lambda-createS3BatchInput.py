@@ -19,7 +19,7 @@ def lambda_handler(event, context):
                 r = s3.head_object( Bucket=m.group(1), Key=m.group(2) )
                 l.append( {
                     'ResultsFile': arnprefix + m.group(1) + "/" + m.group(2),
-                    'ResultsPrefix': event[ "QueryList" ][0][ "ResultsPrefix" ]
+                    'ResultsPrefix': event[ "QueryList" ][0][ "ResultsPrefix" ],
                     'ETag': r[ "ETag" ].strip( '\"' ),
                     'FileToken': m.group(2)[:64],
                     'ExpireDays': d
@@ -27,7 +27,7 @@ def lambda_handler(event, context):
             else:
                 l.append( {
                     'ResultsFile': n[ "ResultsFile" ],
-                    'ResultsPrefix': event[ "QueryList" ][0][ "ResultsPrefix" ]
+                    'ResultsPrefix': event[ "QueryList" ][0][ "ResultsPrefix" ],
                     'ETag': "",
                     'FileToken': "",
                     'ExpireDays': d
