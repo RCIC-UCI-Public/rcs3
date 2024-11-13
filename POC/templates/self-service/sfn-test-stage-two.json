@@ -1,0 +1,169 @@
+{
+  "Comment": "test eventbridge",
+  "StartAt": "add event bridge notifications to bucket",
+  "States": {
+    "add event bridge notifications to bucket": {
+      "Type": "Task",
+      "Parameters": {
+        "Bucket": "xxxuserxxx-xxxhostxxx-xxxbucketxxx",
+        "NotificationConfiguration": {
+          "EventBridgeConfiguration": {}
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:putBucketNotificationConfiguration",
+      "ResultPath": null,
+      "Next": "prepare Athena output for Dynamodb import"
+    },
+    "prepare Athena output for Dynamodb import": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:xxxregionxxx:xxxaccountidxxx:function:prepDynamoImport:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "ResultPath": null,
+      "Next": "ImportTable"
+    },
+    "ImportTable": {
+      "Type": "Task",
+      "Parameters": {
+        "InputFormat": "CSV",
+        "S3BucketSource": {
+          "S3Bucket": "xxxuserxxx-xxxhostxxx-xxxinventoryxxx",
+          "S3KeyPrefix.$": "$.DataDir"
+        },
+        "TableCreationParameters": {
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "filename",
+              "AttributeType": "S"
+            },
+            {
+              "AttributeName": "version_id",
+              "AttributeType": "S"
+            }
+          ],
+          "KeySchema": [
+            {
+              "AttributeName": "filename",
+              "KeyType": "HASH"
+            },
+            {
+              "AttributeName": "version_id",
+              "KeyType": "RANGE"
+            }
+          ],
+          "ProvisionedThroughput": {
+            "ReadCapacityUnits": 5,
+            "WriteCapacityUnits": 5
+          },
+          "TableName": "rcs3-xxxuserxxx-xxxhostxxx-xxxbucketxxx"
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:importTable",
+      "Next": "wait for table creation"
+    },
+    "wait for table creation": {
+      "Type": "Wait",
+      "Seconds": 120,
+      "Next": "DescribeTable"
+    },
+    "DescribeTable": {
+      "Type": "Task",
+      "Parameters": {
+        "TableName": "rcs3-xxxuserxxx-xxxhostxxx-xxxbucketxxx"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:describeTable",
+      "Next": "check if table is ready"
+    },
+    "check if table is ready": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Table.TableStatus",
+          "StringMatches": "ACTIVE",
+          "Next": "Initial Wait 5 Hours Bulk"
+        },
+        {
+          "Variable": "$.Table.TableStatus",
+          "StringMatches": "CREATING",
+          "Next": "wait for table creation"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "Fail": {
+      "Type": "Fail"
+    },
+    "Initial Wait 5 Hours Bulk": {
+      "Type": "Wait",
+      "Seconds": 18000,
+      "Next": "Check Glacier Restore Completed"
+    },
+    "Check Glacier Restore Completed": {
+      "Type": "Task",
+      "Parameters": {
+        "TableName": "rcs3-xxxuserxxx-xxxhostxxx-xxxbucketxxx",
+        "Select": "COUNT",
+        "FilterExpression": "#v = :s",
+        "ExpressionAttributeNames": {
+          "#v": "restore_completed"
+        },
+        "ExpressionAttributeValues": {
+          ":s": {
+            "S": "yes"
+          }
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:scan",
+      "Next": "have objects been restored"
+    },
+    "have objects been restored": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Count",
+          "NumericEqualsPath": "$.ScannedCount",
+          "Next": "remove event bridge notification from bucket"
+        }
+      ],
+      "Default": "Wait 1 Hour"
+    },
+    "Wait 1 Hour": {
+      "Type": "Wait",
+      "Seconds": 3600,
+      "Next": "Check Glacier Restore Completed"
+    },
+    "remove event bridge notification from bucket": {
+      "Type": "Task",
+      "Parameters": {
+        "Bucket": "xxxuserxxx-xxxhostxxx-xxxbucketxxx",
+        "NotificationConfiguration": {}
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:putBucketNotificationConfiguration",
+      "Next": "DeleteTable"
+    },
+    "DeleteTable": {
+      "Type": "Task",
+      "Parameters": {
+        "TableName": "rcs3-xxxuserxxx-xxxhostxxx-xxxbucketxxx"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:deleteTable",
+      "End": true
+    }
+  },
+  "TimeoutSeconds": 46800
+}
