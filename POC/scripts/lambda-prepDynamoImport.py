@@ -4,8 +4,8 @@ import boto3
 def lambda_handler(event, context):
     # remove .txt and .metadata files from directory
     # remaining .csv files will be imported by DynamoDB
-    b = event[ "Bucket" ]
-    p = event[ "DataDir" ]
+    b = event[ "ResultsBucket" ]
+    p = event[ "ResultsPrefix" ]
     k = []
     d = []
     s3 = boto3.client( "s3" )
