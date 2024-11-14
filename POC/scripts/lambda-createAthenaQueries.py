@@ -32,7 +32,7 @@ def lambda_handler(event, context):
     
     # need unique save location for dynamodb upload
     savebucket = event[ "InventoryBucket" ]
-    saveprefix = stamp.strftime( "/rcs3/restore%Y%m%d-%H%M%S" )
+    saveprefix = stamp.strftime( "rcs3/restore%Y%m%d-%H%M%S" )
     
     # create the SQL queries for a specific S3 inventory in Athena
     a = []
