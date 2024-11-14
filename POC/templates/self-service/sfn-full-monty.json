@@ -8,7 +8,7 @@
       "Parameters": {
         "QueryString.$": "States.Format( 'create database if not exists {}', $.QueryDatabase )",
         "ResultConfiguration": {
-          "OutputLocation.$": "States.Format( 's3://{}{}', $.QueryInventory.QueryList[0].ResultsBucket, $.QueryInventory.QueryList[0].ResultsPrefix )"
+          "OutputLocation.$": "States.Format( 's3://{}/{}', $.QueryInventory.QueryList[0].ResultsBucket, $.QueryInventory.QueryList[0].ResultsPrefix )"
         },
         "WorkGroup": "rcs3"
       },
@@ -56,7 +56,7 @@
         },
         "QueryString.$": "$.QuerySchema",
         "ResultConfiguration": {
-          "OutputLocation.$": "States.Format( 's3://{}{}', $.QueryInventory.QueryList[0].ResultsBucket, $.QueryInventory.QueryList[0].ResultsPrefix )"
+          "OutputLocation.$": "States.Format( 's3://{}/{}', $.QueryInventory.QueryList[0].ResultsBucket, $.QueryInventory.QueryList[0].ResultsPrefix )"
         },
         "WorkGroup": "rcs3"
       },
@@ -82,7 +82,7 @@
               },
               "QueryString.$": "$.SearchString",
               "ResultConfiguration": {
-                "OutputLocation.$": "States.Format( 's3://{}{}', $.ResultsBucket, $.ResultsPrefix )"
+                "OutputLocation.$": "States.Format( 's3://{}/{}', $.ResultsBucket, $.ResultsPrefix )"
               },
               "WorkGroup": "rcs3"
             },
@@ -94,19 +94,8 @@
           }
         }
       },
-      "Next": "notify user search",
-      "ResultPath": "$.taskresult"
-    },
-    "notify user search": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "TopicArn": "arn:aws:sns:xxxregionxxx:xxxaccountidxxx:xxxuserxxx-xxxhostxxx-xxxowner_notifyxxx",
-        "Subject": "search results ready",
-        "Message.$": "$.taskresult"
-      },
       "Next": "drop database",
-      "ResultPath": null
+      "ResultPath": "$.taskresult"
     },
     "drop database": {
       "Type": "Task",
@@ -114,7 +103,7 @@
       "Parameters": {
         "QueryString.$": "States.Format( 'drop database {} cascade', $.QueryList[0].QueryDatabase )",
         "ResultConfiguration": {
-          "OutputLocation.$": "States.Format( 's3://{}{}', $.QueryList[0].ResultsBucket, $.QueryList[0].ResultsPrefix )"
+          "OutputLocation.$": "States.Format( 's3://{}/{}', $.QueryList[0].ResultsBucket, $.QueryList[0].ResultsPrefix )"
         },
         "WorkGroup": "rcs3"
       },
@@ -175,7 +164,7 @@
               },
               "Operation": {
                 "S3InitiateRestoreObject": {
-                  "ExpirationInDays": 1,
+                  "ExpirationInDays.$": "$.ExpireDays",
                   "GlacierJobTier": "BULK"
                 }
               },
@@ -234,17 +223,17 @@
         {
           "Variable": "$.notifyUser",
           "IsPresent": true,
-          "Next": "notify user finished"
+          "Next": "notify user restore submitted"
         }
       ],
       "Default": "wait 2 minutes"
     },
-    "notify user finished": {
+    "notify user restore submitted": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
         "Message.$": "$.notifyUser",
-        "Subject": "xxxuserxxx xxxhostxxx restore completed",
+        "Subject": "xxxuserxxx xxxhostxxx file submitted for recovery from Glacier",
         "TopicArn": "arn:aws:sns:xxxregionxxx:xxxaccountidxxx:xxxuserxxx-xxxhostxxx-xxxowner_notifyxxx"
       },
       "End": true
