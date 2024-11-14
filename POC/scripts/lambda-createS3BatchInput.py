@@ -11,6 +11,7 @@ def lambda_handler(event, context):
     l = []
     arnprefix = "arn:aws:s3:::"
     d = event[ "ExpireDays" ]
+    p = event[ "QueryList" ][0][ "ResultsPrefix" ]
     s3 = boto3.client( "s3" )
     for n in event[ "taskresult" ]:
         if n[ "State" ] == "SUCCEEDED":
@@ -19,7 +20,7 @@ def lambda_handler(event, context):
                 r = s3.head_object( Bucket=m.group(1), Key=m.group(2) )
                 l.append( {
                     'ResultsFile': arnprefix + m.group(1) + "/" + m.group(2),
-                    'ResultsPrefix': event[ "QueryList" ][0][ "ResultsPrefix" ],
+                    'ResultsPrefix': p,
                     'ETag': r[ "ETag" ].strip( '\"' ),
                     'FileToken': m.group(2)[:64],
                     'ExpireDays': d
@@ -27,7 +28,7 @@ def lambda_handler(event, context):
             else:
                 l.append( {
                     'ResultsFile': n[ "ResultsFile" ],
-                    'ResultsPrefix': event[ "QueryList" ][0][ "ResultsPrefix" ],
+                    'ResultsPrefix': p,
                     'ETag': "",
                     'FileToken': "",
                     'ExpireDays': d
@@ -35,4 +36,6 @@ def lambda_handler(event, context):
         else:
             # build list of problem files. drop for now
             pass
-    return { 'CreateJobItems': l }
+    # save inputs needed for future steps
+    c = { 'ResultsPrefix': p }
+    return { 'CreateJobItems': l, 'CarryForward': c }
