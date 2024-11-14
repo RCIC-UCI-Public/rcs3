@@ -12,7 +12,8 @@ def lambda_handler(event, context):
     listrecheck = []
     
     s3c = boto3.client( "s3control" )
-    for n in event:
+    jobs = event[ "CreateJobItems" ]
+    for n in jobs:
         jobid = n[ "JobId" ]
         accountid = n[ "AccountId" ]
         response = s3c.describe_job(
@@ -36,13 +37,14 @@ def lambda_handler(event, context):
         # send completion message which signals quit and send to user
         sns_message = ""
         for i in listready:
-            sns_message += "Completed: {}\n".format( i )
+            sns_message += "Submission accepted: {}\n".format( i )
         for i in listfail:
-            sns_message += "Job failed: {}\n".format( i )
+            sns_message += "Submission failed: {}\n".format( i )
         for i in listcancel:
-            sns_message += "Job cancelled: {}\n".format( i )
+            sns_message += "Submission cancelled: {}\n".format( i )
 
         return {
-            'notifyUser': sns_message
+            'notifyUser': sns_message,
+            'CarryForward': event[ "CarryForward" ]
         }
 
