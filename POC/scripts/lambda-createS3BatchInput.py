@@ -11,6 +11,7 @@ def lambda_handler(event, context):
     l = []
     arnprefix = "arn:aws:s3:::"
     d = event[ "ExpireDays" ]
+    b = event[ "QueryList" ][0][ "ResultsBucket" ]
     p = event[ "QueryList" ][0][ "ResultsPrefix" ]
     s3 = boto3.client( "s3" )
     for n in event[ "taskresult" ]:
@@ -37,5 +38,5 @@ def lambda_handler(event, context):
             # build list of problem files. drop for now
             pass
     # save inputs needed for future steps
-    c = { 'ResultsPrefix': p }
+    c = { 'ResultsBucket': b, 'ResultsPrefix': p }
     return { 'CreateJobItems': l, 'CarryForward': c }
