@@ -96,7 +96,7 @@ try:
             Handler=aws[ "lambda_handler" ],
             Code={ "ZipFile": zipBinary.read() },
             Publish=True,
-            Tags={ 'RCS3': 'restore' }
+            Tags={ 'rcs3user': args.user, 'rcs3host': args.host }
         )
     if args.verbose:
         print( response )
