@@ -79,7 +79,8 @@ except iam.exceptions.NoSuchEntityException:
     response = iam.create_policy(
         PolicyName="{}-{}-{}-policy".format( args.user, args.host, args.purpose ),
         PolicyDocument=json_policy,
-        Description="Allow {} access to {}-{}-{}".format( args.purpose, args.user, args.host, aws[ "bucket_postfix" ] )
+        Description="Allow {} access to {}-{}-{}".format( args.purpose, args.user, args.host, aws[ "bucket_postfix" ] ),
+        Tags=[ { 'rcs3user': args.user }, { 'rcs3host': args.host } ]
     )
 except Exception as error:
     print( type(error).__name__ )

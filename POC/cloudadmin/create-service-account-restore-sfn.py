@@ -71,9 +71,8 @@ try:
         roleArn=sfnRole,
         type='STANDARD',
         tags=[
-            { 'key': 'RCS3', 'value': 'restore' },
-            { 'key': 'RCS3-User', 'value': args.user },
-            { 'key': 'RCS3-Host', 'value': args.host }
+            { 'key': 'rcs3user', 'value': args.user },
+            { 'key': 'rcs3host', 'value': args.host }
         ],
         publish=True
     )

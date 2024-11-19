@@ -64,7 +64,8 @@ try:
     response = iam.create_role(
         RoleName=role_name,
         AssumeRolePolicyDocument=json_policy,
-        Description="Allow {} to process requests for {} {}".format( args.purpose, args.user, args.host )
+        Description="Allow {} to process requests for {} {}".format( args.purpose, args.user, args.host ),
+        Tags=[ { 'rcs3user': args.user }, { 'rcs3host': args.host } ]
     )
     if args.verbose:
         print( response )
