@@ -15,7 +15,7 @@
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:xxxregionxxx:xxxaccountidxxx:log-group:/aws/lambda/updateDynamoTable:*"
+                "arn:aws:logs:xxxregionxxx:xxxaccountidxxx:log-group:/aws/lambda/updateDynamodb:*"
             ]
         },
         {
