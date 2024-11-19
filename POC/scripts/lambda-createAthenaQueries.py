@@ -4,12 +4,12 @@ import datetime
 
 def lambda_handler(event, context):
     # create the SQL query to load a specific S3 inventory
-    # expects UserName, HostName, BackupBucket, InventoryBucket, HiveDir, RestoreList,
+    # expects BackupBucket, InventoryBucket, HiveDir, RestoreList,
     # and ExpireDays as inputs
     
     # convert hypens to underscores
-    QueryDatabase = event[ "UserName" ].replace( "-", "_" )
-    QueryTable = event[ "HostName" ].replace( "-", "_" )
+    QueryDatabase = event[ "BackupBucket" ].replace( "-", "_" )
+    QueryTable = "inventory"
     
     stamp =  datetime.datetime.today()
     hivedir = event[ "HiveDir" ].format( stamp.strftime( "%Y-%m-%d" ) )
