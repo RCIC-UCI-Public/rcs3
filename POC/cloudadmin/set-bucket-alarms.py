@@ -85,6 +85,7 @@ def put_alarm(cw,MA):
          'AlarmName' : MA['AlarmName'],
          'AlarmDescription' : MA['AlarmDescription'],
          'ActionsEnabled' : MA['ActionsEnabled'],
+         'OKActions' : MA['OKActions'],
          'AlarmActions' : MA['AlarmActions'],
          'EvaluationPeriods' : MA['EvaluationPeriods'],
          'DatapointsToAlarm' : MA['DatapointsToAlarm'],

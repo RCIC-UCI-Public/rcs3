@@ -1,12 +1,12 @@
 {
-    "Arn": "arn:aws:scheduler:%REGION%:%ACCOUNT%:schedule/default/no-activity-cron",
+    "Arn": "arn:aws:scheduler:%REGION%:%ACCOUNT%:schedule/default/keyAgeMetric-cron",
     "Description": "Periodically invoke the lambda function the finds ages of keys",
     "FlexibleTimeWindow": {
         "MaximumWindowInMinutes": 5,
         "Mode": "FLEXIBLE"
     },
     "GroupName": "default",
-    "Name": "no-activity-cron",
+    "Name": "keyAgeMetric-cron",
     "ScheduleExpression": "rate(1 hours)",
     "ScheduleExpressionTimezone": "America/Los_Angeles",
     "State": "ENABLED",
@@ -16,6 +16,6 @@
             "MaximumEventAgeInSeconds": 86400,
             "MaximumRetryAttempts": 185
         },
-        "RoleArn": "arn:aws:iam::%ACCOUNT%:role/service-role/Amazon_EventBridge_Scheduler_keyAgeMetric"
+        "RoleArn": "arn:aws:iam::%ACCOUNT%:role/keyAgeMetric-scheduler-invoke-role"
     }
 }
