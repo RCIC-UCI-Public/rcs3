@@ -5,7 +5,9 @@
             "AlarmArn": "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% exceeded storage quota",
             "AlarmDescription": "The %OWNER%-%SYSTEM%-%BUCKET% has exceeded %SIZEQUOTA% bytes of storage in Standard and Glacier",
             "ActionsEnabled": true,
-            "OKActions": [],
+            "OKActions": [
+                   %NOTIFY%
+            ],
             "AlarmActions": [
                    %NOTIFY%
             ],

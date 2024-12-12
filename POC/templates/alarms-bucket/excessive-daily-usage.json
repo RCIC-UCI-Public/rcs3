@@ -5,7 +5,9 @@
             "AlarmArn": "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% excessive daily activity",
             "AlarmDescription": "The bucket for owner %OWNER% and system %SYSTEM% has an activity ratio #requests/#objects of > 3.5 over the last day. ",
             "ActionsEnabled": true,
-            "OKActions": [],
+            "OKActions": [
+		%NOTIFY%
+            ],
             "AlarmActions": [
 		%NOTIFY%
             ],

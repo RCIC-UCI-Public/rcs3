@@ -5,7 +5,9 @@
             "AlarmArn": "arn:aws:cloudwatch:%REGION%:%ACCOUNT%:alarm:%OWNER%-%SYSTEM% no activity",
             "AlarmDescription": "The server **%SYSTEM%** assigned to owner **%OWNER%** has had little activity in the previous 24 hours. Backup service might not be running.  Please check state of server. ",
             "ActionsEnabled": true,
-            "OKActions": [],
+            "OKActions": [
+                     %NOTIFY%
+            ],
             "AlarmActions": [
                      %NOTIFY%
             ],

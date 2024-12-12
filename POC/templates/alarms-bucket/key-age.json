@@ -1,0 +1,27 @@
+{
+    "MetricAlarms": [
+      {
+        "AlarmName": "%OWNER%-%SYSTEM%-key-age-alarm",
+        "AlarmDescription": "# RCS3: Backup of %SYSTEM% may have a problem\n*Action Required*\n\nThe Access Key for owner: %OWNER% and system: %SYSTEM% is too old (more than 48 hours old). The access key is automatically changed after every successful backup. Aged keys can indicate a problem.\n\nThis problem is either that:\n\n* Backup is **NOT FUNCTIONING**\n* OR Current backup is taking longer than 48 hours to complete\n\n**PLEASE CHECK YOUR SYSTEM**",
+        "ActionsEnabled": true,
+        "OKActions": [
+            %NOTIFY%
+        ],
+        "AlarmActions": [
+            %NOTIFY%
+        ],
+        "InsufficientDataActions": [],
+        "MetricName": "%OWNER%-%SYSTEM%_key_age",
+        "Namespace": "rcs3",
+        "Statistic": "Maximum",
+        "Dimensions": [],
+        "Period": 3600,
+        "EvaluationPeriods": 1,
+        "DatapointsToAlarm": 1,
+        "Threshold": 48,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "TreatMissingData": "missing"
+    }
+    ],
+    "CompositeAlarms": []
+}
