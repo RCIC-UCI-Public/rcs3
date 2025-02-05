@@ -2,7 +2,7 @@
     "MetricAlarms": [
       {
         "AlarmName": "%OWNER%-%SYSTEM%-key-age-alarm",
-        "AlarmDescription": "# RCS3: Backup of %SYSTEM% may have a problem\n*Action Required*\n\nThe Access Key for owner: %OWNER% and system: %SYSTEM% is too old (more than 48 hours old). The access key is automatically changed after every successful backup. Aged keys can indicate a problem.\n\nThis problem is either that:\n\n* Backup is **NOT FUNCTIONING**\n* OR Current backup is taking longer than 48 hours to complete\n\n**PLEASE CHECK YOUR SYSTEM**",
+        "AlarmDescription": "RCS3: Backup Scheduling State for %SYSTEM%.\n -- If the Alarm state is OK, Then NO ACTION is required. This OK State means that %SYSTEM% has completed a daily or weekly backup within the last 48 hours.\n -- If the Alarm state is ALARM, there may be a PROBLEM:\n    The Access Key for owner: %OWNER% and system: %SYSTEM% is too old (more than 48 hours old).\n\n     ACTION by the System Administrator for %SYSTEM% is NEEDED!:\n            -- Check if your Backup is NOT BEING SCHEDULED\n           OR\n            -- Verify that Current backup is operational but is taking longer than 48 hours to complete\n\n                  PLEASE CHECK YOUR SYSTEM. Not addressing key-age alarms likely means that your system is NOT BEING BACKED UP",
         "ActionsEnabled": true,
         "OKActions": [
             %NOTIFY%
