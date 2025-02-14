@@ -20,14 +20,28 @@ fi
 
 # 1. Install keyAgeMetric
 echo "Installing Key Age Metric lambda function"
+$MYDIR/create-service-account-restore-policy.py lambda generic keyAgeMetric
+$MYDIR/create-service-account-restore-role.py lambda generic keyAgeMetric
 $MYDIR/create-service-account-restore-lambda.py lambda generic keyAgeMetric
 
-# 2. Schedule the keyAgeMetric Lambda
+# 2. Install calcUploadBytes lambda function
+echo "Installing calcUploadBytes lambda function"
+$MYDIR/create-service-account-restore-policy.py lambda generic calcUploadBytes
+$MYDIR/create-service-account-restore-role.py lambda generic calcUploadBytes
+$MYDIR/create-service-account-restore-lambda.py lambda generic calcUploadBytes
+
+# 3. Schedule the keyAgeMetric Lambda
 echo "Create role/policy/trust that allows Scheduler to call the keyAgeMetric"
 $MYDIR/create-role-with-policy.py --templatedir templates/keyAge keyAgeMetric-scheduler-invoke 
 echo "Create/Update the scheduler (cron-like) entry to regularly invoke the keyAgeMetric lambda"
 $MYDIR/create-keyAgeMetric-cron.py
 
-# 3. Enable cloudwatch overview dashboard(s)
+# 4. Schedule the calcUploadBytes lambda function
+echo "Create role/policy/trust that allows Scheduler to call the calcUploadBytes lambda"
+$MYDIR/create-role-with-policy.py -d templates/calcUploadBytes calcUploadBytes-scheduler-invoke
+echo "Create/Update the scheduler (cron-like) entry to regularly invoke the calcUploadBytes lambda"
+$MYDIR/create-calcUploadBytes-cron.py
+
+# 4. Enable cloudwatch overview dashboard(s)
 echo "Installing Cloudwatch overview Dashboards" 
 $MYDIR/set-cloudwatch-dashboards.py
