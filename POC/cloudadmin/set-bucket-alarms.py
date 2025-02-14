@@ -33,7 +33,7 @@ def main(argv):
     p.add_argument( "objectlimit", type=int,
             help="number objects limit in M" )
     p.add_argument( "quotalimit", type=int,
-            help="Quota limit in TiB" )
+            help="Quota limit in TB" )
     args = p.parse_args()
     
     # override location of .aws/config
@@ -60,7 +60,7 @@ def main(argv):
     rvalues = { "%OWNER%": args.owner, 
                 "%SYSTEM%": args.host,
                 "%OBJECTQUOTA%": str(args.objectlimit * 1000000),
-                "%SIZEQUOTA%": str(args.quotalimit * 1000*1000*1000*1000),
+                "%SIZEQUOTA%": str(args.quotalimit * 1024*1024*1024*1024),
                 "%LENS%" : aws["lens"],
                 "%REGION%" : aws["region"],
                 "%ACCOUNT%" : aws["accountid"],
