@@ -26,6 +26,8 @@ p.add_argument( "purpose",
         help="which permissions to apply" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
+p.add_argument( "-t", "--timeout",
+        help="override global timeout in aws-settings.yaml (seconds)" )
 g = p.add_mutually_exclusive_group()
 g.add_argument( "-p", "--policy_postfix",
         help="override policy postfix, substitute for purpose" )
@@ -37,6 +39,12 @@ scriptName = os.path.join( basedir, "scripts", "lambda-{}.py".format( args.purpo
 if not os.path.isfile( scriptName ):
     print( "Missing script: {}".format( scriptName ) )
     sys.exit( 1 )
+
+if args.timeout is None:
+    timeout = aws['lamba_timeout']
+else:
+    timeout = int(args.timeout)
+
 # create zip file from script file
 zipName = os.path.join( basedir, "outputs", args.purpose + ".zip" )
 with zipfile.ZipFile( zipName, "w" ) as z:
@@ -90,7 +98,7 @@ try:
         response = lambda_client.create_function(
             FunctionName="{}".format( args.purpose ),
             Description="{}-{}-{}".format( args.user, args.host, args.purpose ),
-            Timeout=aws[ "lambda_timeout" ],
+            Timeout=timeout,
             Runtime=aws[ "lambda_runtime" ],
             Role=roleArn,
             Handler=aws[ "lambda_handler" ],

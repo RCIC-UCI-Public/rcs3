@@ -28,7 +28,7 @@ $MYDIR/create-service-account-restore-lambda.py lambda generic keyAgeMetric
 echo "Installing calcUploadBytes lambda function"
 $MYDIR/create-service-account-restore-policy.py lambda generic calcUploadBytes
 $MYDIR/create-service-account-restore-role.py lambda generic calcUploadBytes
-$MYDIR/create-service-account-restore-lambda.py lambda generic calcUploadBytes
+$MYDIR/create-service-account-restore-lambda.py --timeout=290 lambda generic calcUploadBytes
 
 # 3. Schedule the keyAgeMetric Lambda
 echo "Create role/policy/trust that allows Scheduler to call the keyAgeMetric"
