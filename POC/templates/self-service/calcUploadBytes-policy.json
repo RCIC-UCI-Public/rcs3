@@ -1,0 +1,33 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"logs:GetLogRecord",
+				"logs:GetQueryResults",
+				"logs:StartQuery",
+				"logs:GetLogEvents",
+				"logs:FilterLogEvents"
+			],
+			"Resource": "arn:aws:logs:xxxregionxxxx:xxxaccountidxxx:log-group:aws-cloudtrail-logs-xiangmix-cncm2:*"
+		},
+		{
+			"Sid": "VisualEditor1",
+			"Effect": "Allow",
+			"Action": "logs:StopQuery",
+			"Resource": "*"
+		},
+		{
+			"Sid": "Statement1",
+			"Effect": "Allow",
+			"Action": [
+				"cloudwatch:PutMetricData"
+			],
+			"Resource": [
+				"*"
+			]
+		}
+	]
+}
