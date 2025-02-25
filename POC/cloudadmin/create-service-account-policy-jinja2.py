@@ -8,20 +8,16 @@ import sys
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
-execdir = os.path.dirname(os.path.abspath(__file__))
-basedir = os.path.dirname( execdir )
-sys.path.append( basedir  + "/common" )
-
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
-    aws = yaml.safe_load( f )
 
 usage="Create or update default IAM policy for service account"
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "user",
-        help="user UCInetID" )
+        help="username" )
 p.add_argument( "host",
         help="hostname" )
-p.add_argument( "-i", "--iprestrictions", nargs="*",
+p.add_argument( "-s", "--settings",
+        help="override default aws-settings.yaml file, must be in config dir" )
+p.add_argument( "-i", "--iprestrictions", action="append",
         help="override iprestrictions list in config file" )
 p.add_argument( "-t", "--policy_template",
         help="override policy_template in config file" )
@@ -33,6 +29,21 @@ g.add_argument( "-p", "--policy_postfix",
 g.add_argument( "-n", "--policy_name",
         help="override policy name, ignoring user and host args" )
 args = p.parse_args()
+
+# declare various paths
+execdir = os.path.dirname(os.path.abspath(__file__))
+basedir = os.path.dirname( execdir )
+libdir = os.path.join( basedir, "common" )
+templatedir = os.path.join( basedir, "templates" )
+sys.path.append( libdir )
+
+# load required aws settings file
+if args.settings is None:
+    aws_settings = os.path.join( basedir, "config", "aws-settings.yaml" )
+else:
+    aws_settings = os.path.join( basedir, "config", args.settings )
+with open( aws_settings, "r" ) as f:
+    aws = yaml.safe_load( f )
 
 # override location of .aws/config
 if "configfile" in aws:
@@ -54,7 +65,7 @@ if args.policy_template is None:
     input_template = aws[ "policy_template" ]
 else:
     input_template = args.policy_template
-environment = Environment(loader=FileSystemLoader(basedir + "/templates/"))
+environment = Environment(loader=FileSystemLoader(templatedir))
 template = environment.get_template( input_template )
 
 my_vars = {
