@@ -41,7 +41,13 @@
                 "arn:aws:s3:::{{ user }}-{{ host }}-{{ bucket }}/*"
             ],
             "Condition": {
-                {{ iprestrictions }}
+{%- if iprestrictions is defined %}
+                "IpAddress": { "aws:SourceIp": [
+{%- for ip in iprestrictions %}
+                    "{{ ip }}"{% if not loop.last %},{% endif %}
+{%- endfor %}
+                ] }
+{%- endif %}
             }
         },
         {
@@ -64,29 +70,29 @@
             "Resource": [
                 "arn:aws:s3:::{{ user }}-{{ host }}-{{ inventory }}",
                 "arn:aws:s3:::{{ user }}-{{ host }}-{{ inventory }}/*"
-            ]
-        },
-        {
-            "Effect": "Deny",
-            "Action": [
-                "s3:CreateBucket",
-                "s3:DeleteBucket",
-                "s3:CreateAccessPoint",
-                "s3:CreateMultiRegionAccessPoint",
-                "s3:CreateAccessPointForObjectLambda",
-                "s3:DeleteObjectVersion",
-                "s3:BypassGovernanceRetention",
-                "s3:DeleteBucketPolicy",
-                "s3:PutBucketAcl"
             ],
-            "Resource": "*"
+            "Condition": {
+{%- if iprestrictions is defined %}
+                "IpAddress": { "aws:SourceIp": [
+{%- for ip in iprestrictions %}
+                    "{{ ip }}"{% if not loop.last %},{% endif %}
+{%- endfor %}
+                ] }
+{%- endif %}
+            }
         },
         {
             "Effect": "Allow",
             "Action": "sns:Publish",
             "Resource": "arn:aws:sns:{{ region }}:{{ accountid }}:{{ user }}-{{ host }}-{{ ownernotify }}",
             "Condition": {
-                {{ iprestrictions }}
+{%- if iprestrictions is defined %}
+                "IpAddress": { "aws:SourceIp": [
+{%- for ip in iprestrictions %}
+                    "{{ ip }}"{% if not loop.last %},{% endif %}
+{%- endfor %}
+                ] }
+{%- endif %}
             }
         },
         {
@@ -94,7 +100,13 @@
             "Action": "sns:ListTopics",
             "Resource": "arn:aws:sns:{{ region }}:{{ accountid }}:*",
             "Condition": {
-                {{ iprestrictions }}
+{%- if iprestrictions is defined %}
+                "IpAddress": { "aws:SourceIp": [
+{%- for ip in iprestrictions %}
+                    "{{ ip }}"{% if not loop.last %},{% endif %}
+{%- endfor %}
+                ] }
+{%- endif %}
             }
         },
         {
@@ -106,7 +118,7 @@
             ],
             "Resource": "arn:aws:iam::{{ accountid }}:user/{{ user }}-{{ host }}-sa",
             "Condition": {
-{%- if True %}
+{%- if iprestrictions is defined %}
                 "IpAddress": { "aws:SourceIp": [
 {%- for ip in iprestrictions %}
                     "{{ ip }}"{% if not loop.last %},{% endif %}

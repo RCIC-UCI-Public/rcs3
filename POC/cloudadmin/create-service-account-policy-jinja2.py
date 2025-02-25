@@ -71,8 +71,6 @@ my_vars = {
 if args.iprestrictions is None:
     if "iprestrictions" in aws.keys():
         my_vars[ "iprestrictions" ] = aws[ "iprestrictions" ]
-    else:
-        my_vars[ "iprestrictions" ] = ""
 else:
     my_vars[ "iprestrictions" ] = args.iprestrictions
 
