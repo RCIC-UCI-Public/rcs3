@@ -35,7 +35,7 @@ class RcloneConf(object):
 def main():
     usage="Create rclone.conf from template."
     p = argparse.ArgumentParser( description=usage )
-    p.add_argument( "owner", help="ID of onwer (e.g., UCInetID)" )
+    p.add_argument( "owner", help="ID of owner (e.g., UCInetID)" )
     p.add_argument( "host", help="hostname" )
     args = p.parse_args()
     conf = RcloneConf(args.owner,args.host)
@@ -43,4 +43,4 @@ def main():
 
 if __name__ == "__main__":
    main()
-        
+

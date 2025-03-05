@@ -29,7 +29,7 @@ p.add_argument( "-v", "--verbose", action="store_true",
 args = p.parse_args()
 
 if not args.state in [ "enable", "disable" ]:
-    print( "Exitting, unknown state: {}".format( args.state ) )
+    print( "Exiting, unknown state: {}".format( args.state ) )
     sys.exit(0)
 
 # override location of .aws/config
