@@ -111,7 +111,7 @@ except iam.exceptions.NoSuchEntityException:
         PolicyName=policy_name,
         PolicyDocument=json_policy,
         Description="Allow service account access to {}-{}-{}".format( args.user, args.host, aws[ "bucket_postfix" ] ),
-        Tags=[ { 'rcs3user': args.user }, { 'rcs3host': args.host } ]
+        Tags=[ {'Key':'rcs3user', 'Value': args.user }, { 'Key':'rcs3host', 'Value':args.host } ]
     )
 except Exception as error:
     print( type(error).__name__ )
