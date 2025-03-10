@@ -18,21 +18,22 @@ spartTemplate= '''
 ## These are parts of a single statement
 resourceTemplate = '''
             ,
-            "Resource" : {{
-                    [{RESOURCELIST}]
-            }}
+            "Resource" : [
+                    {RESOURCELIST}
+            ] 
 '''
 conditionTemplate = '''
             ,
-            "Condition" : {{
-                    [{CONDITIONLIST}]
+            "Condition" : [ 
+                    {CONDITIONLIST}
+            ]
             }}
 '''
 principalTemplate = '''
             ,
-            "Principal" : {{
+            "Principal" : [ 
                     [ {PRINCIPALLIST} ]
-            }}
+            ] 
 '''            
 ## This is the template for the JSON policy
 ## STATEMENTLIST is a comma-joined string of filled statement Parts

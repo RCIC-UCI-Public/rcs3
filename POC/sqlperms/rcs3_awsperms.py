@@ -80,6 +80,7 @@ class rcs3awsdb():
        statements = []
        # Read each meta-statement in from the policySetsView to format out a statement
        (fieldNames,rows)=self.getSetEntries(table=setView,setName=setName);
+       print(setName, setView)
        asDict = [ dict(zip(fieldNames,x)) for x in rows ]
        for entry in asDict:
            # Each entry can have multiple list expansions. expand all list (sets) into formatted

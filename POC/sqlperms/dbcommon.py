@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import json
 from rcs3_awsperms import rcs3awsdb
 
 if __name__ == '__main__':
@@ -28,5 +29,10 @@ if __name__ == '__main__':
              else:
                  fields=("name","pattern")
              print(db.formatList(setView=table,setName=qarg,fields=fields))
+         elif command == "generate":
+             theDoc=json.loads(db.document(setView=table,setName=qarg))
+             print(json.dumps(theDoc,indent=4))
+            
+             
              
             
