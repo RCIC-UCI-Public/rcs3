@@ -2,7 +2,7 @@
 
 import sqlite3
 import sys
-import statementParts;
+import statementParts as SP;
 
 class rcs3awsdb():
     def __init__(self,verbose=False):
@@ -73,6 +73,34 @@ class rcs3awsdb():
        formatted = ",\n".join( ('"%s"' %x for x in joinedFields) )
        return formatted
 
+    def document(self,setName,setView="policy"):
+       """Using statement parts, format a complete policy document"""
+       
+       theDoc = ""
+       statements = []
+       # Read each meta-statement in from the policySetsView to format out a statement
+       (fieldNames,rows)=self.getSetEntries(table=setView,setName=setName);
+       asDict = [ dict(zip(fieldNames,x)) for x in rows ]
+       for entry in asDict:
+           # Each entry can have multiple list expansions. expand all list (sets) into formatted
+           # strings to make up a single policy statement 
+           PList = self.formatList(setView="principal",setName=entry['principal'],fields="pattern")
+           RList = self.formatList(setView="resource",setName=entry['resource'],fields="pattern")
+           #Clist = self.formatList(setView="condition",setName=entry['condition'],fields="pattern")
+           CList=""
+           sid = entry['sid']
+           effect = entry['effect']
+           action = self.formatList(setView="action",setName=entry['action'],fields=("service","permission"))
+           resource= SP.resourceTemplate.format(RESOURCELIST=RList) if len(RList) > 0 else ""
+           principal= SP.principalTemplate.format(PRINCIPALLIST=PList) if len(PList) > 0 else ""
+           condition= SP.conditionTemplate.format(CONDITIONLIST=CList) if len(CList) > 0 else ""
+
+           completeStatement=(SP.spartTemplate.format(
+               SID=sid,EFFECT=effect,ACTIONLIST=action,RESOURCE=resource,PRINCIPAL=principal,CONDITION=condition))
+           statements.extend([completeStatement])
+       
+       # Join all the statements into a full policy document
+       return SP.jsonTemplate.format(STATEMENTLIST=",\n".join(statements))
 
 
     def lookuproles(self,role='%'):
