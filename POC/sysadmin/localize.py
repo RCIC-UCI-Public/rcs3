@@ -14,7 +14,7 @@ def main():
     usage="Create localize rclone-conf and aws credentials. Create Backup Scripts"
     usage+="\nDoes NOT overwrite existing files"
     p = argparse.ArgumentParser( description=usage )
-    p.add_argument( "owner", help="ID of onwer (e.g., UCInetID)" )
+    p.add_argument( "owner", help="ID of owner (e.g., UCInetID)" )
     p.add_argument( "host", help="hostname" )
     args = p.parse_args()
     scriptdir=os.path.realpath(os.path.dirname(__file__))
@@ -42,8 +42,8 @@ def main():
     sc.write_syncScript()
     sc.write_topupScript()
 
-    
+
 
 if __name__ == "__main__":
    main()
-        
+

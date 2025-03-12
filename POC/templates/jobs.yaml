@@ -1,6 +1,6 @@
 ## This is a sample jobs.yaml the defines a single backup job
 ## relative to the root "/" path
-## Path is commmon to the jobs relative to the path
+## Path is common to the jobs relative to the path
 ---
 srcpaths:
 - path: /

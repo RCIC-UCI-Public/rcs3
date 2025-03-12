@@ -1,6 +1,6 @@
 ## This is a sample jobs.yaml the defines four backup jobs on a single path
 ## Job names must be distinct (not checked, yet)
-## Path is commmon to the jobs relative to the path
+## Path is common to the jobs relative to the path
 ---
 srcpaths:
 - archivepath: pub-all/dfs8/pub/ppapadop

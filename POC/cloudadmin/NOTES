@@ -27,7 +27,7 @@ II. New System to be added
 
 
     B. Sysadmin tasks
-        a.  Have the system adminstrator clone the github repo.  
+        a.  Have the system administrator clone the github repo.  
         b.  Make sure key software is installed: (Python3 with yaml module, aws, rclone)
         c.  After the bucket has been created, localize the setup
             sysadmin/localize.py <owner> <system>

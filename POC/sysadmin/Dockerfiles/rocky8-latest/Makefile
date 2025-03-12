@@ -22,7 +22,7 @@ push:
 	docker push $(REPO_NAME)/$(IMAGE_NAME):$(TAG_LATEST)
 
 clean:
-	docker image prune
+	docker image prune --all
 
 all: build push
 
