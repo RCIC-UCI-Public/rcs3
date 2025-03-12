@@ -4,12 +4,31 @@ import sqlite3
 import sys
 import statementParts as SP;
 
-class rcs3awsdb():
+class elements:
+    def __init__(self):
+        self._maps = { 'action':'actions','constraint':'constraints', 'principal':'principals',
+                'policy':'policies','resource':'resources'}
+        self._tcols = { 'action': ('service','permission'),
+                'constraint' : ('name','pattern'),
+                'principal' : ('name','pattern'),
+                'policy' : ('sid','effect'),
+                'resource' : ('name','pattern')}
+
+    def etable(self,tname):
+        """ map the singular name to the table name that holds the baseline elements"""
+        return self._maps[tname]
+
+    def cols(self,tname):
+        """ names of the fields in each element table """
+        return self._tcols[tname]
+
+class rcs3awsdb:
     def __init__(self,verbose=False):
        self.connection=sqlite3.connect('rcs3aws.db')
        self.cursor = self.connection.cursor()
        self.cursor.execute("PRAGMA foreign_keys=on")
        self.verbose = verbose
+       self.elem = elements()
 
     def execute(self,stmt,errorsToCaller=False):
        try:
@@ -104,11 +123,31 @@ class rcs3awsdb():
        return SP.jsonTemplate.format(STATEMENTLIST=",\n".join(statements))
 
 
-    def lookuproles(self,role='%'):
-       """ return list of roles that match a single search criteria """
-       stmt = """SELECT ID,ROLENAME,ROLEDESC
-                      FROM ROLES WHERE ROLENAME LIKE '%s';"""  % role 
-       return self.lookup(stmt)
+    def addElement(self,eClass,kw,val,optParams={}):
+       """add a base element to the eClass """
+       table = self.elem.etable(eClass)
+       cols = self.elem.cols(eClass)
+
+       fields = [ e for e in cols ]
+       values = [f"'{kw}'", f"'{val}'"]
+
+       # Need special handling for policies since there a number of optional arguments to include cross tables
+       # a SID is required for a policy - its the "name"
+       if eClass == 'policy':
+           try:
+              for (k,v) in optParams[eClass].items():
+                  fields.extend([k,])
+                  term=f"(select ID from {k}Sets where setName='{v}')" if v is not None else 'NULL'
+                  values.extend([term,])
+           except:
+               pass
+       tfields=",".join(fields)
+       tvalues=",".join(values)
+       stmt = f"INSERT INTO {table}({tfields}) VALUES({tvalues});"
+
+       print(stmt)
+       #self.execute(stmt) 
+       #self.commit()
     
     def lookuporgs(self,org='%'):
        """ return list of orgs that match a single search criteria """
