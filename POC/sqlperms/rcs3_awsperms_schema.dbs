@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="awsperms.sql" id="Project-58d" database="Sqlite" >
+	<schema name="public" >
+		<table name="actionSetMembers" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="memberID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setID" type="INTEGER" jt="4" />
+			<index name="pk_actionSetMembers" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_asmMemberSet" unique="UNIQUE_INDEX" >
+				<column name="memberID" />
+				<column name="setID" />
+			</index>
+			<fk name="FK_actionSetMembers actionSets" to_schema="public" to_table="actionSets" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="setID" pk="ID" />
+			</fk>
+			<fk name="FK_actionSetMembers actions" to_schema="public" to_table="actions" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="memberID" pk="ID" />
+			</fk>
+		</table>
+		<table name="actionSets" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setName" type="TEXT" jt="-1" mandatory="y" />
+			<index name="pk_actionSets" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_permSets_setName" unique="UNIQUE_KEY" >
+				<column name="setName" />
+			</index>
+		</table>
+		<table name="actions" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="service" type="TEXT" jt="-1" />
+			<column name="permission" type="TEXT" jt="-1" />
+			<index name="pk_actions" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_action" unique="UNIQUE_INDEX" >
+				<column name="service" />
+				<column name="permission" />
+			</index>
+		</table>
+		<table name="conditionSetMembers" prior="restrictionSetMembers" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="memberID" type="INTEGER" jt="4" />
+			<column name="setID" type="INTEGER" jt="4" />
+			<index name="pk_constraintSetMembers" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_conditionSetMembers" unique="UNIQUE_KEY" >
+				<column name="memberID" />
+				<column name="setID" />
+			</index>
+			<fk name="fk_constraintsetmembers" to_schema="public" to_table="conditions" delete_action="cascade" update_action="cascade" >
+				<fk_column name="memberID" pk="ID" />
+			</fk>
+			<fk name="fk_constraintSetMembers1" to_schema="public" to_table="conditionSets" delete_action="cascade" update_action="cascade" >
+				<fk_column name="setID" pk="ID" />
+			</fk>
+		</table>
+		<table name="conditionSets" prior="restrictionSets" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setName" type="TEXT" length="128" jt="-1" mandatory="y" />
+			<index name="pk_constraintSets" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_constraintSets" unique="UNIQUE_KEY" >
+				<column name="setName" />
+			</index>
+		</table>
+		<table name="conditions" prior="restrictions" >
+			<comment><![CDATA[base elements of conditions]]></comment>
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="name" type="VARCHAR" length="100" jt="12" mandatory="y" />
+			<column name="pattern" type="TEXT" jt="-1" mandatory="y" />
+			<index name="pk_constraints" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_constraints" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="policies" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="sid" type="TEXT" jt="-1" mandatory="y" />
+			<column name="action" type="INTEGER" jt="4" mandatory="y" />
+			<column name="resource" type="INTEGER" jt="4" />
+			<column name="principal" type="INTEGER" jt="4" />
+			<column name="effect" type="TEXT" jt="-1" />
+			<column name="condition" prior="restriction" type="INTEGER" jt="4" />
+			<index name="pk_policies" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_sidStatement" unique="UNIQUE_KEY" >
+				<column name="sid" />
+			</index>
+			<index name="unq_policies" unique="UNIQUE_INDEX" >
+				<column name="effect" />
+				<column name="action" />
+				<column name="resource" />
+				<column name="principal" />
+				<column name="condition" />
+			</index>
+			<constraint name="CK_policies" >
+				<string><![CDATA[ EFFECT=='Allow' or EFFECT=='Deny']]></string>options="" 
+			</constraint>
+			<fk name="FK_policies actionSets" to_schema="public" to_table="actionSets" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="action" pk="ID" />
+			</fk>
+			<fk name="FK_policies resourceSets" to_schema="public" to_table="resourceSets" delete_action="setNull" update_action="cascade" options="" >
+				<fk_column name="resource" pk="ID" />
+			</fk>
+			<fk name="FK_policies principalSets" to_schema="public" to_table="principalSets" delete_action="setNull" update_action="cascade" options="" >
+				<fk_column name="principal" pk="ID" />
+			</fk>
+			<fk name="fk_policiesConditionSets" to_schema="public" to_table="conditionSets" delete_action="cascade" update_action="cascade" >
+				<fk_column name="condition" pk="ID" />
+			</fk>
+		</table>
+		<table name="policySetMembers" spec="" >
+			<column name="memberID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<index name="pk_policySetMembers" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_policysetID" unique="UNIQUE_INDEX" >
+				<column name="setID" />
+				<column name="memberID" />
+			</index>
+			<fk name="FK_policySetMembers policySets" to_schema="public" to_table="policySets" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="setID" pk="ID" />
+			</fk>
+			<fk name="FK_policySetMembers policies" to_schema="public" to_table="policies" options="" >
+				<fk_column name="memberID" pk="ID" />
+			</fk>
+		</table>
+		<table name="policySets" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setName" type="TEXT" jt="-1" />
+			<index name="pk_policySets" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_policySets" unique="UNIQUE_KEY" >
+				<column name="setName" />
+			</index>
+		</table>
+		<table name="principalSetMembers" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="memberID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setID" type="INTEGER" jt="4" mandatory="y" />
+			<index name="pk_principalSetMembers" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_memberID" unique="UNIQUE_INDEX" >
+				<column name="memberID" />
+				<column name="setID" />
+			</index>
+			<fk name="FK_principalSetMembers principals" to_schema="public" to_table="principals" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="memberID" pk="ID" />
+			</fk>
+			<fk name="FK_principalSetMembers principalSets" to_schema="public" to_table="principalSets" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="setID" pk="ID" />
+			</fk>
+		</table>
+		<table name="principalSets" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setName" type="TEXT" jt="-1" mandatory="y" />
+			<index name="pk_principalSets" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_principalSets" unique="UNIQUE_KEY" >
+				<column name="setName" />
+			</index>
+		</table>
+		<table name="principals" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="name" type="TEXT" jt="-1" mandatory="y" />
+			<column name="pattern" type="TEXT" jt="-1" mandatory="y" />
+			<index name="pk_principals" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_principals_name" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+		</table>
+		<table name="resourceSetMembers" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="memberID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setID" type="INTEGER" jt="4" />
+			<index name="pk_resourceSetMembers" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_rsmmemberID" unique="UNIQUE_INDEX" >
+				<column name="memberID" />
+				<column name="setID" />
+			</index>
+			<fk name="FK_resourceSetMembers resources" to_schema="public" to_table="resources" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="memberID" pk="ID" />
+			</fk>
+			<fk name="FK_resourceSetMembers resourceSets" to_schema="public" to_table="resourceSets" delete_action="cascade" update_action="cascade" options="" >
+				<fk_column name="setID" pk="ID" />
+			</fk>
+		</table>
+		<table name="resourceSets" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="setName" type="TEXT" jt="-1" mandatory="y" />
+			<index name="pk_resourceSets" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_resourceSets_setName" unique="UNIQUE_KEY" >
+				<column name="setName" />
+			</index>
+		</table>
+		<table name="resources" spec="" >
+			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
+			<column name="name" type="TEXT" jt="-1" mandatory="y" />
+			<column name="pattern" type="TEXT" jt="-1" mandatory="y" />
+			<index name="pk_resources" unique="PRIMARY_KEY" >
+				<column name="ID" />
+			</index>
+			<index name="unq_resources_name" unique="UNIQUE_KEY" >
+				<column name="name" />
+			</index>
+		</table>
+		<view name="actionSetsView" >
+			<view_script><![CDATA[CREATE VIEW actionSetsView as select setName,service,permission from actionSetMembers asm join actions a on asm.memberID=a.id join actionSets aSets on asm.setID=aSets.ID]]></view_script>
+		</view>
+		<view name="conditionSetsView" >
+			<view_script><![CDATA[CREATE VIEW conditionSetsView as select setName,name,pattern from conditionSetMembers csm join conditions c on csm.memberID=c.id join conditionSets cSets on csm.setID=cSets.ID]]></view_script>
+		</view>
+		<view name="policySetsView" >
+			<view_script><![CDATA[CREATE VIEW policySetsView as select psets.setName,p.sid,p.effect,aset.setName as action, rset.setName as resource, prset.setName as principal, cset.setName as 'condition' from policySetMembers psm join policies p on psm.memberID=p.id join policySets psets on psm.setID=psets.ID join actionSets aset on p.action=aset.ID join resourceSets rset on p.resource=rset.ID left join principalSets prset on p.principal=prset.ID left join conditionSets cset on p.'condition'=cset.ID]]></view_script>
+		</view>
+		<view name="principalSetsView" >
+			<view_script><![CDATA[CREATE VIEW principalSetsView as select setName,name,pattern from principalSetMembers psm join principals p on psm.memberID=p.id join principalSets pSets on psm.setID=pSets.ID]]></view_script>
+		</view>
+		<view name="resourceSetsView" >
+			<view_script><![CDATA[CREATE VIEW resourceSetsView as select setName,name,pattern from resourceSetMembers rsm join resources r on rsm.memberID=r.id join resourceSets rSets on rsm.setID=rSets.ID]]></view_script>
+		</view>
+	</schema>
+	<layout name="Layout" id="Layout-13f9" show_relation="columns" >
+		<entity schema="public" name="actionSetMembers" color="BED3F4" x="1776" y="48" />
+		<entity schema="public" name="actionSets" color="BED3F4" x="1584" y="48" />
+		<entity schema="public" name="actionSetsView" color="BED3F4" x="1584" y="192" />
+		<entity schema="public" name="actions" color="BED3F4" x="2000" y="48" />
+		<entity schema="public" name="conditionSetMembers" color="C1D8EE" x="1792" y="336" />
+		<entity schema="public" name="conditionSets" color="C1D8EE" x="1584" y="336" />
+		<entity schema="public" name="conditionSetsView" color="3986C1" x="1584" y="448" />
+		<entity schema="public" name="conditions" color="C1D8EE" x="2032" y="336" />
+		<entity schema="public" name="policies" color="C7F4BE" x="720" y="48" />
+		<entity schema="public" name="policySetMembers" color="C7F4BE" x="912" y="48" />
+		<entity schema="public" name="policySets" color="C7F4BE" x="1136" y="48" />
+		<entity schema="public" name="policySetsView" color="C7F4BE" x="544" y="48" />
+		<entity schema="public" name="principalSetMembers" color="BEBEF4" x="944" y="336" />
+		<entity schema="public" name="principalSets" color="BEBEF4" x="752" y="336" />
+		<entity schema="public" name="principalSetsView" color="BEBEF4" x="752" y="448" />
+		<entity schema="public" name="principals" color="BEBEF4" x="1184" y="336" />
+		<entity schema="public" name="resourceSetMembers" color="F4DDBE" x="272" y="336" />
+		<entity schema="public" name="resourceSets" color="F4DDBE" x="80" y="336" />
+		<entity schema="public" name="resourceSetsView" color="F4DDBE" x="48" y="512" />
+		<entity schema="public" name="resources" color="F4DDBE" x="512" y="336" />
+		<script name="awsperms.sql" id="Editor-2678" language="SQL" file="file:////wsl.localhost/Ubuntu/home/ppapadop/rcs3/POC/sqlperms/awsperms.sql" />
+		<script name="awsperms.sql" id="Editor-5c1" language="SQL" confirmed="y" file="file:////wsl.localhost/Ubuntu/home/ppapadop/rcs3/POC/sqlperms/awsperms.sql" />
+	</layout>
+</project>

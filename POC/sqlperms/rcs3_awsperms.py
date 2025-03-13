@@ -34,6 +34,7 @@ class rcs3awsdb:
        try:
            if self.verbose:
                print("execute: '%s'" % stmt, file=sys.stderr)
+               return
            self.cursor.execute(stmt)
        except sqlite3.IntegrityError as e:
            if not errorsToCaller:
@@ -104,10 +105,9 @@ class rcs3awsdb:
        for entry in asDict:
            # Each entry can have multiple list expansions. expand all list (sets) into formatted
            # strings to make up a single policy statement 
-           PList = self.formatList(setView="principal",setName=entry['principal'],fields="pattern")
-           RList = self.formatList(setView="resource",setName=entry['resource'],fields="pattern")
-           #Clist = self.formatList(setView="condition",setName=entry['condition'],fields="pattern")
-           CList=""
+           PList = self.formatList(setView='principal',setName=entry['principal'],fields="pattern")
+           RList = self.formatList(setView='resource',setName=entry['resource'],fields="pattern")
+           CList = self.formatList(setView='condition',setName=entry['condition'],fields="pattern")
            sid = entry['sid']
            effect = entry['effect']
            action = self.formatList(setView="action",setName=entry['action'],fields=("service","permission"))
@@ -144,16 +144,38 @@ class rcs3awsdb:
        tfields=",".join(fields)
        tvalues=",".join(values)
        stmt = f"INSERT INTO {table}({tfields}) VALUES({tvalues});"
-
-       print(stmt)
-       #self.execute(stmt) 
-       #self.commit()
+       self.execute(stmt) 
+       self.commit()
     
-    def lookuporgs(self,org='%'):
-       """ return list of orgs that match a single search criteria """
-       stmt = """SELECT ID,ORGNAME,ORGDESC
-                      FROM ORGS WHERE ORGNAME LIKE '%s';"""  % org
-       return self.lookup(stmt)
+    def addSet(self,space,setName):
+       """Add a Set of setName to the space """
+       stmt = f"INSERT INTO {space}Sets(setName) VALUES('{setName}');"
+       self.execute(stmt) 
+       self.commit()
+    
+    def addToSet(self,space,setName,*selectors):
+       """Add selectors into setName to the space """
+       # Special Handling for action space
+       if space == 'action':
+           service,permission = selectors[0][0], selectors[0][1]
+           memberID = f"( select ID from {self.elem.etable(space)} where service='{service}' and permission='{permission}')"
+       else:
+           name = selectors[0][0]
+           memberID = f"(select ID from {self.elem.etable(space)} where name='{name}')"
+       stmt = f"""INSERT INTO {space}SetMembers(memberID,setID) 
+                  VALUES({memberID},(select ID from {space}Sets where setName='{setName}'));"""
+       self.execute(stmt) 
+       self.commit()
+    
+    def listSet(self,space,key='%'):
+       """ List the Elements of a Set """ 
+       (fieldNames,rows)=self.getSetEntries(table=space,setName=key)
+       header = " | ".join(fieldNames)
+       data = header + "\n"
+       for row in rows:
+           srow = ( "" if x is None else x for x in row)
+           data += " | ".join(srow) + "\n"
+       return data 
 
     def lookupuserroles(self,uid='%'):
        """ return list of roles that match a user """

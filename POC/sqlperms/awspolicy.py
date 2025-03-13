@@ -53,7 +53,7 @@ if __name__ == '__main__':
          parser.add_argument('command', metavar='command',choices=commands, nargs=1, help=f'{commands}')
          parser.add_argument('space', metavar='space',choices=spaces, nargs=1, help=f'{spaces}')
          parser.add_argument('spaceArg', default='%',nargs='?', help='space argument')
-         parser.add_argument('extra', nargs='?', help='extra (context-specific) space argument')
+         parser.add_argument('extra', nargs='*', help='extra (context-specific) space argument')
          for x in actionOptions:
              parser.add_argument(f'--{x}', default=None, help=f'action space {x} qualifier (default: None)')
          
@@ -67,14 +67,10 @@ if __name__ == '__main__':
          extra=args.extra
          verbose = args.verbose
 
-         print(args)
-         for x in policyOptions:
-             print(x,eval(f'args.{x}'))
          db = rcs3awsdb(verbose)
          optParams = { 'action':dict(zip(actionOptions, (eval(f'args.{x}') for x in actionOptions))),
                       'policy':dict(zip(policyKeys,(eval(f'args.{x}') for x in policyOptions)))
                     }
-         print(optParams)
          if  verbose:
              print ("command is %s, space %s" % (command,space), file=sys.stderr)
          if command == "listview":
@@ -82,9 +78,12 @@ if __name__ == '__main__':
          elif command == "add":
              if args.extra is not None:
                  db.addElement(eClass=space,kw=spaceArg,val=args.extra,optParams=optParams)
-
-         elif command == "list":
-             print(db.formatList(setView=space,setName=spaceArg,fields=fields,optParams=optParams))
+         elif command == "addSet":
+                 db.addSet(space,spaceArg)
+         elif command == "addToSet":
+                 db.addToSet(space,spaceArg,extra)
+         elif command == "listSet":
+             print(db.listSet(space,spaceArg))
          elif command == "generate":
              theDoc=json.loads(db.document(setView=space,setName=spaceArg))
              print(json.dumps(theDoc,indent=4))
