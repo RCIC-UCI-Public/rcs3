@@ -538,3 +538,28 @@ awspolicy.py addToSet principal serviceAWS serviceScheduler
 
 awspolicy.py addSet principal serviceStates
 awspolicy.py addToSet principal serviceStates serviceStates
+
+# Conditions
+awspolicy.py add condition arnBackupBucket '{"ArnLike" : {"aws:SourceArn": "arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{POSTFIX_BUCKET}}"} }'
+awspolicy.py add condition equalsAccount '{"StringEquals" : {"aws:SourceAccount": "{{ACCOUNT}}"} }'
+awspolicy.py add condition equalsAccountAndControl '{"StringEquals" :  {"aws:SourceAccount": "{{ACCOUNT}}", "s3:x-amz-acl": "bucket-owner-full-control"} }'
+awspolicy.py add condition s3PrefixOwner '{"StringEquals" : {"s3:prefix": ["{{OWNER}}", "{{OWNER}}/"], "s3:delimiter": ["/"]} }'
+awspolicy.py add condition IPRestrictions "{{IP_RESTRICTIONS}}"
+
+# Condition Sets
+
+awspolicy.py addSet condition arnBackupBucket
+awspolicy.py addToSet condition arnBackupBucket arnBackupBucket
+
+awspolicy.py addSet condition equalsAccountAndControl
+awspolicy.py addToSet condition equalsAccountAndControl equalsAccountAndControl
+
+awspolicy.py addSet condition equalsAccount
+awspolicy.py addToSet condition equalsAccount equalsAccount
+
+awspolicy.py addSet condition IPRestrictions
+awspolicy.py addToSet condition IPRestrictions IPRestrictions
+
+awspolicy.py addSet condition s3PrefixOwner
+awspolicy.py addToSet condition s3PrefixOwner s3PrefixOwner
+
