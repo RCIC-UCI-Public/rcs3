@@ -573,6 +573,14 @@ awspolicy.py add policy publishNotifications Allow --actionSet snsPublish --reso
 awspolicy.py add policy snsListTopics Allow --actionSet snsListTopics --resourceSet snsRegionAccountAny --conditionSet IPRestrictions
 awspolicy.py add policy rotateAccessKey Allow --actionSet updateAccessKey --resourceSet backupServiceAccount --conditionSet IPRestrictions
 
+## For keyAgeMetric-policy
+awspolicy.py add policy listUsersAndKeys Allow --actionSet listUserKeys --resourceSet anyResource 
+awspolicy.py add policy createLogGroup Allow --actionSet createLogGroup --resourceSet anyResource 
+awspolicy.py add policy createLogStream Allow --actionSet putLogEvents --resourceSet anyResource 
+awspolicy.py add policy publishMetrics Allow --actionSet cloudwatchPutMetric --resourceSet anyResource 
+
+
+### Policy "JSON" files based upon defined policies above
 # == template-policy2 ===
 awspolicy.py addSet policy template-policy2
 awspolicy.py addToSet policy template-policy2 writeBackupBucket
@@ -581,5 +589,13 @@ awspolicy.py addToSet policy template-policy2 denyDangerousOps
 awspolicy.py addToSet policy template-policy2 publishNotifications
 awspolicy.py addToSet policy template-policy2 snsListTopics 
 awspolicy.py addToSet policy template-policy2 rotateAccessKey 
+
+
+## == keyAgeMetric-policy ==
+awspolicy.py addSet policy keyAgeMetric-policy 
+awspolicy.py addToSet policy keyAgeMetric-policy listUsersAndKeys
+awspolicy.py addToSet policy keyAgeMetric-policy createLogGroup
+awspolicy.py addToSet policy keyAgeMetric-policy createLogStream
+awspolicy.py addToSet policy keyAgeMetric-policy publishMetrics
 
 
