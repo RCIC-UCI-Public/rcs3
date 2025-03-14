@@ -515,3 +515,26 @@ awspolicy.py addToSet resource snsOwnerNotify snsOwnerNotify
 awspolicy.py addSet resource sfnFullMonty
 awspolicy.py addToSet resource sfnFullMonty sfnFullMonty
 
+# Principals
+
+awspolicy.py add principal serviceS3Batch '{"Service":"batchoperations.s3.amazonaws.com"}'
+awspolicy.py add principal serviceLambda '{"Service":"lambda.amazonaws.com"}'
+awspolicy.py add principal serviceAWS '{"Service":"s3.amazonaws.com"}'
+awspolicy.py add principal serviceScheduler '{"Service":"scheduler.amazonaws.com"}'
+awspolicy.py add principal serviceStates '{"Service":"states.amazonaws.com"}'
+
+# Principal Sets
+awspolicy.py addSet principal serviceS3Batch
+awspolicy.py addToSet principal serviceS3Batch serviceS3Batch
+
+awspolicy.py addSet principal serviceLambda
+awspolicy.py addToSet principal serviceLambda serviceLambda
+
+awspolicy.py addSet principal serviceAWS
+awspolicy.py addToSet principal serviceAWS serviceAWS
+
+awspolicy.py addSet principal serviceScheduler
+awspolicy.py addToSet principal serviceAWS serviceScheduler
+
+awspolicy.py addSet principal serviceStates
+awspolicy.py addToSet principal serviceStates serviceStates
