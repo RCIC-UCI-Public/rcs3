@@ -343,3 +343,175 @@ awspolicy.py addToSet action sfnExecution states StartSyncExecution
 
 awspolicy.py addSet action stsAssumeRole
 awspolicy.py addToSet action stsAssumeRole sts AssumeRole
+
+## Resources
+awspolicy.py add resource any '*'
+awspolicy.py add resource athenaDatacatalog 'arn:aws:athena:{{REGION}}:{{ACCOUNT}}:datacatalog/*'
+awspolicy.py add resource athenaWorkgroup 'arn:aws:athena:{{REGION}}:{{ACCOUNT}}:workgroup/rcs3'
+awspolicy.py add resource dynamodbTable 'arn:aws:dynamodb:{{REGION}}:{{ACCOUNT}}:table/*{{BUCKET_POSTFIX}}'
+awspolicy.py add resource glueCatalog 'arn:aws:glue:{{REGION}}:{{ACCOUNT}}:catalog'
+awspolicy.py add resource glueDatabase 'arn:aws:glue:{{REGION}}:{{ACCOUNT}}:database/*'
+awspolicy.py add resource glueTable 'arn:aws:glue:{{REGION}}:{{ACCOUNT}}:table/*'
+awspolicy.py add resource glueUserDefinedFunction 'arn:aws:glue:{{REGION}}:{{ACCOUNT}}:userDefinedFunction/*'
+awspolicy.py add resource iamRestoreBatchPermsRole 'arn:aws:iam::{{ACCOUNT}}:role/{{OWNER}}-{{SYSTEM}}-restore-s3batch-perms-role'
+awspolicy.py add resource backupServiceAccount 'arn:aws:iam::{{ACCOUNT}}:user/{{OWNER}}-{{SYSTEM}}-sa'
+awspolicy.py add resource lambdaFunction 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:{{FUNCTION}}'
+awspolicy.py add resource lambdaFunctionMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:{{FUNCTION}}:*'
+awspolicy.py add resource lambdaCalcUploadBytes 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:calcUploadBytes'
+awspolicy.py add resource lambdaCalcUploadBytesMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:calcUploadBytes:*'
+awspolicy.py add resource lambdaKeyAgeMetric 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:keyAgeMetric'
+awspolicy.py add resource lambdaKeyAgeMetricMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:keyAgeMetric:*'
+awspolicy.py add resource lambdaCreateAthenaQueries 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:createAthenaQueries'
+awspolicy.py add resource lambdaCreateAthenaQueriesMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:createAthenaQueries:*'
+awspolicy.py add resource lambdaCreateS3BatchInput 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:createS3BatchInput'
+awspolicy.py add resource lambdaCreateS3BatchInputMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:createS3BatchInput:*'
+awspolicy.py add resource lambdaPollCreateJobStatus 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:pollCreateJobStatus'
+awspolicy.py add resource lambdaPollCreateJobStatusMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:pollCreateJobStatus:*'
+awspolicy.py add resource regionAccountAny 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:*'
+awspolicy.py add resource loggroupCreateAthenaQueries 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/createAthenaQueries:*'
+awspolicy.py add resource loggroupCreateS3BatchInput 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/createS3BatchInput:*'
+awspolicy.py add resource loggroupPollCreateJobStatus 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/pollCreateJobStatus:*'
+awspolicy.py add resource loggroupPostCloudwatchMetrics 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/postCloudwatchMetrics:*'
+awspolicy.py add resource loggroupPrepDynamoImport 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/prepDynamoImport:*'
+awspolicy.py add resource loggroupQueryS3Restore 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/queryS3Restore:*'
+awspolicy.py add resource loggroupUpdateDynamodb 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/updateDynamodb:*'
+awspolicy.py add resource loggroupCloudtrails 'arn:aws:logs:{{REGION}}x:{{ACCOUNT}}:log-group:aws-cloudtrail-logs-xiangmix-cncm2:*'
+awspolicy.py add resource inventoryPrefix 'arn:aws:s3:::*{{INVENTORY_POSTFIX}}'
+awspolicy.py add resource inventoryRCS3Path 'arn:aws:s3:::*{{INVENTORY_POSTFIX}}/rcs3/*'
+awspolicy.py add resource reports 'arn:aws:s3:::{{REPORTS}}'
+awspolicy.py add resource reportsContents 'arn:aws:s3:::{{REPORTS}}/*'
+awspolicy.py add resource reportsOwner 'arn:aws:s3:::{{REPORTS}}/{{OWNER}}/*'
+awspolicy.py add resource backupBucketPrefix 'arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{BUCKET_POSTFIX}}'
+awspolicy.py add resource backupBucketContents 'arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{BUCKET_POSTFIX}}/*'
+awspolicy.py add resource inventoryBucketPrefix 'arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{INVENTORY_POSTFIX}}'
+awspolicy.py add resource inventoryBucketPrefixContents 'arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{INVENTORY_POSTFIX}}/*'
+awspolicy.py add resource inventoryBucketRCS3Path 'arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{INVENTORY_POSTFIX}}/rcs3/*'
+awspolicy.py add resource snsRegionAccountAny 'arn:aws:sns:{{REGION}}:{{ACCOUNT}}:*'
+awspolicy.py add resource snsOwnerNotify 'arn:aws:sns:{{REGION}}:{{ACCOUNT}}:{{OWNER}}-{{SYSTEM}}-{{OWNER_NOTIFY}}'
+awspolicy.py add resource sfnFullMonty 'arn:aws:states:{{REGION}}:{{ACCOUNT}}:stateMachine:{{OWNER}}-{{SYSTEM}}-sfn-full-monty'
+
+
+## Resource Groups
+
+awspolicy.py addSet resource anyResource
+awspolicy.py addToSet resource anyResource any
+
+awspolicy.py addSet resource athenaResources
+awspolicy.py addToSet resource athenaResources athenaDatacatalog
+awspolicy.py addToSet resource athenaResources athenaWorkgroup
+
+awspolicy.py addSet resource dynamodbBucket
+awspolicy.py addToSet resource dynamodbBucket dynamodbTable
+
+awspolicy.py addSet resource glueResources
+awspolicy.py addToSet resource glueResources glueCatalog
+awspolicy.py addToSet resource glueResources glueDatabase
+awspolicy.py addToSet resource glueResources glueTable
+awspolicy.py addToSet resource glueResources glueUserDefinedFunction
+
+awspolicy.py addSet resource iamS3batchPermsRole
+awspolicy.py addToSet resource iamS3batchPermsRole iamRestoreBatchPermsRole
+
+awspolicy.py addSet resource backupServiceAccount
+awspolicy.py addToSet resource backupServiceAccount backupServiceAccount 
+
+awspolicy.py addSet resource lambdaFunction
+awspolicy.py addToSet resource lambdaFunction lambdaFunction
+awspolicy.py addToSet resource lambdaFunction lambdaFunctionMethods
+
+awspolicy.py addSet resource lambdaCalcUploadBytes
+awspolicy.py addToSet resource lambdaCalcUploadBytes lambdaCalcUploadBytes
+awspolicy.py addToSet resource lambdaCalcUploadBytes lambdaCalcUploadBytesMethods
+
+awspolicy.py addSet resource lambdaKeyAgeMetric
+awspolicy.py addToSet resource lambdaKeyAgeMetric lambdaKeyAgeMetric
+awspolicy.py addToSet resource lambdaKeyAgeMetric lambdaKeyAgeMetricMethods
+
+awspolicy.py addSet resource lambdaCreateAthenaQueries
+awspolicy.py addToSet resource lambdaCreateAthenaQueries lambdaCreateAthenaQueries
+awspolicy.py addToSet resource lambdaCreateAthenaQueries lambdaCreateAthenaQueriesMethods
+
+awspolicy.py addSet resource lambdaAthenaBatch
+awspolicy.py addToSet resource lambdaAthenaBatch lambdaCreateAthenaQueries
+awspolicy.py addToSet resource lambdaAthenaBatch lambdaCreateAthenaQueriesMethods
+awspolicy.py addToSet resource lambdaAthenaBatch lambdaCreateS3BatchInput
+awspolicy.py addToSet resource lambdaAthenaBatch lambdaCreateS3BatchInputMethods
+awspolicy.py addToSet resource lambdaAthenaBatch lambdaPollCreateJobStatus
+awspolicy.py addToSet resource lambdaAthenaBatch lambdaPollCreateJobStatusMethods
+
+awspolicy.py addSet resource regionAccountAny
+awspolicy.py addToSet resource regionAccountAny regionAccountAny
+
+awspolicy.py addSet resource restoreLoggroups
+awspolicy.py addToSet resource restoreLoggroups loggroupCreateAthenaQueries
+awspolicy.py addToSet resource restoreLoggroups loggroupCreateS3BatchInput
+awspolicy.py addToSet resource restoreLoggroups loggroupPollCreateJobStatus
+
+awspolicy.py addSet resource loggroupCreateAthenaQueries
+awspolicy.py addToSet resource loggroupCreateAthenaQueries loggroupCreateAthenaQueries
+
+awspolicy.py addSet resource loggroupCreateS3BatchInput
+awspolicy.py addToSet resource loggroupCreateS3BatchInput loggroupCreateS3BatchInput
+
+awspolicy.py addSet resource loggroupPollCreateJobStatus
+awspolicy.py addToSet resource loggroupPollCreateJobStatus loggroupPollCreateJobStatus
+
+awspolicy.py addSet resource loggroupPostCloudwatchMetrics
+awspolicy.py addToSet resource loggroupPostCloudwatchMetrics loggroupPostCloudwatchMetrics
+
+awspolicy.py addSet resource loggroupPrepDynamoImport
+awspolicy.py addToSet resource loggroupPrepDynamoImport loggroupPrepDynamoImport
+
+awspolicy.py addSet resource loggroupQueryS3Restore
+awspolicy.py addToSet resource loggroupQueryS3Restore loggroupQueryS3Restore
+
+awspolicy.py addSet resource loggroupUpdateDynamodb
+awspolicy.py addToSet resource loggroupUpdateDynamodb loggroupUpdateDynamodb
+
+awspolicy.py addSet resource loggroupCloudtrails
+awspolicy.py addToSet resource loggroupCloudtrails loggroupCloudtrails
+
+awspolicy.py addSet resource inventoryPrefix
+awspolicy.py addToSet resource inventoryPrefix inventoryPrefix
+
+awspolicy.py addSet resource inventoryRCS3Path
+awspolicy.py addToSet resource inventoryRCS3Path inventoryRCS3Path
+
+awspolicy.py addSet resource reports
+awspolicy.py addToSet resource reports reports
+
+awspolicy.py addSet resource reportsContents
+awspolicy.py addToSet resource reportsContents reportsContents
+
+awspolicy.py addSet resource reportsOwner
+awspolicy.py addToSet resource reportsOwner reportsOwner
+
+awspolicy.py addSet resource backupBucket
+awspolicy.py addToSet resource backupBucket backupBucketPrefix
+awspolicy.py addToSet resource backupBucket backupBucketContents
+
+awspolicy.py addSet resource backupBucketPrefix
+awspolicy.py addToSet resource backupBucketPrefix backupBucketPrefix
+
+awspolicy.py addSet resource backupBucketContents
+awspolicy.py addToSet resource backupBucketContents backupBucketContents
+
+awspolicy.py addSet resource inventoryBucket
+awspolicy.py addToSet resource inventoryBucket inventoryBucketPrefix
+awspolicy.py addToSet resource inventoryBucket inventoryBucketPrefixContents
+
+awspolicy.py addSet resource inventoryBucketContents
+awspolicy.py addToSet resource inventoryBucketContents inventoryBucketPrefixContents
+
+awspolicy.py addSet resource inventoryBucketRCS3Path
+awspolicy.py addToSet resource inventoryBucketRCS3Path inventoryBucketRCS3Path
+
+awspolicy.py addSet resource snsRegionAccountAny
+awspolicy.py addToSet resource snsRegionAccountAny snsRegionAccountAny
+
+awspolicy.py addSet resource snsOwnerNotify
+awspolicy.py addToSet resource snsOwnerNotify snsOwnerNotify
+
+awspolicy.py addSet resource sfnFullMonty
+awspolicy.py addToSet resource sfnFullMonty sfnFullMonty
+
