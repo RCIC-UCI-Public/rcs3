@@ -544,7 +544,7 @@ awspolicy.py add condition arnBackupBucket '{"ArnLike" : {"aws:SourceArn": "arn:
 awspolicy.py add condition equalsAccount '{"StringEquals" : {"aws:SourceAccount": "{{ACCOUNT}}"} }'
 awspolicy.py add condition equalsAccountAndControl '{"StringEquals" :  {"aws:SourceAccount": "{{ACCOUNT}}", "s3:x-amz-acl": "bucket-owner-full-control"} }'
 awspolicy.py add condition s3PrefixOwner '{"StringEquals" : {"s3:prefix": ["{{OWNER}}", "{{OWNER}}/"], "s3:delimiter": ["/"]} }'
-awspolicy.py add condition IPRestrictions "{{IP_RESTRICTIONS}}"
+awspolicy.py add condition IPRestrictions '{ "{{IP_RULE}}" : "{{IP_ADDRESSES}}" }'
 
 # Condition Sets
 
@@ -562,4 +562,24 @@ awspolicy.py addToSet condition IPRestrictions IPRestrictions
 
 awspolicy.py addSet condition s3PrefixOwner
 awspolicy.py addToSet condition s3PrefixOwner s3PrefixOwner
+
+## Policies
+
+## For template-policy2
+awspolicy.py add policy writeBackupBucket Allow --actionSet backupUserPermissions --resourceSet backupBucket --conditionSet IPRestrictions 
+awspolicy.py add policy readInventoryBucket Allow --actionSet readBucketAndAttributes --resourceSet inventoryBucket
+awspolicy.py add policy denyDangerousOps Deny --actionSet dangerousS3Permissions --resourceSet anyResource
+awspolicy.py add policy publishNotifications Allow --actionSet snsPublish --resourceSet snsOwnerNotify --conditionSet IPRestrictions
+awspolicy.py add policy snsListTopics Allow --actionSet snsListTopics --resourceSet snsRegionAccountAny --conditionSet IPRestrictions
+awspolicy.py add policy rotateAccessKey Allow --actionSet updateAccessKey --resourceSet backupServiceAccount --conditionSet IPRestrictions
+
+# == template-policy2 ===
+awspolicy.py addSet policy template-policy2
+awspolicy.py addToSet policy template-policy2 writeBackupBucket
+awspolicy.py addToSet policy template-policy2 readInventoryBucket
+awspolicy.py addToSet policy template-policy2 denyDangerousOps
+awspolicy.py addToSet policy template-policy2 publishNotifications
+awspolicy.py addToSet policy template-policy2 snsListTopics 
+awspolicy.py addToSet policy template-policy2 rotateAccessKey 
+
 

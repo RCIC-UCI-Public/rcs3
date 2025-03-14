@@ -13,8 +13,7 @@ spaces = ('action', 'policy', 'principal','resource','condition')
 
 # Command-specific options
 actionOptions = ('service','permission')
-#policyOptions = ('actionSet','principalSet','resourceSet', 'conditionSet')
-policyOptions = ('actionSet','principalSet','resourceSet')
+policyOptions = ('actionSet','principalSet','resourceSet', 'conditionSet')
 
 policyKeys = tuple( x.replace('Set','') for x in policyOptions)
 
@@ -82,10 +81,13 @@ if __name__ == '__main__':
                  db.addSet(space,spaceArg)
          elif command == "addToSet":
                  db.addToSet(space,spaceArg,extra)
+         elif command == "list":
+                 print(db.list(space,spaceArg))
          elif command == "listSet":
              print(db.listSet(space,spaceArg))
          elif command == "generate":
-             theDoc=json.loads(db.document(setView=space,setName=spaceArg))
+             textDoc=db.document(setView=space,setName=spaceArg)
+             theDoc=json.loads(textDoc)
              print(json.dumps(theDoc,indent=4))
             
              

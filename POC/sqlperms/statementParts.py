@@ -4,7 +4,7 @@
 
 spartTemplate= '''            
          {{
-            "sid": "{SID}",
+            "Sid": "{SID}",
             "Effect": "{EFFECT}",
             "Action": [
                 {ACTIONLIST}
@@ -27,7 +27,6 @@ conditionTemplate = '''
             "Condition" : [ 
                     {CONDITIONLIST}
             ]
-            }}
 '''
 principalTemplate = '''
             ,

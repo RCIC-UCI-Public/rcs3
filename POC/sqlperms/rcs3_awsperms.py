@@ -6,10 +6,10 @@ import statementParts as SP;
 
 class elements:
     def __init__(self):
-        self._maps = { 'action':'actions','constraint':'constraints', 'principal':'principals',
+        self._maps = { 'action':'actions','condition':'conditions', 'principal':'principals',
                 'policy':'policies','resource':'resources'}
         self._tcols = { 'action': ('service','permission'),
-                'constraint' : ('name','pattern'),
+                'condition' : ('name','pattern'),
                 'principal' : ('name','pattern'),
                 'policy' : ('sid','effect'),
                 'resource' : ('name','pattern')}
@@ -77,6 +77,15 @@ class rcs3awsdb:
        query = "SELECT * from '%s' where setName like '%s' order by setName" % (tableView, setName)
        return self.getTableEntries(table=tableView,query=query)
     
+    def quoteOrRaw(self,arg):
+        """Arg is a string, but the string might represent a dictionary. If so, don't quote,
+           else quote """
+        try:
+            isDict = eval(arg)
+            return arg;
+        except:
+            return '"%s"' % arg
+
     def formatList(self,setView=None,setName=None,fields=(),joiner=":"):
        """Return formatted (suitable for inclusion in json policy statement) list elements in the set  """
        (fieldNames,rows)=self.getSetEntries(table=setView,setName=setName);
@@ -90,7 +99,8 @@ class rcs3awsdb:
        joinedFields=[ joiner.join( (row[key] for key in selectors) ) for row in asDict ]
 
        # Finally, need each joinedField to be wrapped in double quotes and then put in a comma separated list
-       formatted = ",\n".join( ('"%s"' %x for x in joinedFields) )
+
+       formatted = ",\n".join( (self.quoteOrRaw(x) for x in joinedFields) )
        return formatted
 
     def document(self,setName,setView="policy"):
@@ -129,7 +139,7 @@ class rcs3awsdb:
        cols = self.elem.cols(eClass)
 
        fields = [ e for e in cols ]
-       values = [f"'{kw}'", f"'{val}'"]
+       values = [f"'{kw}'", f"'{val[0]}'"]
 
        # Need special handling for policies since there a number of optional arguments to include cross tables
        # a SID is required for a policy - its the "name"
@@ -161,21 +171,34 @@ class rcs3awsdb:
            memberID = f"( select ID from {self.elem.etable(space)} where service='{service}' and permission='{permission}')"
        else:
            name = selectors[0][0]
-           memberID = f"(select ID from {self.elem.etable(space)} where name='{name}')"
+           memberID = f"(select ID from {self.elem.etable(space)} where {self.elem.cols(space)[0]}='{name}')"
        stmt = f"""INSERT INTO {space}SetMembers(memberID,setID) 
                   VALUES({memberID},(select ID from {space}Sets where setName='{setName}'));"""
        self.execute(stmt) 
        self.commit()
     
-    def listSet(self,space,key='%'):
-       """ List the Elements of a Set """ 
-       (fieldNames,rows)=self.getSetEntries(table=space,setName=key)
+    def printRows(self,fieldNames,rows):
+       """ Format a "table" for human-readable printing """
        header = " | ".join(fieldNames)
        data = header + "\n"
        for row in rows:
-           srow = ( "" if x is None else x for x in row)
+           sfmt = tuple((str(x) for x in row))
+           srow = ( "" if x is None else x for x in sfmt)
            data += " | ".join(srow) + "\n"
        return data 
+
+    def list(self,space,key='%'):
+       """ List the Elements of a space""" 
+       table = self.elem.etable(space)
+       keyColumn = self.elem.cols(space)[0]
+       query = f"SELECT * from {table} where {keyColumn} like '{key}' order by {keyColumn}" 
+       (fieldNames,rows)=self.getTableEntries(table,query)
+       return self.printRows(fieldNames,rows)
+
+    def listSet(self,space,key='%'):
+       """ List the Elements of a Set """ 
+       (fieldNames,rows)=self.getSetEntries(table=space,setName=key)
+       return self.printRows(fieldNames,rows)
 
     def lookupuserroles(self,uid='%'):
        """ return list of roles that match a user """
