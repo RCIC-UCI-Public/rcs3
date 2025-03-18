@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="awsperms.sql" id="Project-58d" database="Sqlite" >
+<project name="awsperms.sql" database="Sqlite" id="Project-58d" >
 	<schema name="public" >
 		<table name="actionSetMembers" spec="" >
 			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
@@ -72,7 +72,7 @@
 		<table name="conditions" prior="restrictions" >
 			<comment><![CDATA[base elements of conditions]]></comment>
 			<column name="ID" type="INTEGER" jt="4" mandatory="y" />
-			<column name="name" type="VARCHAR" length="100" jt="12" mandatory="y" />
+			<column name="name" type="TEXT" length="100" jt="-1" mandatory="y" />
 			<column name="pattern" type="TEXT" jt="-1" mandatory="y" />
 			<index name="pk_constraints" unique="PRIMARY_KEY" >
 				<column name="ID" />
@@ -103,7 +103,7 @@
 				<column name="condition" />
 			</index>
 			<constraint name="CK_policies" >
-				<string><![CDATA[ EFFECT=='Allow' or EFFECT=='Deny']]></string>options="" 
+				<string><![CDATA[ EFFECT=='Allow' or EFFECT=='Deny']]></string>
 			</constraint>
 			<fk name="FK_policies actionSets" to_schema="public" to_table="actionSets" delete_action="cascade" update_action="cascade" options="" >
 				<fk_column name="action" pk="ID" />
@@ -231,7 +231,10 @@
 			<view_script><![CDATA[CREATE VIEW conditionSetsView as select setName,name,pattern from conditionSetMembers csm join conditions c on csm.memberID=c.id join conditionSets cSets on csm.setID=cSets.ID]]></view_script>
 		</view>
 		<view name="policySetsView" >
-			<view_script><![CDATA[CREATE VIEW policySetsView as select psets.setName,p.sid,p.effect,aset.setName as action, rset.setName as resource, prset.setName as principal, cset.setName as 'condition' from policySetMembers psm join policies p on psm.memberID=p.id join policySets psets on psm.setID=psets.ID join actionSets aset on p.action=aset.ID join resourceSets rset on p.resource=rset.ID left join principalSets prset on p.principal=prset.ID left join conditionSets cset on p.'condition'=cset.ID]]></view_script>
+			<view_script><![CDATA[CREATE VIEW policySetsView as select psets.setName,p.sid,p.effect,aset.setName as action, rset.setName as resource, prset.setName as principal, cset.setName as 'condition' from policySetMembers psm join policies p on psm.memberID=p.id join policySets psets on psm.setID=psets.ID join actionSets aset on p.action=aset.ID left join resourceSets rset on p.resource=rset.ID left join principalSets prset on p.principal=prset.ID left join conditionSets cset on p.'condition'=cset.ID]]></view_script>
+		</view>
+		<view name="policyView" >
+			<view_script><![CDATA[CREATE VIEW policyView as select p.ID, p.sid,p.effect,aset.setName as action, rset.setName as resource, prset.setName as principal, cset.setName as 'condition'  from policies p join actionSets aset on p.action=aset.ID left join resourceSets rset on p.resource=rset.ID left join principalSets prset on p.principal=prset.ID left join conditionSets cset on p.'condition'=cset.ID order by p.sid]]></view_script>
 		</view>
 		<view name="principalSetsView" >
 			<view_script><![CDATA[CREATE VIEW principalSetsView as select setName,name,pattern from principalSetMembers psm join principals p on psm.memberID=p.id join principalSets pSets on psm.setID=pSets.ID]]></view_script>
@@ -253,6 +256,7 @@
 		<entity schema="public" name="policySetMembers" color="C7F4BE" x="912" y="48" />
 		<entity schema="public" name="policySets" color="C7F4BE" x="1136" y="48" />
 		<entity schema="public" name="policySetsView" color="C7F4BE" x="544" y="48" />
+		<entity schema="public" name="policyView" color="3986C1" x="544" y="112" />
 		<entity schema="public" name="principalSetMembers" color="BEBEF4" x="944" y="336" />
 		<entity schema="public" name="principalSets" color="BEBEF4" x="752" y="336" />
 		<entity schema="public" name="principalSetsView" color="BEBEF4" x="752" y="448" />
@@ -261,7 +265,5 @@
 		<entity schema="public" name="resourceSets" color="F4DDBE" x="80" y="336" />
 		<entity schema="public" name="resourceSetsView" color="F4DDBE" x="48" y="512" />
 		<entity schema="public" name="resources" color="F4DDBE" x="512" y="336" />
-		<script name="awsperms.sql" id="Editor-2678" language="SQL" file="file:////wsl.localhost/Ubuntu/home/ppapadop/rcs3/POC/sqlperms/awsperms.sql" />
-		<script name="awsperms.sql" id="Editor-5c1" language="SQL" confirmed="y" file="file:////wsl.localhost/Ubuntu/home/ppapadop/rcs3/POC/sqlperms/awsperms.sql" />
 	</layout>
 </project>
