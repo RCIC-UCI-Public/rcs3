@@ -6,13 +6,16 @@ import json
 import os
 import sys
 import yaml
+from jinja2 import Environment, FileSystemLoader
 
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
-sys.path.append( basedir  + "/common" )
-import transform
+libdir = os.path.join( basedir, "common" )
+templatedir = os.path.join( basedir, "templates", "self-service" )
+sys.path.append( libdir )
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
+aws_settings = os.path.join( basedir, "config", "aws-settings.yaml" )
+with open( aws_settings, "r" ) as f:
     aws = yaml.safe_load( f )
 
 usage="Create or update Step Function with access to specific resources determined by purpose."
@@ -42,23 +45,24 @@ if "region" in aws:
 else:
     sfn = session.client( "stepfunctions" )
 
-# load the template which allows launching EC2 instance
-input_template = basedir + "/templates/self-service/sfn-{}.json".format( args.purpose )
-if not os.path.isfile( input_template ):
-    print( "Not found: {}".format( input_template ) )
-    sys.exit( -1 )
+# load the step function template
+input_template = "sfn-{}.json.jinja".format( args.purpose )
+environment = Environment(loader=FileSystemLoader(templatedir))
+template = environment.get_template( input_template )
 my_vars = {
-    "xxxuserxxx": args.user,
-    "xxxhostxxx": args.host,
-    "xxxbucketxxx": aws[ "bucket_postfix" ],
-    "xxxinventoryxxx": aws[ "inventory_postfix" ],
-    "xxxaccountidxxx": aws[ "accountid" ],
-    "xxxregionxxx": aws[ "region" ],
-    "xxxowner_notifyxxx": aws[ "owner_notify" ]
+    "user": args.user,
+    "host": args.host,
+    "bucket": aws[ "bucket_postfix" ],
+    "inventory": aws[ "inventory_postfix" ],
+    "accountid": aws[ "accountid" ],
+    "region": aws[ "region" ],
+    "owner_notify": aws[ "owner_notify" ]
 }
-sfnJson = transform.template_to_string( input_template, my_vars )
+sfnJson = template.render( my_vars )
 if args.verbose:
     print( sfnJson )
+
+sys.exit(0)
 
 # create the step function
 sfnName = "{}-{}-sfn-{}".format( args.user, args.host, args.purpose )
