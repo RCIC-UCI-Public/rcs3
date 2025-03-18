@@ -14,13 +14,13 @@ CREATE UNIQUE INDEX unq_action ON actions ( service, permission );
 
 CREATE TABLE conditionSets ( 
 	ID                   INTEGER NOT NULL  PRIMARY KEY  ,
-	setName              TEXT(128) NOT NULL    ,
+	setName              TEXT NOT NULL    ,
 	CONSTRAINT unq_constraintSets UNIQUE ( setName )
  );
 
 CREATE TABLE conditions ( 
 	ID                   INTEGER NOT NULL  PRIMARY KEY  ,
-	name                 VARCHAR(100) NOT NULL    ,
+	name                 TEXT NOT NULL    ,
 	pattern              TEXT NOT NULL    ,
 	CONSTRAINT unq_constraints UNIQUE ( name )
  );
@@ -128,7 +128,9 @@ CREATE VIEW actionSetsView as select setName,service,permission from actionSetMe
 
 CREATE VIEW conditionSetsView as select setName,name,pattern from conditionSetMembers csm join conditions c on csm.memberID=c.id join conditionSets cSets on csm.setID=cSets.ID;
 
-CREATE VIEW policySetsView as select psets.setName,p.sid,p.effect,aset.setName as action, rset.setName as resource, prset.setName as principal, cset.setName as 'condition' from policySetMembers psm join policies p on psm.memberID=p.id join policySets psets on psm.setID=psets.ID join actionSets aset on p.action=aset.ID join resourceSets rset on p.resource=rset.ID left join principalSets prset on p.principal=prset.ID left join conditionSets cset on p.'condition'=cset.ID;
+CREATE VIEW policySetsView as select psets.setName,p.sid,p.effect,aset.setName as action, rset.setName as resource, prset.setName as principal, cset.setName as 'condition' from policySetMembers psm join policies p on psm.memberID=p.id join policySets psets on psm.setID=psets.ID join actionSets aset on p.action=aset.ID left join resourceSets rset on p.resource=rset.ID left join principalSets prset on p.principal=prset.ID left join conditionSets cset on p.'condition'=cset.ID;
+
+CREATE VIEW policyView as select p.ID, p.sid,p.effect,aset.setName as action, rset.setName as resource, prset.setName as principal, cset.setName as 'condition'  from policies p join actionSets aset on p.action=aset.ID left join resourceSets rset on p.resource=rset.ID left join principalSets prset on p.principal=prset.ID left join conditionSets cset on p.'condition'=cset.ID order by p.sid;
 
 CREATE VIEW principalSetsView as select setName,name,pattern from principalSetMembers psm join principals p on psm.memberID=p.id join principalSets pSets on psm.setID=pSets.ID;
 
