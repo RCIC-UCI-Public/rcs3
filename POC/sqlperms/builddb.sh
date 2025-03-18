@@ -534,7 +534,7 @@ awspolicy.py addSet principal serviceAWS
 awspolicy.py addToSet principal serviceAWS serviceAWS
 
 awspolicy.py addSet principal serviceScheduler
-awspolicy.py addToSet principal serviceAWS serviceScheduler
+awspolicy.py addToSet principal serviceScheduler serviceScheduler
 
 awspolicy.py addSet principal serviceStates
 awspolicy.py addToSet principal serviceStates serviceStates
@@ -563,9 +563,15 @@ awspolicy.py addToSet condition IPRestrictions IPRestrictions
 awspolicy.py addSet condition s3PrefixOwner
 awspolicy.py addToSet condition s3PrefixOwner s3PrefixOwner
 
-## Policies
-
-## For template-policy2
+########################## Policies #########################
+# This is where the rubber meets the road
+# Do this existing JSON file
+#     For each file
+#         1. Generate policy statements needed (if it doesn't already exist) 
+#         2. Generate the policy SET named as <existing file>  without the .json ending
+#         3. Add the policy statements to the SET to complete the file definition
+2
+### template-policy2 component policies
 awspolicy.py add policy writeBackupBucket Allow --actionSet backupUserPermissions --resourceSet backupBucket --conditionSet IPRestrictions 
 awspolicy.py add policy readInventoryBucket Allow --actionSet readBucketAndAttributes --resourceSet inventoryBucket
 awspolicy.py add policy denyDangerousOps Deny --actionSet dangerousS3Permissions --resourceSet anyResource
@@ -573,15 +579,7 @@ awspolicy.py add policy publishNotifications Allow --actionSet snsPublish --reso
 awspolicy.py add policy snsListTopics Allow --actionSet snsListTopics --resourceSet snsRegionAccountAny --conditionSet IPRestrictions
 awspolicy.py add policy rotateAccessKey Allow --actionSet updateAccessKey --resourceSet backupServiceAccount --conditionSet IPRestrictions
 
-## For keyAgeMetric-policy
-awspolicy.py add policy listUsersAndKeys Allow --actionSet listUserKeys --resourceSet anyResource 
-awspolicy.py add policy createLogGroup Allow --actionSet createLogGroup --resourceSet anyResource 
-awspolicy.py add policy createLogStream Allow --actionSet putLogEvents --resourceSet anyResource 
-awspolicy.py add policy publishMetrics Allow --actionSet cloudwatchPutMetric --resourceSet anyResource 
-
-
-### Policy "JSON" files based upon defined policies above
-# == template-policy2 ===
+# == template-policy2.json  ===
 awspolicy.py addSet policy template-policy2
 awspolicy.py addToSet policy template-policy2 writeBackupBucket
 awspolicy.py addToSet policy template-policy2 readInventoryBucket
@@ -591,11 +589,70 @@ awspolicy.py addToSet policy template-policy2 snsListTopics
 awspolicy.py addToSet policy template-policy2 rotateAccessKey 
 
 
-## == keyAgeMetric-policy ==
+## keyAgeMetric-policy component policies
+awspolicy.py add policy listUsersAndKeys Allow --actionSet listUserKeys --resourceSet anyResource 
+awspolicy.py add policy createLogGroup Allow --actionSet createLogGroup --resourceSet anyResource 
+awspolicy.py add policy createLogStream Allow --actionSet putLogEvents --resourceSet anyResource 
+awspolicy.py add policy publishMetrics Allow --actionSet cloudwatchPutMetric --resourceSet anyResource 
+
+## == keyAgeMetric-policy.json ==
 awspolicy.py addSet policy keyAgeMetric-policy 
 awspolicy.py addToSet policy keyAgeMetric-policy listUsersAndKeys
 awspolicy.py addToSet policy keyAgeMetric-policy createLogGroup
 awspolicy.py addToSet policy keyAgeMetric-policy createLogStream
 awspolicy.py addToSet policy keyAgeMetric-policy publishMetrics
 
+
+## calcUploadBytes-policy component policies
+awspolicy.py add policy processLogEvents Allow --actionSet processLogEvents --resourceSet loggroupCloudtrails 
+awspolicy.py add policy stopLogQuery Allow --actionSet stopLogQuery --resourceSet anyResource 
+
+## == calcUploadBytes-policy.json ==
+awspolicy.py addSet policy calcUploadBytes-policy 
+awspolicy.py addToSet policy calcUploadBytes-policy processLogEvents
+awspolicy.py addToSet policy calcUploadBytes-policy stopLogQuery
+awspolicy.py addToSet policy calcUploadBytes-policy publishMetrics
+
+## Generic lambdaAssumeRole-trust component policies
+
+awspolicy.py add policy lambdaAssumeRole Allow --actionSet stsAssumeRole --principalSet serviceLambda
+
+## == lambdaAssumeRole-trust.json ==
+#
+# Can be used to generate the following files:
+#   calcUploadBytes-trust.json
+#   createAthenaQueries-trust.json
+#   createS3BatchInput-trust.json
+#   keyAgeMetric-trust.json
+#   pollCreateJobStatus-trust.json
+#   postCloudwatchMetrics-trust.json
+#   prepDynamoImport-trust.json
+#   queryS3Restore-trust.json
+#   restore-lambda-perms-trust.json
+#   updateDynamodb-trust.json
+awspolicy.py addSet policy lambdaAssumeRole-trust
+awspolicy.py addToSet policy lambdaAssumeRole-trust lambdaAssumeRole
+
+## Generic schedulerAssumeRole-trust components
+
+awspolicy.py add policy schedulerAssumeRole Allow --actionSet stsAssumeRole --principalSet serviceScheduler --conditionSet equalsAccount
+
+## == lambdaAssumeRole-trust.json ==
+#
+# Can be used to generate the following files:
+#     calcUploadBytes-scheduler-invoke-trust.json 
+#     keyAgeMetric-scheduler-invoke-trust.json
+awspolicy.py addSet policy schedulerAssumeRole-trust
+awspolicy.py addToSet policy schedulerAssumeRole-trust schedulerAssumeRole
+
+### Generic lambdaInvoke-policy components used for scheduled lambdas
+awspolicy.py add policy lambdaInvoke Allow --actionSet lambdaInvoke --resourceSet lambdaFunction
+
+
+## == lambdaInvoke-policy.json ==
+#
+# Can be used to create  {{FUNCTION}}-scheduler-invoke-policy.json where
+##   {{FUNCTION}} = [calcUploadBytes,keyAgeMetric]
+awspolicy.py addSet policy lambdaInvoke-policy
+awspolicy.py addToSet policy lambdaInvoke-policy lambdaInvoke
 
