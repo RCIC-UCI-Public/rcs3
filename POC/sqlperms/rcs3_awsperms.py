@@ -82,9 +82,11 @@ class rcs3awsdb:
            else quote """
         try:
             isDict = eval(arg)
-            return arg;
+            if type(isDict) is dict:
+                return arg;
         except:
-            return '"%s"' % arg
+            pass
+        return '"%s"' % arg
 
     def formatList(self,setView=None,setName=None,fields=(),joiner=":"):
        """Return formatted (suitable for inclusion in json policy statement) list elements in the set  """
@@ -99,8 +101,8 @@ class rcs3awsdb:
        joinedFields=[ joiner.join( (row[key] for key in selectors) ) for row in asDict ]
 
        # Finally, need each joinedField to be wrapped in double quotes and then put in a comma separated list
-
        formatted = ",\n".join( (self.quoteOrRaw(x) for x in joinedFields) )
+
        return formatted
 
     def document(self,setName,setView="policy"):
@@ -110,7 +112,6 @@ class rcs3awsdb:
        statements = []
        # Read each meta-statement in from the policySetsView to format out a statement
        (fieldNames,rows)=self.getSetEntries(table=setView,setName=setName);
-       print(setName, setView)
        asDict = [ dict(zip(fieldNames,x)) for x in rows ]
        for entry in asDict:
            # Each entry can have multiple list expansions. expand all list (sets) into formatted
