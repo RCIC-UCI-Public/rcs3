@@ -240,7 +240,7 @@ awspolicy.py addToSet action backupUserPermissions s3 PutObject
 awspolicy.py addToSet action backupUserPermissions s3 PutObjectAcl
 
 
-awspolicy.py addSet action limitedS3Permssions
+awspolicy.py addSet action limitedS3Permissions
 awspolicy.py addToSet action limitedS3Permissions s3 AbortMultipartUpload
 awspolicy.py addToSet action limitedS3Permissions s3 GetBucketLocation
 awspolicy.py addToSet action limitedS3Permissions s3 GetObject
@@ -273,10 +273,10 @@ awspolicy.py addSet action deleteBucket
 awspolicy.py addToSet action deleteBucket s3 DeleteBucket
 
 awspolicy.py addSet action s3ListPutDeleteObjects 
-awspolicy.py addToSet action s3PutDeleteObjects s3 DeleteObject
-awspolicy.py addToSet action s3PutDeleteObjects s3 GetObject
-awspolicy.py addToSet action s3PutDeleteObjects s3 ListBucket
-awspolicy.py addToSet action s3PutDeleteObjects s3 PutObject
+awspolicy.py addToSet action s3ListPutDeleteObjects s3 DeleteObject
+awspolicy.py addToSet action s3ListPutDeleteObjects s3 GetObject
+awspolicy.py addToSet action s3ListPutDeleteObjects s3 ListBucket
+awspolicy.py addToSet action s3ListPutDeleteObjects s3 PutObject
 
 awspolicy.py addSet action s3GetDeleteObjects 
 awspolicy.py addToSet action s3GetDeleteObjects s3 DeleteObject
@@ -367,7 +367,7 @@ awspolicy.py add resource lambdaCreateS3BatchInput 'arn:aws:lambda:{{REGION}}:{{
 awspolicy.py add resource lambdaCreateS3BatchInputMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:createS3BatchInput:*'
 awspolicy.py add resource lambdaPollCreateJobStatus 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:pollCreateJobStatus'
 awspolicy.py add resource lambdaPollCreateJobStatusMethods 'arn:aws:lambda:{{REGION}}:{{ACCOUNT}}:function:pollCreateJobStatus:*'
-awspolicy.py add resource regionAccountAny 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:*'
+awspolicy.py add resource logsRegionAccountAny 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:*'
 awspolicy.py add resource loggroupCreateAthenaQueries 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/createAthenaQueries:*'
 awspolicy.py add resource loggroupCreateS3BatchInput 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/createS3BatchInput:*'
 awspolicy.py add resource loggroupPollCreateJobStatus 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/pollCreateJobStatus:*'
@@ -439,8 +439,8 @@ awspolicy.py addToSet resource lambdaAthenaBatch lambdaCreateS3BatchInputMethods
 awspolicy.py addToSet resource lambdaAthenaBatch lambdaPollCreateJobStatus
 awspolicy.py addToSet resource lambdaAthenaBatch lambdaPollCreateJobStatusMethods
 
-awspolicy.py addSet resource regionAccountAny
-awspolicy.py addToSet resource regionAccountAny regionAccountAny
+awspolicy.py addSet resource logsRegionAccountAny
+awspolicy.py addToSet resource logsRegionAccountAny logsRegionAccountAny
 
 awspolicy.py addSet resource restoreLoggroups
 awspolicy.py addToSet resource restoreLoggroups loggroupCreateAthenaQueries
@@ -579,7 +579,7 @@ awspolicy.py add policy publishNotifications Allow --actionSet snsPublish --reso
 awspolicy.py add policy snsListTopics Allow --actionSet snsListTopics --resourceSet snsRegionAccountAny --conditionSet IPRestrictions
 awspolicy.py add policy rotateAccessKey Allow --actionSet updateAccessKey --resourceSet backupServiceAccount --conditionSet IPRestrictions
 
-# == template-policy2.json  ===
+# ====== template-policy2.json  =======
 awspolicy.py addSet policy template-policy2
 awspolicy.py addToSet policy template-policy2 writeBackupBucket
 awspolicy.py addToSet policy template-policy2 readInventoryBucket
@@ -595,7 +595,7 @@ awspolicy.py add policy createLogGroup Allow --actionSet createLogGroup --resour
 awspolicy.py add policy createLogStream Allow --actionSet putLogEvents --resourceSet anyResource 
 awspolicy.py add policy publishMetrics Allow --actionSet cloudwatchPutMetric --resourceSet anyResource 
 
-## == keyAgeMetric-policy.json ==
+## ====== keyAgeMetric-policy.json ======
 awspolicy.py addSet policy keyAgeMetric-policy 
 awspolicy.py addToSet policy keyAgeMetric-policy listUsersAndKeys
 awspolicy.py addToSet policy keyAgeMetric-policy createLogGroup
@@ -607,7 +607,7 @@ awspolicy.py addToSet policy keyAgeMetric-policy publishMetrics
 awspolicy.py add policy processLogEvents Allow --actionSet processLogEvents --resourceSet loggroupCloudtrails 
 awspolicy.py add policy stopLogQuery Allow --actionSet stopLogQuery --resourceSet anyResource 
 
-## == calcUploadBytes-policy.json ==
+## ====== calcUploadBytes-policy.json ======
 awspolicy.py addSet policy calcUploadBytes-policy 
 awspolicy.py addToSet policy calcUploadBytes-policy processLogEvents
 awspolicy.py addToSet policy calcUploadBytes-policy stopLogQuery
@@ -617,7 +617,7 @@ awspolicy.py addToSet policy calcUploadBytes-policy publishMetrics
 
 awspolicy.py add policy lambdaAssumeRole Allow --actionSet stsAssumeRole --principalSet serviceLambda
 
-## == lambdaAssumeRole-trust.json ==
+## ====== lambdaAssumeRole-trust.json ======
 #
 # Can be used to generate the following files:
 #   calcUploadBytes-trust.json
@@ -637,7 +637,7 @@ awspolicy.py addToSet policy lambdaAssumeRole-trust lambdaAssumeRole
 
 awspolicy.py add policy schedulerAssumeRole Allow --actionSet stsAssumeRole --principalSet serviceScheduler --conditionSet equalsAccount
 
-## == lambdaAssumeRole-trust.json ==
+## ====== lambdaAssumeRole-trust.json ======
 #
 # Can be used to generate the following files:
 #     calcUploadBytes-scheduler-invoke-trust.json 
@@ -649,10 +649,130 @@ awspolicy.py addToSet policy schedulerAssumeRole-trust schedulerAssumeRole
 awspolicy.py add policy lambdaInvoke Allow --actionSet lambdaInvoke --resourceSet lambdaFunction
 
 
-## == lambdaInvoke-policy.json ==
+## ====== lambdaInvoke-policy.json ======
 #
 # Can be used to create  {{FUNCTION}}-scheduler-invoke-policy.json where
 ##   {{FUNCTION}} = [calcUploadBytes,keyAgeMetric]
 awspolicy.py addSet policy lambdaInvoke-policy
 awspolicy.py addToSet policy lambdaInvoke-policy lambdaInvoke
+
+### Generic createAthenaQueries-policy c
+awspolicy.py add policy athenaQueryLogs Allow --actionSet putLogEvents --resourceSet loggroupCreateAthenaQueries
+
+
+## ====== createAthenaQueries-policy.json ======
+#
+# Can be used to create  {{FUNCTION}}-scheduler-invoke-policy.json where
+##   {{FUNCTION}} = [calcUploadBytes,keyAgeMetric]
+awspolicy.py addSet policy createAthenaQueries-policy
+awspolicy.py addToSet policy createAthenaQueries-policy athenaQueryLogs
+
+### createS3BatchInput-policy components 
+awspolicy.py add policy retrieveETag Allow --actionSet getObject --resourceSet inventoryRCS3Path
+awspolicy.py add policy S3BatchWriteLogEvents Allow --actionSet putLogEvents --resourceSet loggroupCreateS3BatchInput
+
+
+## ====== createS3BatchInput-policy.json ======
+#
+awspolicy.py addSet policy createS3BatchInput-policy
+awspolicy.py addToSet policy createS3BatchInput-policy retrieveETag
+awspolicy.py addToSet policy createS3BatchInput-policy S3BatchWriteLogEvents
+
+
+### pollCreateJobsStatus-policy components 
+awspolicy.py add policy queryS3BatchJobs Allow --actionSet listS3BatchJobs --resourceSet resourceAny
+awspolicy.py add policy pollJobsStatusWriteLogEvents Allow --actionSet putLogEvents --resourceSet loggroupPollCreateJobStatus
+
+
+## == pollCreateJobsStatus-policy.json ==
+#
+awspolicy.py addSet policy pollCreateJobStatus-policy
+awspolicy.py addToSet policy pollCreateJobStatus-policy queryS3BatchJobs
+awspolicy.py addToSet policy pollCreateJobStatus-policy pollJobsStatusWriteLogEvents
+
+
+### postCloudwatchMetrics-policy components 
+awspolicy.py add policy logsCreateLogGroup Allow --actionSet createLogGroup --resourceSet  logsRegionAccountAny
+awspolicy.py add policy postCloudwatchLogEvents Allow --actionSet putLogEvents --resourceSet loggroupPostCloudwatchMetrics
+
+
+## == postCloudwatchMetrics-policy.json ==
+#
+awspolicy.py addSet policy postCloudwatchMetrics-policy
+awspolicy.py addToSet policy postCloudwatchMetrics-policy logsCreateLogGroup
+awspolicy.py addToSet policy postCloudwatchMetrics-policy postCloudwatchLogEvents
+awspolicy.py addToSet policy postCloudwatchMetrics-policy publishMetrics
+
+
+### prepDynamoImport-policy components 
+awspolicy.py add policy listInventoryBucket Allow --actionSet listBucket --resourceSet  inventoryPrefix
+awspolicy.py add policy deleteNonCvsObjs Allow --actionSet s3GetDeleteObjects --resourceSet inventoryRCS3Path
+awspolicy.py add policy dynamoImportWriteLogEvents Allow --actionSet putLogEvents --resourceSet loggroupPrepDynamoImport
+
+
+## == prepDynamoImport-policy.json ==
+#
+awspolicy.py addSet policy prepDynamoImport-policy
+awspolicy.py addToSet policy prepDynamoImport-policy listInventoryBucket
+awspolicy.py addToSet policy prepDynamoImport-policy deleteNonCvsObjs
+awspolicy.py addToSet policy prepDynamoImport-policy dynamoImportWriteLogEvents
+
+
+### queryS3Restore-policy components 
+awspolicy.py add policy queryRestoreStatus Allow --actionSet getObjectVersion --resourceSet  inventoryAny
+awspolicy.py add policy queryS3RestoreWriteLogEvents Allow --actionSet putLogEvents --resourceSet loggroupQueryS3Restore
+
+
+## == queryS3Restore-policy.json ==
+#
+awspolicy.py addSet policy queryS3Restore-policy
+awspolicy.py addToSet policy queryS3Restore-policy queryRestoreStatus
+awspolicy.py addToSet policy queryS3Restore-policy queryS3RestoreWriteLogEvents
+
+### restore-lambda-perms-policy components 
+awspolicy.py add policy createAndWriteLogStream Allow --actionSet putLogEvents --resourceSet restoreLoggroups
+awspolicy.py add policy getReportObject Allow --actionSet getObject --resourceSet reportsContents
+awspolicy.py add policy queryS3BatchJobsAnyResource Allow --actionSet listS3BatchJobs --resourceSet anyResource
+
+
+## == restore-lambda-perms-policy.json ==
+#
+awspolicy.py addSet policy restore-lambda-perms-policy
+awspolicy.py addToSet policy restore-lambda-perms-policy createAndWriteLogStream
+awspolicy.py addToSet policy restore-lambda-perms-policy getReportObject
+awspolicy.py addToSet policy restore-lambda-perms-policy queryS3BatchJobsAnyResource
+
+
+### restore-stepfunc-perms-policy components 
+awspolicy.py add policy sfnAccessPrimary Allow --actionSet limitedS3Permissions --resourceSet backupBucket
+awspolicy.py add policy sfnAccessInventory Allow --actionSet limitedS3Permissions --resourceSet inventoryBucket
+awspolicy.py add policy sfnWriteToUserFolder Allow --actionSet s3ListPutDeleteObjects --resourceSet inventoryBucketRCS3Path
+awspolicy.py add policy sfnS3BatchJobsAnyResource Allow --actionSet s3BatchJobs --resourceSet anyResource
+awspolicy.py add policy sfnAthenaAccess Allow --actionSet athenaExecution --resourceSet athenaResources
+awspolicy.py add policy sfnGlueAccess Allow --actionSet gluePermissions --resourceSet glueResources
+awspolicy.py add policy sfnCloudwatchMetrics Allow --actionSet cloudwatchAlarms --resourceSet anyResource
+awspolicy.py add policy sfnListAndPublish Allow --actionSet snsListAndPublish --resourceSet anyResource
+awspolicy.py add policy sfnInvokeLambdas Allow --actionSet lambdaInvoke --resourceSet lambdaAthenaBatch
+awspolicy.py add policy sfnInstanceRole Allow --actionSet iamPassRole --resourceSet iamS3batchPermsRole
+awspolicy.py add policy sfnInvokeStepFunctionRestore Allow --actionSet sfnExecution --resourceSet sfnFullMonty
+
+
+## == restore-stepfunc-perms-policy.json ==
+#
+awspolicy.py addSet policy restore-stepfunc-perms-policy
+
+
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnAccessPrimary
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnAccessInventory
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnWriteToUserFolder
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnS3BatchJobsAnyResource
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnAthenaAccess
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnGlueAccess
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnCloudwatchMetrics
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnListAndPublish
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnInvokeLambdas
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnInstanceRole
+awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnInvokeStepFunctionRestore
+
+
 
