@@ -774,5 +774,34 @@ awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnInvokeLambdas
 awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnInstanceRole
 awspolicy.py addToSet policy restore-stepfunc-perms-policy sfnInvokeStepFunctionRestore
 
+### restore-s3batch-perms-policy components 
+awspolicy.py add policy restoreObject2Bucket Allow --actionSet restoreObject --resourceSet backupBucketContents
+awspolicy.py add policy readManifestWriteReport Allow --actionSet getPutObjectVersion --resourceSet inventoryBucketRCS3Path
 
+## == restore-s3batch-perms-policy.json ==
+#
+awspolicy.py addSet policy restore-s3batch-perms-policy
 
+awspolicy.py addToSet policy restore-s3batch-perms-policy restoreObject2Bucket
+awspolicy.py addToSet policy restore-s3batch-perms-policy readManifestWriteReport
+
+### restore-s3batch-perms-trust components 
+awspolicy.py add policy s3BatchAssumeRole Allow --actionSet stsAssumeRole --principalSet serviceS3Batch
+
+## == restore-s3batch-perms-trust.json ==
+#
+awspolicy.py addSet policy restore-s3batch-perms-trust
+
+awspolicy.py addToSet policy restore-s3batch-perms-trust s3BatchAssumeRole 
+
+### updateDynamodb-policy components 
+awspolicy.py add policy updateDynamoPrintLogs Allow --actionSet putLogEvents --resourceSet loggroupUpdateDynamodb
+awspolicy.py add policy dynamoTableUpdate Allow --actionSet dynamoDBItems --resourceSet dynamodbBucket
+
+## == updateDynamodb-policy.json ==
+#
+awspolicy.py addSet policy updateDynamodb-policy
+
+awspolicy.py addToSet policy updateDynamodb-policy logsCreateLogGroup 
+awspolicy.py addToSet policy updateDynamodb-policy updateDynamoPrintLogs 
+awspolicy.py addToSet policy updateDynamodb-policy dynamoTableUpdate 
