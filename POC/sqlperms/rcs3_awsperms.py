@@ -176,8 +176,8 @@ class rcs3awsdb:
        self.execute(stmt) 
        self.commit()
     
-    def addToSet(self,space,setName,*selectors):
-       """Add selectors into setName to the space """
+    def addToSet(self,space,setName,*selectors,delete=False):
+       """Add (or Delete) selectors into setName to the space """
        # Special Handling for action space
        if space == 'action':
            service,permission = selectors[0][0], selectors[0][1]
@@ -185,11 +185,19 @@ class rcs3awsdb:
        else:
            name = selectors[0][0]
            memberID = f"(select ID from {self.elem.etable(space)} where {self.elem.cols(space)[0]}='{name}')"
-       stmt = f"""INSERT INTO {space}SetMembers(memberID,setID) 
-                  VALUES({memberID},(select ID from {space}Sets where setName='{setName}'));"""
+       setID = f"(select ID from {space}Sets where setName='{setName}')"
+       if delete:
+           stmt = f"""DELETE FROM {space}SetMembers WHERE memberID={memberID} and setID={setID};"""
+       else: 
+           stmt = f"""INSERT INTO {space}SetMembers(memberID,setID) 
+                  VALUES({memberID},{setID});"""
        self.execute(stmt) 
        self.commit()
     
+    def deleteFromSet(self,space,setName,*selectors):
+       """Delete selectors into setName to the space """
+       self.addToSet(space,setName,*selectors,delete=True)
+
     def printRows(self,fieldNames,rows):
        """ Format a "table" for human-readable printing """
        header = " | ".join(fieldNames)
@@ -200,12 +208,16 @@ class rcs3awsdb:
            data += " | ".join(srow) + "\n"
        return data 
 
-    def list(self,space,key='%',view=False):
-       """ List the Elements of a space""" 
-       table = self.elem.etable(space)
+    def list(self,space,key='%',view=False,setNames=False):
+       """ List the Elements of a space,view,or Sets""" 
        keyColumn = self.elem.cols(space)[0]
        if view:
            table=f"{space}View"
+       elif setNames:
+           table=f"{space}Sets"
+           keyColumn = "setName"
+       else:
+           table = self.elem.etable(space)
        query = f"SELECT * from {table} where {keyColumn} like '{key}' order by {keyColumn}" 
        (fieldNames,rows)=self.getTableEntries(table,query)
        return self.printRows(fieldNames,rows)

@@ -562,6 +562,7 @@ awspolicy.py addToSet condition IPRestrictions IPRestrictions
 
 awspolicy.py addSet condition s3PrefixOwner
 awspolicy.py addToSet condition s3PrefixOwner s3PrefixOwner
+awspolicy.py addToSet condition s3PrefixOwner IPRestrictions
 
 ########################## Policies #########################
 # This is where the rubber meets the road
@@ -805,3 +806,20 @@ awspolicy.py addSet policy updateDynamodb-policy
 awspolicy.py addToSet policy updateDynamodb-policy logsCreateLogGroup 
 awspolicy.py addToSet policy updateDynamodb-policy updateDynamoPrintLogs 
 awspolicy.py addToSet policy updateDynamodb-policy dynamoTableUpdate 
+
+### template-policy3 components 
+awspolicy.py add policy readInventoryBucketIPRestricted Allow --actionSet readBucketAndAttributes --resourceSet inventoryBucket --conditionSet IPRestrictions
+awspolicy.py add policy listAllBuckets Allow --actionSet listAllBuckets --resourceSet anyResource --conditionSet IPRestrictions
+awspolicy.py add policy viewPersonalReportsFolder Allow --actionSet listAllBuckets --resourceSet reports --conditionSet s3PrefixOwner
+awspolicy.py add policy addFileToPersonalFolder Allow --actionSet s3ListPutDeleteObjects  --resourceSet reportsOwner --conditionSet IPRestrictions
+
+## == template-policy3.json ==
+#
+awspolicy.py addSet policy template-policy3
+
+awspolicy.py addToSet policy template-policy3 writeBackupBucket  
+awspolicy.py addToSet policy template-policy3 readInventoryBucketIPRestricted 
+awspolicy.py addToSet policy template-policy3 listAllBuckets 
+awspolicy.py addToSet policy template-policy3 viewPersonalReportsFolder 
+awspolicy.py addToSet policy template-policy3 addFileToPersonalFolder 
+
