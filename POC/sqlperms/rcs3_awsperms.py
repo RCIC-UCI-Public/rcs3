@@ -134,8 +134,8 @@ class rcs3awsdb:
        return SP.jsonTemplate.format(STATEMENTLIST=",\n".join(statements))
 
 
-    def addElement(self,eClass,kw,val,optParams={}):
-       """add a base element to the eClass """
+    def addElement(self,eClass,kw,val,optParams={},update=False):
+       """add (or optionally modify existing) a base element to the eClass """
        table = self.elem.etable(eClass)
        cols = self.elem.cols(eClass)
 
@@ -154,10 +154,22 @@ class rcs3awsdb:
                pass
        tfields=",".join(fields)
        tvalues=",".join(values)
-       stmt = f"INSERT INTO {table}({tfields}) VALUES({tvalues});"
+       if not update:
+           stmt = f"INSERT INTO {table}({tfields}) VALUES({tvalues});"
+       elif table !=  "actions":
+           setFormat = [ f"{x[0]} = {x[1]}" for x in  list(zip(fields,values))[1:] ]
+           setString = ", ".join(setFormat)
+           stmt = f"UPDATE {table} SET {setString} WHERE {fields[0]} = {values[0]};"
+       else:
+           return
+
        self.execute(stmt) 
        self.commit()
     
+    def modifyElement(self,eClass,kw,val,optParams={}):
+       """ modify an existing base element to the eClass """
+       self.addElement(eClass,kw,val,optParams={},update=True)
+
     def addSet(self,space,setName):
        """Add a Set of setName to the space """
        stmt = f"INSERT INTO {space}Sets(setName) VALUES('{setName}');"
@@ -188,10 +200,12 @@ class rcs3awsdb:
            data += " | ".join(srow) + "\n"
        return data 
 
-    def list(self,space,key='%'):
+    def list(self,space,key='%',view=False):
        """ List the Elements of a space""" 
        table = self.elem.etable(space)
        keyColumn = self.elem.cols(space)[0]
+       if view:
+           table=f"{space}View"
        query = f"SELECT * from {table} where {keyColumn} like '{key}' order by {keyColumn}" 
        (fieldNames,rows)=self.getTableEntries(table,query)
        return self.printRows(fieldNames,rows)
@@ -200,50 +214,3 @@ class rcs3awsdb:
        """ List the Elements of a Set """ 
        (fieldNames,rows)=self.getSetEntries(table=space,setName=key)
        return self.printRows(fieldNames,rows)
-
-    def lookupuserroles(self,uid='%'):
-       """ return list of roles that match a user """
-       stmt = """SELECT UCINETID,LAST,FIRST,ORGNAME,ROLENAME,ROLEDESC
-                      FROM ADMINS WHERE UCINETID LIKE '%s' ORDER by UCINETID,ROLENAME;"""  % uid
-       return self.lookup(stmt)
-
-    def addorg(self,org,orgdesc):
-       if len(self.lookuproles(org)) == 0:
-          stmt = """INSERT INTO ORGS(ORGNAME,ORGDESC) VALUES('%s','%s')""" % (org,orgdesc)
-          self.execute(stmt)
-          self.commit()
-
-    def addrole(self,role,roledesc):
-       if len(self.lookuproles(role)) == 0:
-          stmt = """INSERT INTO ROLES(ROLENAME,ROLEDESC) VALUES('%s','%s')""" % (role,roledesc)
-          self.execute(stmt)
-          self.commit()
-
-    def adduser(self,uid,last,first,campusid,email,dept):
-
-       statement = """INSERT INTO USERS(UCINETID,LAST,FIRST,UCICAMPUSID,EMAIL,ORG) 
-                VALUES('%s','%s','%s','%s','%s',
-                (Select ID from ORGS where ORGNAME='%s'));""" % (uid,last,first,campusid,email,dept) 
-       self.execute(statement)
-       self.commit()
-
-    def adduserrole(self,uid,role):
-       statement = """INSERT INTO USERROLES(USER,ROLE) 
-                VALUES((Select ID from USERS where UCINETID='%s'),
-                       (Select ID from ROLES where ROLENAME='%s'));""" % (uid,role) 
-       try:
-           self.execute(statement,errorsToCaller=True)
-           self.commit()
-       except Exception as e:
-           print("User %s already has role %s" % (uid,role), file=sys.stderr)
-
-    def deluserrole(self,uid,role='%'):
-       statement = """DELETE FROM USERROLES where 
-                USER=(Select ID from USERS where UCINETID='%s') and ROLE=(Select ID from ROLES where ROLENAME like '%s');""" % (uid,role) 
-       self.execute(statement)
-       self.commit()
-
-    def deluser(self,uid):
-       statement = """DELETE FROM USERS WHERE UCINETID='%s';""" % uid
-       self.execute(statement)
-       self.commit()

@@ -7,7 +7,7 @@ from rcs3_awsperms import rcs3awsdb
 
 commands = ('add', 'addSet', 'addToSet',
             'delete','deleteSet','deleteFromSet',
-            'format','generate','list','listSet','modify')
+            'format','generate','list','listSet','listView','modify')
 
 spaces = ('action', 'policy', 'principal','resource','condition')
 
@@ -85,6 +85,11 @@ if __name__ == '__main__':
                  print(db.list(space,spaceArg))
          elif command == "listSet":
              print(db.listSet(space,spaceArg))
+         elif command == "listView":
+                 print(db.list(space,spaceArg,view=True))
+         elif command == "modify":
+             if args.extra is not None:
+                 db.modifyElement(eClass=space,kw=spaceArg,val=args.extra,optParams=optParams)
          elif command == "generate":
              textDoc=db.document(setView=space,setName=spaceArg)
              theDoc=json.loads(textDoc)
