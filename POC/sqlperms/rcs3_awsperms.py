@@ -83,9 +83,11 @@ class rcs3awsdb:
         try:
             isDict = eval(arg)
             if type(isDict) is dict:
-                return arg;
+                return arg
         except:
-            pass
+            # handle the case where a Jinja2 templated item doesn't eval to anything
+            if arg.startswith("{"):
+                return arg
         return '"%s"' % arg
 
     def formatList(self,setView=None,setName=None,fields=(),joiner=":"):

@@ -96,8 +96,12 @@ if __name__ == '__main__':
                  db.modifyElement(eClass=space,kw=spaceArg,val=args.extra,optParams=optParams)
          elif command == "generate":
              textDoc=db.document(setView=space,setName=spaceArg)
-             theDoc=json.loads(textDoc)
-             print(json.dumps(theDoc,indent=4))
+             try:
+                 # Try to load as a JSON -- might fail with certain jinja2 constructs
+                 theDoc=json.loads(textDoc)
+                 print(json.dumps(theDoc,indent=4))
+             except:
+                 print(textDoc)
             
              
              
