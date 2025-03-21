@@ -540,7 +540,7 @@ awspolicy.py addSet principal serviceStates
 awspolicy.py addToSet principal serviceStates serviceStates
 
 # Conditions
-awspolicy.py add condition arnBackupBucket '{"ArnLike" : {"aws:SourceArn": "arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{POSTFIX_BUCKET}}"} }'
+awspolicy.py add condition arnBackupBucket '{"ArnLike" : {"aws:SourceArn": "arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{BUCKET_POSTFIX}}"} }'
 awspolicy.py add condition equalsAccount '{"StringEquals" : {"aws:SourceAccount": "{{ACCOUNT}}"} }'
 awspolicy.py add condition equalsAccountAndControl '{"StringEquals" :  {"aws:SourceAccount": "{{ACCOUNT}}", "s3:x-amz-acl": "bucket-owner-full-control"} }'
 awspolicy.py add condition s3PrefixOwner '{"StringEquals" : {"s3:prefix": ["{{OWNER}}", "{{OWNER}}/"], "s3:delimiter": ["/"]} }'
