@@ -22,6 +22,12 @@ class elements:
         """ names of the fields in each element table """
         return self._tcols[tname]
 
+    def patternSpaces(self):
+        """ Return the spaces where 'pattern' is a field name """
+        f = lambda x: x[0] if 'pattern' in x[1] else None
+        spaces = list(filter( lambda y: y is not None, [ f(x) for x in self._tcols.items()]))
+        return spaces
+
 class rcs3awsdb:
     def __init__(self,verbose=False):
        self.connection=sqlite3.connect('rcs3aws.db')
@@ -228,3 +234,27 @@ class rcs3awsdb:
        """ List the Elements of a Set """ 
        (fieldNames,rows)=self.getSetEntries(table=space,setName=key)
        return self.printRows(fieldNames,rows)
+
+    def variables(self,space):
+        """ Return the set of Jinja2 variables defined """
+        definedVars= set()
+        if space == "all":
+            searchSpace = self.elem.patternSpaces()
+        else:
+            searchSpace = [space,]
+
+        
+        for table in searchSpace:
+            etable=self.elem.etable(table)
+            query = f"SELECT * from {etable}" 
+            (fieldNames,rows)=self.getTableEntries(etable,query)
+            asDictList = [ dict(zip(fieldNames,x)) for x in rows ]
+            for rowDict in asDictList:
+                pattern=rowDict['pattern']
+                # look for split items that have '}}' in them -- these are strings that start with a jinja2 var
+                jvars = filter(lambda x: "}}" in x, pattern.split("{{"))
+                trimmedVars = [ x.replace("}}"," ").strip().split()[0] for x in jvars ]
+                for x in trimmedVars:
+                    definedVars.add(x)
+
+        return definedVars

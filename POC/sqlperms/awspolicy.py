@@ -7,9 +7,9 @@ from rcs3_awsperms import rcs3awsdb
 
 commands = ('add', 'addSet', 'addToSet',
             'delete','deleteSet','deleteFromSet',
-            'format','generate','list','listSet','listView','modify','setNames')
+            'format','generate','list','listSet','listView','modify','setNames','variables')
 
-spaces = ('action', 'policy', 'principal','resource','condition')
+spaces = ('action', 'policy', 'principal','resource','condition','all')
 
 # Command-specific options
 actionOptions = ('service','permission')
@@ -94,6 +94,8 @@ if __name__ == '__main__':
          elif command == "modify":
              if args.extra is not None:
                  db.modifyElement(eClass=space,kw=spaceArg,val=args.extra,optParams=optParams)
+         elif command == "variables":
+                 print(db.variables(space))
          elif command == "generate":
              textDoc=db.document(setView=space,setName=spaceArg)
              try:
