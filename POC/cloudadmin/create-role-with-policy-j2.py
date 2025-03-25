@@ -133,14 +133,14 @@ try:
         response = iam.delete_policy_version( PolicyArn=policy_arn, VersionId=vid )
     response = iam.create_policy_version(
         PolicyArn=policy_arn,
-        PolicyDocument=json_policy,
+        PolicyDocument=policyjson,
         SetAsDefault=True
     )
 except iam.exceptions.NoSuchEntityException:
     print( "Creating policy: {}".format( policy_arn ) )
     response = iam.create_policy(
         PolicyName="{}-policy".format( args.entity ),
-        PolicyDocument=json_policy,
+        PolicyDocument=policyjson,
         Description="Allow {} access".format( args.entity )
     )
 except Exception as error:
@@ -155,12 +155,12 @@ if args.verbose:
 
 # lookup an existing policy
 try:
-    role_name = "{}-role".format( args.policy )
+    role_name = "{}-role".format( args.entity )
     try:
         response = iam.create_role(
             RoleName=role_name,
-            AssumeRolePolicyDocument=json_trust,
-            Description="Allow {} to process requests".format( args.policy )
+            AssumeRolePolicyDocument=trustjson,
+            Description="Allow {} to process requests".format( args.entity )
         )
     except botocore.exceptions.ClientError as error:
         if error.response['Error']['Code'] == 'EntityAlreadyExists':
