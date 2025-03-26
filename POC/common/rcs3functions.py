@@ -6,7 +6,38 @@ import yaml
 import json
 import io
 import re
+import boto3
 
+
+class boto3Clients():
+    def __init__(self):
+       self._aws = read_aws_settings()
+       # when run from AWS services, profile is not used
+       if "profile" in self._aws:
+           self._session = boto3.Session( profile_name=self._aws[ "profile" ] )
+       else:
+           self._session = boto3
+
+       # create clients. Doesn't matter if they are used. 
+       # compresses code
+       self._b3clients= ["athena","events","iam","lambda","logs","s3","sns","stepfunctions"]
+       self._clients={}
+       for c in self._b3clients:
+           if "region" in self._aws:
+                self._clients[c] = self._session.client( c, region_name=self._aws[ "region" ] )
+           else:
+                self._clients[c] = self._session.client(c)
+
+           
+           # Add the attribute to the object so caller can access boto3 clients as
+           # obj.Lambda, obj.Athena, obj.S3 , obj.SFN
+           if c == "stepfunctions":
+               attrkey="SFN"
+           elif len(c) == 3:
+               attrkey = c.upper()
+           else:
+               attrkey= c.title() 
+           setattr(self,attrkey,self._clients[c])
 
 class TextIgnoreCommentsWrapper(io.TextIOWrapper):
     """ Wrap a file to filter out lines STARTING with '#' when reading, skip 'empty' lines if skipblank is true"""
@@ -54,6 +85,20 @@ def read_aws_settings(settings=None,configdir=None):
         sys.stderr.write(errMsg)
         sys.exit(-1) 
     return aws
+
+def aws_to_j2vars(aws):
+    """ This takes all keys in AWS and returns keys that are all CAPS. It also does some static
+        mapping for some keys. This is so older rcs3 versions out their will still work while 
+        software transitions to jinja2 variables """
+
+    sMap = [("ACCOUNT","ACCOUNTID"),("IP_ADDRESSES","IPRESTRICTIONS")]
+    j2Vars = { k.upper() : v for k,v in aws.items() }
+    for knew,kold in sMap:
+        try:
+           j2Vars[knew] = j2Vars[kold]
+        except:
+           pass
+    return j2Vars
 
 def replace_all(text, dic, comment=None):
     """ replace text with (key,value) (key is not regex). 
