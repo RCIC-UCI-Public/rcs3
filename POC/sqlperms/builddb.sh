@@ -517,11 +517,11 @@ awspolicy.py addToSet resource sfnFullMonty sfnFullMonty
 
 # Principals
 
-awspolicy.py add principal serviceS3Batch '{"Service":"batchoperations.s3.amazonaws.com"}'
-awspolicy.py add principal serviceLambda '{"Service":"lambda.amazonaws.com"}'
-awspolicy.py add principal serviceAWS '{"Service":"s3.amazonaws.com"}'
-awspolicy.py add principal serviceScheduler '{"Service":"scheduler.amazonaws.com"}'
-awspolicy.py add principal serviceStates '{"Service":"states.amazonaws.com"}'
+awspolicy.py add principal serviceS3Batch '"Service":"batchoperations.s3.amazonaws.com"'
+awspolicy.py add principal serviceLambda '"Service":"lambda.amazonaws.com"'
+awspolicy.py add principal serviceAWS '"Service":"s3.amazonaws.com"'
+awspolicy.py add principal serviceScheduler '"Service":"scheduler.amazonaws.com"'
+awspolicy.py add principal serviceStates '"Service":"states.amazonaws.com"'
 
 # Principal Sets
 awspolicy.py addSet principal serviceS3Batch
@@ -540,11 +540,11 @@ awspolicy.py addSet principal serviceStates
 awspolicy.py addToSet principal serviceStates serviceStates
 
 # Conditions
-awspolicy.py add condition arnBackupBucket '{"ArnLike" : {"aws:SourceArn": "arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{BUCKET_POSTFIX}}"} }'
-awspolicy.py add condition equalsAccount '{"StringEquals" : {"aws:SourceAccount": "{{ACCOUNT}}"} }'
-awspolicy.py add condition equalsAccountAndControl '{"StringEquals" :  {"aws:SourceAccount": "{{ACCOUNT}}", "s3:x-amz-acl": "bucket-owner-full-control"} }'
-awspolicy.py add condition s3PrefixOwner '{"StringEquals" : {"s3:prefix": ["{{OWNER}}", "{{OWNER}}/"], "s3:delimiter": ["/"]} }'
-awspolicy.py add condition IPRestrictions "{ {%- if IP_ADDRESSES is defined %}\"IpAddress\": { \"aws:SourceIp\": {{IP_ADDRESSES | tojson}} } {%- endif %} }"
+awspolicy.py add condition arnBackupBucket '"ArnLike" : {"aws:SourceArn": "arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{BUCKET_POSTFIX}}"}'
+awspolicy.py add condition equalsAccount '"StringEquals" : {"aws:SourceAccount": "{{ACCOUNT}}"}'
+awspolicy.py add condition equalsAccountAndControl '"StringEquals" :  {"aws:SourceAccount": "{{ACCOUNT}}", "s3:x-amz-acl": "bucket-owner-full-control"}'
+awspolicy.py add condition s3PrefixOwner '"StringEquals" : {"s3:prefix": ["{{OWNER}}", "{{OWNER}}/"], "s3:delimiter": ["/"]}'
+awspolicy.py add condition IPRestrictions "{ {%- if IP_ADDRESSES is defined %}\"IpAddress\": { \"aws:SourceIp\": {IP_ADDRESSES | tojson}} } {%- endif %}"
 
 # Condition Sets
 
