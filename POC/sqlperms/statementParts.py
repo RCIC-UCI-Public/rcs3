@@ -24,15 +24,15 @@ resourceTemplate = '''
 '''
 conditionTemplate = '''
             ,
-            "Condition" : [ 
+            "Condition" : {{ 
                     {CONDITIONLIST}
-            ]
+            }}
 '''
 principalTemplate = '''
             ,
-            "Principal" : [ 
-                    [ {PRINCIPALLIST} ]
-            ] 
+            "Principal" : {{ 
+                    {PRINCIPALLIST}
+            }} 
 '''            
 ## This is the template for the JSON policy
 ## STATEMENTLIST is a comma-joined string of filled statement Parts
