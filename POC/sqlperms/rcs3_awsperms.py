@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 import sqlite3
+import os
 import sys
+import json
+from jinja2 import Template
 import statementParts as SP;
 
 class elements:
@@ -30,7 +33,8 @@ class elements:
 
 class rcs3awsdb:
     def __init__(self,verbose=False):
-       self.connection=sqlite3.connect('rcs3aws.db')
+       thisDir = os.path.abspath(os.path.dirname(__file__))
+       self.connection=sqlite3.connect(os.path.join(thisDir,'rcs3aws.db'))
        self.cursor = self.connection.cursor()
        self.cursor.execute("PRAGMA foreign_keys=on")
        self.verbose = verbose
@@ -40,7 +44,6 @@ class rcs3awsdb:
        try:
            if self.verbose:
                print("execute: '%s'" % stmt, file=sys.stderr)
-               return
            self.cursor.execute(stmt)
        except sqlite3.IntegrityError as e:
            if not errorsToCaller:
@@ -91,6 +94,12 @@ class rcs3awsdb:
             if type(isDict) is dict:
                 return arg
         except:
+            pass
+        try:
+            isDict = eval(f"{{ {arg} }}")
+            if type(isDict) is dict:
+                return arg
+        except:
             # handle the case where a Jinja2 templated item doesn't eval to anything
             if arg.startswith("{"):
                 return arg
@@ -113,8 +122,9 @@ class rcs3awsdb:
 
        return formatted
 
-    def document(self,setName,setView="policy"):
-       """Using statement parts, format a complete policy document"""
+    def document(self,setName,setView="policy",j2Vars=None,jsonFormat=False):
+       """Using statement parts, format a complete policy document, return as a string
+          If j2Vars is supplied, then render variables prior to returning"""
        
        theDoc = ""
        statements = []
@@ -139,7 +149,18 @@ class rcs3awsdb:
            statements.extend([completeStatement])
        
        # Join all the statements into a full policy document
-       return SP.jsonTemplate.format(STATEMENTLIST=",\n".join(statements))
+       theDoc = SP.jsonTemplate.format(STATEMENTLIST=",\n".join(statements))
+       
+       # Render the jinja2 variables in theDoc
+       if j2Vars is not None:
+           j2template = Template(theDoc)
+           theDoc = j2template.render(j2Vars)
+
+       # Return JSON or String 
+       if jsonFormat:
+           return json.loads(theDoc)
+       return theDoc
+
 
 
     def addElement(self,eClass,kw,val,optParams={},update=False):
