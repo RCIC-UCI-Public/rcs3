@@ -5,6 +5,11 @@ import os
 import sys
 import json
 from jinja2 import Template
+
+# Make sure that we can import local items
+myDirectory=os.path.realpath(os.path.dirname(__file__))
+sys.path.append(myDirectory)
+
 import statementParts as SP;
 
 class elements:
@@ -32,9 +37,13 @@ class elements:
         return spaces
 
 class rcs3awsdb:
-    def __init__(self,verbose=False):
-       thisDir = os.path.abspath(os.path.dirname(__file__))
-       self.connection=sqlite3.connect(os.path.join(thisDir,'rcs3aws.db'))
+    def __init__(self,verbose=False,database='rcs3aws.db'):
+       dbfile = database
+       if os.path.sep not in database:
+           dbfile=os.path.join(myDirectory,database)
+       if verbose:
+           print(dbfile)
+       self.connection=sqlite3.connect(dbfile)
        self.cursor = self.connection.cursor()
        self.cursor.execute("PRAGMA foreign_keys=on")
        self.verbose = verbose
@@ -89,18 +98,29 @@ class rcs3awsdb:
     def quoteOrRaw(self,arg):
         """Arg is a string, but the string might represent a dictionary. If so, don't quote,
            else quote """
+
+        # Special handling: A string that starts with with '#' and '#':
+        #              o strip the leading and trailing #
+        #              o do NOT quote
+        # Needed to escape out complex jinja2 expressions
+
+        if len(arg) > 2 and arg.startswith('#') and arg.endswith('#'):
+            return arg[1:-1]
+
+        # Try to guess if we should NOT quote
+        # 1. Is this a string-version of python dict
         try:
             isDict = eval(arg)
             if type(isDict) is dict:
                 return arg
         except:
             pass
+        # 2. if enclosed in { }, is this a string-version of python dict
         try:
             isDict = eval(f"{{ {arg} }}")
             if type(isDict) is dict:
                 return arg
         except:
-            # handle the case where a Jinja2 templated item doesn't eval to anything
             if arg.startswith("{"):
                 return arg
         return '"%s"' % arg

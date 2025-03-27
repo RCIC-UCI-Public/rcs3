@@ -3,6 +3,12 @@
 import argparse
 import sys
 import json
+import os
+from jinja2 import Template
+
+# Make sure that we can import local items
+myDirectory=os.path.realpath(os.path.dirname(__file__))
+sys.path.append(myDirectory)
 from rcs3_awsperms import rcs3awsdb
 
 commands = ('add', 'addSet', 'addToSet',
@@ -39,16 +45,34 @@ policyKeys = tuple( x.replace('Set','') for x in policyOptions)
 #     awspolicy add policy <sid> <effect> [--actionSet=<name>] [--resourceSet=<name>] [--principalSet=<name>] [--conditionSet=<name>]
 #     Note: the sets referred to must exist
 
-#6    To create a policy document, need to first create a set and then add policy(ies) to it
+# 6.  To create a policy document, need to first create a set and then add policy(ies) to it
 #     awspolicy addSet policy SA-backup-policy
 #     awspolicy addToSet policy SA-backup-policy <sid of policy>
 #     awspolicy addToSet policy SA-backup-policy <sid2 if policy> 
 #    
+# 7. Testing a complete policy
+# --- Rendering with jinja2 variables for human readability, testing
+#
+#     o Generate a file with aws-settings.yaml converted to standardized jinja2 variables
+#               ../common/genvars.py > /tmp/myvars
+#
+#     o (Optional) edit generated file to add "OWNER":"<owner name>", "SYSTEM":"<systemname>" to the dictionary
+#       Note: "FUNCTION" is another good testing key for generic lambda policies
+#
+#     o generate a policy specifying the variables
+#         awspolicy.py --variables="$(cat /tmp/myvars)" generate policy template-policy3
+#
+#
+# --- To see the jinja2 template (not rendered)
+#         awspolicy.py generate policy template-policy3
+#      Note: in general this form is NOT parseable JSON. It is not "pretty printed"
+#
 
 if __name__ == '__main__':
 
          parser = argparse.ArgumentParser(description='AWS Policy Document Generator',allow_abbrev=True)
          parser.add_argument('-verbose', action='store_true',help='verbosity')
+         parser.add_argument('--variables',default=None, help ='string dictionary of jinja2 variables')
          parser.add_argument('command', metavar='command',choices=commands, nargs=1, help=f'{commands}')
          parser.add_argument('space', metavar='space',choices=spaces, nargs=1, help=f'{spaces}')
          parser.add_argument('spaceArg', default='%',nargs='?', help='space argument')
@@ -98,6 +122,11 @@ if __name__ == '__main__':
                  print(db.variables(space))
          elif command == "generate":
              textDoc=db.document(setView=space,setName=spaceArg)
+
+             if args.variables is not None:
+                 j2template = Template(textDoc)
+                 textDoc = j2template.render(eval(args.variables))
+
              try:
                  # Try to load as a JSON -- might fail with certain jinja2 constructs
                  theDoc=json.loads(textDoc)

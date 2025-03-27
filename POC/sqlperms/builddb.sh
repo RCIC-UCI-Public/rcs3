@@ -544,7 +544,7 @@ awspolicy.py add condition arnBackupBucket '"ArnLike" : {"aws:SourceArn": "arn:a
 awspolicy.py add condition equalsAccount '"StringEquals" : {"aws:SourceAccount": "{{ACCOUNT}}"}'
 awspolicy.py add condition equalsAccountAndControl '"StringEquals" :  {"aws:SourceAccount": "{{ACCOUNT}}", "s3:x-amz-acl": "bucket-owner-full-control"}'
 awspolicy.py add condition s3PrefixOwner '"StringEquals" : {"s3:prefix": ["{{OWNER}}", "{{OWNER}}/"], "s3:delimiter": ["/"]}'
-awspolicy.py add condition IPRestrictions "{ {%- if IP_ADDRESSES is defined %}\"IpAddress\": { \"aws:SourceIp\": {IP_ADDRESSES | tojson}} } {%- endif %}"
+awspolicy.py add condition IPRestrictions "{%- if IP_ADDRESSES is defined %}\"IpAddress\": { \"aws:SourceIp\": {{IP_ADDRESSES | tojson}} } {%- endif %}"
 
 # Condition Sets
 
