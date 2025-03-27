@@ -519,7 +519,7 @@ awspolicy.py addToSet resource sfnFullMonty sfnFullMonty
 
 awspolicy.py add principal serviceS3Batch '"Service":"batchoperations.s3.amazonaws.com"'
 awspolicy.py add principal serviceLambda '"Service":"lambda.amazonaws.com"'
-awspolicy.py add principal serviceAWS '"Service":"s3.amazonaws.com"'
+awspolicy.py add principal serviceS3 '"Service":"s3.amazonaws.com"'
 awspolicy.py add principal serviceScheduler '"Service":"scheduler.amazonaws.com"'
 awspolicy.py add principal serviceStates '"Service":"states.amazonaws.com"'
 
@@ -530,8 +530,8 @@ awspolicy.py addToSet principal serviceS3Batch serviceS3Batch
 awspolicy.py addSet principal serviceLambda
 awspolicy.py addToSet principal serviceLambda serviceLambda
 
-awspolicy.py addSet principal serviceAWS
-awspolicy.py addToSet principal serviceAWS serviceAWS
+awspolicy.py addSet principal serviceS3
+awspolicy.py addToSet principal serviceS3 serviceS3
 
 awspolicy.py addSet principal serviceScheduler
 awspolicy.py addToSet principal serviceScheduler serviceScheduler
@@ -822,4 +822,13 @@ awspolicy.py addToSet policy template-policy3 readInventoryBucketIPRestricted
 awspolicy.py addToSet policy template-policy3 listAllBuckets 
 awspolicy.py addToSet policy template-policy3 viewPersonalReportsFolder 
 awspolicy.py addToSet policy template-policy3 addFileToPersonalFolder 
+
+
+## == inventory-permissions components ==
+awspolicy.py add policy inventoryPermissions Allow --actionSet putObject --resourceSet inventoryBucketContents --conditionSet equalsAccountAndControl --principalSet serviceS3
+
+awspolicy.py addSet policy inventory-permissions
+awspolicy.py addToSet policy inventory-permissions inventoryPermissions  
+
+
 
