@@ -6,13 +6,15 @@ import json
 import os
 import sys
 import yaml
+from jinja2 import Environment, FileSystemLoader
 
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
-sys.path.append( basedir  + "/common" )
-import transform
+libdir = os.path.join( basedir, "common" )
+templatedir = os.path.join( basedir, "templates" )
+sys.path.append( libdir )
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
+with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
     aws = yaml.safe_load( f )
 
 usage="Create or update IAM policy with access to specific resources determined by purpose."
@@ -23,6 +25,8 @@ p.add_argument( "host",
         help="hostname" )
 p.add_argument( "purpose",
         help="which permissions to apply" )
+p.add_argument( "-i", "--iprestrictions", action="append",
+        help="override iprestrictions list in config file" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
@@ -42,21 +46,32 @@ if "region" in aws:
 else:
     iam = session.client( "iam" )
 
-# load the template which allows launching EC2 instance
-input_template = basedir + "/templates/self-service/{}-policy.json".format( args.purpose )
-if not os.path.isfile( input_template ):
-    print( "Not found: {}".format( input_template ) )
-    sys.exit( -1 )
+# load the policy template
+if args.policy_template is None:
+    input_template = aws[ "policy_template" ]
+else:
+    input_template = args.policy_template
+environment = Environment(loader=FileSystemLoader(templatedir))
+template = environment.get_template( input_template )
+
 my_vars = {
-    "xxxuserxxx": args.user,
-    "xxxhostxxx": args.host,
-    "xxxbucketxxx": aws[ "bucket_postfix" ],
-    "xxxinventoryxxx": aws[ "inventory_postfix" ],
-    "xxxaccountidxxx": aws[ "accountid" ],
-    "xxxregionxxx": aws[ "region" ],
-    "xxxiprestrictionsxxx": transform.createPolicyIpCondition( aws[ "iprestrictions" ] )
+    "OWNER": args.user,
+    "SYSTEM": args.host,
+    "BUCKET_POSTFIX": aws[ "bucket_postfix" ],
+    "INVENTORY_POSTFIX": aws[ "inventory_postfix" ],
+    "ACCOUNT": aws[ "accountid" ],
+    "REGION": aws[ "region" ]
 }
-json_policy = transform.template_to_string( input_template, my_vars )
+
+if args.iprestrictions is None:
+    if "iprestrictions" in aws.keys():
+        my_vars[ "iprestrictions" ] = aws[ "iprestrictions" ]
+else:
+    my_vars[ "iprestrictions" ] = args.iprestrictions
+
+json_policy = template.render( my_vars )
+if args.verbose:
+    print( json_policy )
 
 
 # create the EC2 policy or lookup an existing policy
