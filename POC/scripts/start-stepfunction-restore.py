@@ -12,8 +12,7 @@ import json
 
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
-sys.path.append( basedir  + "/common" )
-
+sys.path.append( os.path.join( basedir, "common" ) )
 
 usage="Upload glacier restore list, encoding with urllib"
 p = argparse.ArgumentParser( description=usage )
@@ -33,7 +32,7 @@ p.add_argument( "-d", "--daystoretain", type=int,
         help="number of days to retain restored files" )
 args = p.parse_args()
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
+with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
     aws = yaml.safe_load( f )
 
 # override location of .aws/config
