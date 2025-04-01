@@ -9,10 +9,9 @@ import yaml
 
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
-sys.path.append( basedir  + "/common" )
-import transform
+sys.path.append( os.path.join( basedir, "common" ) )
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
+with open( os.path.join( basedir, "config", "aws-settings.yaml" ), "r" ) as f:
     aws = yaml.safe_load( f )
 
 usage="Create role by attaching trust relationship to existing policy."
