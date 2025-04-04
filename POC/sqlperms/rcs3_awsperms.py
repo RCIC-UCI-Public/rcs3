@@ -257,7 +257,26 @@ class rcs3awsdb:
            data += " | ".join(srow) + "\n"
        return data 
 
+    
     def list(self,space,key='%',view=False,setNames=False):
+       (fieldNames,rows) = self.listRaw(space,key,view,setNames)
+       return self.printRows(fieldNames,rows)
+
+    def getVal(self, space,key='%',view=False,setNames=False,field=None):
+       if field is None:
+          field=self.elem.cols(space)[1]
+       (fieldNames,rows) = self.listRaw(space,key,view,setNames)
+       idx = fieldNames.index(field)
+       rvals = [ row[idx] for row in rows ]
+       if len(rvals) > 1:
+           return rvals
+       else:
+           return rvals[0]
+       
+
+
+
+    def listRaw(self,space,key='%',view=False,setNames=False):
        """ List the Elements of a space,view,or Sets""" 
        keyColumn = self.elem.cols(space)[0]
        if view:
@@ -269,7 +288,7 @@ class rcs3awsdb:
            table = self.elem.etable(space)
        query = f"SELECT * from {table} where {keyColumn} like '{key}' order by {keyColumn}" 
        (fieldNames,rows)=self.getTableEntries(table,query)
-       return self.printRows(fieldNames,rows)
+       return (fieldNames,rows)
 
     def listSet(self,space,key='%'):
        """ List the Elements of a Set """ 

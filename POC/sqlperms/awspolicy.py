@@ -13,7 +13,7 @@ from rcs3_awsperms import rcs3awsdb
 
 commands = ('add', 'addSet', 'addToSet',
             'delete','deleteSet','deleteFromSet',
-            'format','generate','list','listSet','listView','modify','setNames','variables')
+            'format','generate','getVal','list','listSet','listView','modify','setNames','variables')
 
 spaces = ('action', 'policy', 'principal','resource','condition','all')
 
@@ -107,6 +107,8 @@ if __name__ == '__main__':
                  db.addToSet(space,spaceArg,extra)
          elif command == "deleteFromSet":
                  db.deleteFromSet(space,spaceArg,extra)
+         elif command == "getVal":
+                 print(db.getVal(space,spaceArg))
          elif command == "list":
                  print(db.list(space,spaceArg))
          elif command == "listSet":
