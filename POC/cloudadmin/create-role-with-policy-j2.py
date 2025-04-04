@@ -29,9 +29,14 @@
 #  [-V <string rep of variable dictionary> ]
 #       Jinja2 variables to add to (and/or overwrite) the default variables 
 #
+#  [--function=<lambda function> ]
+#       Syntactic sugar to replace  -V '{ "FUNCTION": "<lambda function>" }'
 # Example of creating a particular role for the scheduler to invoke a lambda (common)
 #         create-role-with-policy keyAgeMetric-scheduler -p lambdaInvoke-policy -t schedulerAssumeRole-trust \
 #                     -V '{"FUNCTION":"keyAgeMetric"} 
+#         OR
+#         create-role-with-policy keyAgeMetric-scheduler -p lambdaInvoke-policy -t schedulerAssumeRole-trust \
+#                     --function=keyAgeMetric 
 #
 #
 #         o Creates the policy keyAgeMetric-scheduler-policy
@@ -47,100 +52,91 @@ import json
 import os
 import sys
 import yaml
-from jinja2 import Template
 
 execdir = os.path.dirname(os.path.abspath(__file__))
 basedir = os.path.dirname( execdir )
 sys.path.append( os.path.join(basedir,"common" ))
 sys.path.append( os.path.join(basedir, "sqlperms"))
 import rcs3_awsperms
+from rcs3functions import *
 
-with open( basedir + "/config/aws-settings.yaml", "r" ) as f:
-    aws = yaml.safe_load( f )
+aws = read_aws_settings()
+# override location of .aws/config
+if "configfile" in aws:
+    os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
 usage="Create or update IAM policy with access to specific resources determined by name."
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "entity",
         help="basename of <entity>-role and <entity>-policy to create in AWS" )
+p.add_argument("--function", dest="function", default=None,
+        help="use to name a lambda function." )
 p.add_argument( "-p", "--policy", dest="policydoc", default=None,
         help="Use DB policy instead of <entity>-policy" )
 p.add_argument( "-t", "--trust", dest="trustdoc", default=None,
         help="Use DB trust instead of <entity>-trust" )
-p.add_argument( "-V", "--variables", dest="variables", default="",
+p.add_argument( "-V", "--variables", dest="variables", default=None,
         help="String rep of variable dictionary to add-to/override defaults" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
 
-# override location of .aws/config
-if "configfile" in aws:
-    os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
-
-# when run from AWS services, profile is not used
-if "profile" in aws:
-    session = boto3.Session( profile_name=aws[ "profile" ] )
-else:
-    session = boto3
-
-if "region" in aws:
-    iam = session.client( "iam", region_name=aws[ "region" ] )
-else:
-    iam = session.client( "iam" )
 
 # load the policy template 
-db = rcs3_awsperms.rcs3awsdb()
+db = rcs3_awsperms.rcs3awsdb(verbose=args.verbose)
 input_policy = args.entity + "-policy" if args.policydoc is None else args.policydoc
 input_trust = args.entity + "-trust" if args.trustdoc is None else args.trustdoc
 
-jinja2vars = {
+j2vars = {
     "ACCOUNT": aws[ "accountid" ],
     "REGION": aws[ "region" ],
     "IP_ADDRESSES": aws[ "iprestrictions" ] 
 }
 
-for k,v in json.loads(args.variables).items():
-    jinja2vars[k] = v
+if args.function is not None:
+    j2vars["FUNCTION"] = args.function
 
-# Read the policy and trust statements from the database
-# These might have jinja2 variables and might not parse as json
-policydocGeneric = db.document(setView="policy",setName=input_policy)
-trustdocGeneric = db.document(setView="policy",setName=input_trust)
+if args.variables is not None:
+    for k,v in json.loads(args.variables).items():
+        j2vars[k] = v
 
-# Render the docs using jinja2
-policydoc=Template(policydocGeneric).render(jinja2vars)
-trustdoc= Template(trustdocGeneric).render(jinja2vars)
+# Read the policy and trust statements from the database, want jsonFormat
+policyjson = db.document(setView="policy",setName=input_policy,j2Vars=j2vars,jsonFormat=True)
+trustjson = db.document(setView="policy",setName=input_trust,j2Vars=j2vars, jsonFormat=True)
+# Need string versions of JSON objects.
+# Boto3 seems to be pedantic and not like additional whitespace. It really is simplest to have
+# the db.document returned as a JSON object and then have json re-format it as string
 
-# Make sure we have valid json before proceeding
-policyjson=json.loads(policydoc)
-trustjson=json.loads(trustdoc)
+policytxt = json.dumps(policyjson)
+trusttxt = json.dumps(trustjson)
+
 if args.verbose:
    print("=== Generated policy JSON ===")
    print(json.dumps(policyjson,indent=4))
    print("=== Generated trust JSON ===")
    print(json.dumps(trustjson,indent=4))
 
-sys.exit(0)
-
-# 1. Lookup Policy, Delete versions if too many, Create a new policy version OR create a new non-existing policy 
+## Create boto3Clients. 
+b3 = boto3Clients()
 try:
     policy_arn = "arn:aws:iam::{}:policy/{}-policy"\
         .format( aws[ "accountid" ],args.entity )
-    response = iam.list_policy_versions( PolicyArn=policy_arn )
+    response = b3.IAM.list_policy_versions( PolicyArn=policy_arn )
     if args.verbose:
         print( response )
     if len( response[ "Versions" ] ) > 4:
         vid = response[ "Versions" ][ 4 ][ "VersionId" ]
-        response = iam.delete_policy_version( PolicyArn=policy_arn, VersionId=vid )
-    response = iam.create_policy_version(
+        response = b3.IAM.delete_policy_version( PolicyArn=policy_arn, VersionId=vid )
+    response = b3.IAM.create_policy_version(
         PolicyArn=policy_arn,
-        PolicyDocument=policyjson,
+        PolicyDocument=policytxt,
         SetAsDefault=True
     )
-except iam.exceptions.NoSuchEntityException:
+except b3.IAM.exceptions.NoSuchEntityException:
     print( "Creating policy: {}".format( policy_arn ) )
-    response = iam.create_policy(
+    response = b3.IAM.create_policy(
         PolicyName="{}-policy".format( args.entity ),
-        PolicyDocument=policyjson,
+        PolicyDocument=policytxt,
         Description="Allow {} access".format( args.entity )
     )
 except Exception as error:
@@ -157,23 +153,23 @@ if args.verbose:
 try:
     role_name = "{}-role".format( args.entity )
     try:
-        response = iam.create_role(
+        response = b3.IAM.create_role(
             RoleName=role_name,
-            AssumeRolePolicyDocument=trustjson,
+            AssumeRolePolicyDocument=trusttxt,
             Description="Allow {} to process requests".format( args.entity )
         )
     except botocore.exceptions.ClientError as error:
         if error.response['Error']['Code'] == 'EntityAlreadyExists':
-            policies = iam.list_attached_role_policies(RoleName=role_name)
+            policies = b3.IAM.list_attached_role_policies(RoleName=role_name)
             for policy in policies['AttachedPolicies']:
-                iam.detach_role_policy(RoleName=role_name,PolicyArn=policy['PolicyArn'])
+                b3.IAM.detach_role_policy(RoleName=role_name,PolicyArn=policy['PolicyArn'])
             if ( args.verbose ):
                 print(policies)
                 
     if args.verbose:
         print( response )
 
-    response = iam.attach_role_policy(
+    response = b3.IAM.attach_role_policy(
         RoleName=role_name,
         PolicyArn=policy_arn
     )
