@@ -14,9 +14,7 @@ libdir = os.path.join( basedir, "common" )
 templatedir = os.path.join( basedir, "templates", "self-service" )
 sys.path.append( libdir )
 
-aws_settings = os.path.join( basedir, "config", "aws-settings.yaml" )
-with open( aws_settings, "r" ) as f:
-    aws = yaml.safe_load( f )
+from rcs3functions import *
 
 usage="Create or update Step Function with access to specific resources determined by purpose."
 p = argparse.ArgumentParser( description=usage )
@@ -30,33 +28,26 @@ p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
 
+aws = read_aws_settings()
 # override location of .aws/config
 if "configfile" in aws:
     os.environ[ "AWS_CONFIG_FILE" ] = aws[ "configfile" ]
 
-# when run from AWS services, profile is not used
-if "profile" in aws:
-    session = boto3.Session( profile_name=aws[ "profile" ] )
-else:
-    session = boto3
-
-if "region" in aws:
-    sfn = session.client( "stepfunctions", region_name=aws[ "region" ] )
-else:
-    sfn = session.client( "stepfunctions" )
+## Create boto3Clients. 
+b3 = boto3Clients()
 
 # load the step function template
 input_template = "sfn-{}.json.jinja".format( args.purpose )
 environment = Environment(loader=FileSystemLoader(templatedir))
 template = environment.get_template( input_template )
 my_vars = {
-    "user": args.user,
-    "host": args.host,
-    "bucket": aws[ "bucket_postfix" ],
-    "inventory": aws[ "inventory_postfix" ],
-    "accountid": aws[ "accountid" ],
-    "region": aws[ "region" ],
-    "owner_notify": aws[ "owner_notify" ]
+    "OWNER": args.user,
+    "SYSTEM": args.host,
+    "BUCKET_PREFIX": aws[ "bucket_postfix" ],
+    "INVENTORY_PREFIX": aws[ "inventory_postfix" ],
+    "ACCOUNT": aws[ "accountid" ],
+    "REGION": aws[ "region" ],
+    "OWNER_NOTIFY": aws[ "owner_notify" ]
 }
 sfnJson = template.render( my_vars )
 if args.verbose:
@@ -69,7 +60,7 @@ sfnName = "{}-{}-sfn-{}".format( args.user, args.host, args.purpose )
 sfnRole = "arn:aws:iam::{}:role/{}-{}-restore-stepfunc-perms-role".format( aws[ "accountid" ], args.user, args.host)
 sfnArn = "arn:aws:states:{}:{}:stateMachine:{}".format( aws[ "region" ], aws[ "accountid" ], sfnName )
 try:
-    response = sfn.create_state_machine(
+    response = b3.SFN.create_state_machine(
         name=sfnName,
         definition=sfnJson,
         roleArn=sfnRole,
@@ -82,9 +73,9 @@ try:
     )
     if args.verbose:
         print( response )
-except sfn.exceptions.StateMachineAlreadyExists:
+except b3.SFN.exceptions.StateMachineAlreadyExists:
     print( "Updating existing state machine: {}".format( args.purpose ) )
-    response = sfn.update_state_machine(
+    response = b3.SFN.update_state_machine(
         stateMachineArn=sfnArn,
         definition=sfnJson,
         roleArn=sfnRole,

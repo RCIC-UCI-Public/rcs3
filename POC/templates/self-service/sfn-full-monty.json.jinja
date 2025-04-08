@@ -1,5 +1,5 @@
 {
-  "Comment": "Use Athena to query files in {{ user }}-{{ host }}-{{ bucket }} that have been moved to Glacier",
+  "Comment": "Use Athena to query files in {{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_PREFIX }} that have been moved to Glacier",
   "StartAt": "create Athena queries",
   "States": {
     "create database": {
@@ -20,15 +20,15 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload": {
-          "UserName": "{{ user }}",
-          "HostName": "{{ host }}",
-          "BackupBucket": "{{ user }}-{{ host }}-{{ bucket }}",
-          "InventoryBucket": "{{ user }}-{{ host }}-{{ inventory }}",
-          "HiveDir": "{{ user }}-{{ host }}-{{ bucket }}/{{ user }}-{{ host }}-daily/hive/dt={}-01-00/",
+          "UserName": "{{ OWNER }}",
+          "HostName": "{{ SYSTEM }}",
+          "BackupBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_PREFIX }}",
+          "InventoryBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ INVENTORY_PREFIX }}",
+          "HiveDir": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_PREFIX }}/{{ OWNER }}-{{ SYSTEM }}-daily/hive/dt={}-01-00/",
           "RestoreList.$": "$.RestoreList",
           "ExpireDays.$": "$.ExpireDays"
         },
-        "FunctionName": "arn:aws:lambda:{{ region }}:{{ accountid }}:function:createAthenaQueries:$LATEST"
+        "FunctionName": "arn:aws:lambda:{{ REGION }}:{{ ACCOUNT }}:function:createAthenaQueries:$LATEST"
       },
       "Retry": [
         {
@@ -116,7 +116,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:{{ region }}:{{ accountid }}:function:createS3BatchInput:$LATEST"
+        "FunctionName": "arn:aws:lambda:{{ REGION }}:{{ ACCOUNT }}:function:createS3BatchInput:$LATEST"
       },
       "Retry": [
         {
@@ -145,7 +145,7 @@
             "Type": "Task",
             "End": true,
             "Parameters": {
-              "AccountId": "{{ accountid }}",
+              "AccountId": "{{ ACCOUNT }}",
               "ClientRequestToken.$": "$.FileToken",
               "ConfirmationRequired": "False",
               "Manifest": {
@@ -170,18 +170,18 @@
               },
               "Priority": 10,
               "Report": {
-                "Bucket": "arn:aws:s3:::{{ user }}-{{ host }}-{{ inventory }}",
+                "Bucket": "arn:aws:s3:::{{ OWNER }}-{{ SYSTEM }}-{{ INVENTORY_PREFIX }}",
                 "Prefix": "rcs3",
                 "Format": "Report_CSV_20180820",
                 "Enabled": true,
                 "ReportScope": "FailedTasksOnly"
               },
-              "RoleArn": "arn:aws:iam::{{ accountid }}:role/{{ user }}-{{ host }}-restore-s3batch-perms-role"
+              "RoleArn": "arn:aws:iam::{{ ACCOUNT }}:role/{{ OWNER }}-{{ SYSTEM }}-restore-s3batch-perms-role"
             },
             "Resource": "arn:aws:states:::aws-sdk:s3control:createJob",
             "ResultSelector": {
               "JobId.$": "$.JobId",
-              "AccountId": "{{ accountid }}"
+              "AccountId": "{{ ACCOUNT }}"
             }
           }
         }
@@ -200,7 +200,7 @@
       "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "arn:aws:lambda:{{ region }}:{{ accountid }}:function:pollCreateJobStatus:$LATEST"
+        "FunctionName": "arn:aws:lambda:{{ REGION }}:{{ ACCOUNT }}:function:pollCreateJobStatus:$LATEST"
       },
       "Retry": [
         {
@@ -233,8 +233,8 @@
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
         "Message.$": "$.notifyUser",
-        "Subject": "{{ user }} {{ host }} file submitted for recovery from Glacier",
-        "TopicArn": "arn:aws:sns:{{ region }}:{{ accountid }}:{{ user }}-{{ host }}-{{ owner_notify }}"
+        "Subject": "{{ OWNER }} {{ SYSTEM }} file submitted for recovery from Glacier",
+        "TopicArn": "arn:aws:sns:{{ REGION }}:{{ ACCOUNT }}:{{ OWNER }}-{{ SYSTEM }}-{{ OWNER_NOTIFY }}"
       },
       "End": true
     }
