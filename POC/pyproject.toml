@@ -1,0 +1,26 @@
+[project]
+name = "rcs3py"
+version = "0.0.5"
+authors = [
+  { name="Philip Papadopoulos", email="ppapadop@uci.edu" },
+  { name="Franciso Lopez", email="lopez@uci.edu" },
+  { name="Nick Santucci", email="santucci@uci.edu" },
+]
+description = "Support for RCS3 (Rclone to S3) Data Backup"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Linux/Windows",
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/RCIC-UCI-Public/rcs3"
+
+[tool.setuptools.packages.find]
+where = ["src"]  # list of folders that contain the packages (["."] by default)
+include = ["rcs3py"]  # package names should match these glob patterns (["*"] by default)
+exclude = ["rcs3py.tests*"]  # exclude packages matching these glob patterns (empty by default)
+namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
