@@ -40,7 +40,7 @@ if not os.path.isfile( scriptName ):
     sys.exit( 1 )
 
 if args.timeout is None:
-    timeout = aws['lamba_timeout']
+    timeout = aws['lambda_timeout']
 else:
     timeout = int(args.timeout)
 
