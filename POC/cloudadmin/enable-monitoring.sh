@@ -20,13 +20,13 @@ fi
 
 # 1. Install keyAgeMetric
 echo "Installing Key Age Metric lambda function"
-$MYDIR/create-service-account-restore-policy.py lambda generic keyAgeMetric
+$MYDIR/create-service-account-restore-policy.py --template self-service/keyAgeMetric-policy.json lambda generic keyAgeMetric
 $MYDIR/create-service-account-restore-role.py lambda generic keyAgeMetric
 $MYDIR/create-service-account-restore-lambda.py lambda generic keyAgeMetric
 
 # 2. Install calcUploadBytes lambda function
 echo "Installing calcUploadBytes lambda function"
-$MYDIR/create-service-account-restore-policy.py lambda generic calcUploadBytes
+$MYDIR/create-service-account-restore-policy.py --template self-service/calcUploadBytes-policy.json lambda generic calcUploadBytes
 $MYDIR/create-service-account-restore-role.py lambda generic calcUploadBytes
 $MYDIR/create-service-account-restore-lambda.py --timeout=290 lambda generic calcUploadBytes
 
