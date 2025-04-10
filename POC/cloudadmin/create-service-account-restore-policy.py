@@ -27,6 +27,8 @@ p.add_argument( "purpose",
         help="which permissions to apply" )
 p.add_argument( "-i", "--iprestrictions", action="append",
         help="override iprestrictions list in config file" )
+p.add_argument( "-t", "--template", dest="policy_template", default=None,
+        help="specify a non-default policy  template file" )
 p.add_argument( "-v", "--verbose", action="store_true",
         help="optional print statements for more detail" )
 args = p.parse_args()
