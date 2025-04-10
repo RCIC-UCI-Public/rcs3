@@ -18,10 +18,10 @@ from rcs3functions import *
 
 usage="Create or update Step Function with access to specific resources determined by purpose."
 p = argparse.ArgumentParser( description=usage )
-p.add_argument( "user",
-        help="user UCInetID" )
-p.add_argument( "host",
-        help="hostname" )
+p.add_argument( "owner",
+        help="owner" )
+p.add_argument( "system",
+        help="system" )
 p.add_argument( "purpose",
         help="which permissions to apply" )
 p.add_argument( "-v", "--verbose", action="store_true",
@@ -41,10 +41,10 @@ input_template = "sfn-{}.json.jinja".format( args.purpose )
 environment = Environment(loader=FileSystemLoader(templatedir))
 template = environment.get_template( input_template )
 my_vars = {
-    "OWNER": args.user,
-    "SYSTEM": args.host,
-    "BUCKET_PREFIX": aws[ "bucket_postfix" ],
-    "INVENTORY_PREFIX": aws[ "inventory_postfix" ],
+    "OWNER": args.owner,
+    "SYSTEM": args.system,
+    "BUCKET_POSTFIX": aws[ "bucket_postfix" ],
+    "INVENTORY_POSTFIX": aws[ "inventory_postfix" ],
     "ACCOUNT": aws[ "accountid" ],
     "REGION": aws[ "region" ],
     "OWNER_NOTIFY": aws[ "owner_notify" ]
@@ -56,8 +56,8 @@ if args.verbose:
 sys.exit(0)
 
 # create the step function
-sfnName = "{}-{}-sfn-{}".format( args.user, args.host, args.purpose )
-sfnRole = "arn:aws:iam::{}:role/{}-{}-restore-stepfunc-perms-role".format( aws[ "accountid" ], args.user, args.host)
+sfnName = "{}-{}-sfn-{}".format( args.owner, args.system, args.purpose )
+sfnRole = "arn:aws:iam::{}:role/{}-{}-restore-stepfunc-perms-role".format( aws[ "accountid" ], args.owner, args.system)
 sfnArn = "arn:aws:states:{}:{}:stateMachine:{}".format( aws[ "region" ], aws[ "accountid" ], sfnName )
 try:
     response = b3.SFN.create_state_machine(
@@ -66,8 +66,8 @@ try:
         roleArn=sfnRole,
         type='STANDARD',
         tags=[
-            { 'key': 'rcs3user', 'value': args.user },
-            { 'key': 'rcs3host', 'value': args.host }
+            { 'key': 'rcs3owner', 'value': args.owner },
+            { 'key': 'rcs3system', 'value': args.system }
         ],
         publish=True
     )

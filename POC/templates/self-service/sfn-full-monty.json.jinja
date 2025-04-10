@@ -1,5 +1,5 @@
 {
-  "Comment": "Use Athena to query files in {{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_PREFIX }} that have been moved to Glacier",
+  "Comment": "Use Athena to query files in {{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }} that have been moved to Glacier",
   "StartAt": "create Athena queries",
   "States": {
     "create database": {
@@ -22,9 +22,9 @@
         "Payload": {
           "UserName": "{{ OWNER }}",
           "HostName": "{{ SYSTEM }}",
-          "BackupBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_PREFIX }}",
-          "InventoryBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ INVENTORY_PREFIX }}",
-          "HiveDir": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_PREFIX }}/{{ OWNER }}-{{ SYSTEM }}-daily/hive/dt={}-01-00/",
+          "BackupBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}",
+          "InventoryBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ INVENTORY_POSTFIX }}",
+          "HiveDir": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}/{{ OWNER }}-{{ SYSTEM }}-daily/hive/dt={}-01-00/",
           "RestoreList.$": "$.RestoreList",
           "ExpireDays.$": "$.ExpireDays"
         },
@@ -170,7 +170,7 @@
               },
               "Priority": 10,
               "Report": {
-                "Bucket": "arn:aws:s3:::{{ OWNER }}-{{ SYSTEM }}-{{ INVENTORY_PREFIX }}",
+                "Bucket": "arn:aws:s3:::{{ OWNER }}-{{ SYSTEM }}-{{ INVENTORY_POSTFIX }}",
                 "Prefix": "rcs3",
                 "Format": "Report_CSV_20180820",
                 "Enabled": true,
