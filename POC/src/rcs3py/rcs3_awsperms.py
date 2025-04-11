@@ -6,6 +6,7 @@ import sys
 import shlex
 import json
 from jinja2 import Template
+from platformdirs import user_config_dir
 
 # Make sure that we can import local items
 myDirectory=os.path.realpath(os.path.dirname(__file__))
@@ -41,7 +42,9 @@ class rcs3awsdb:
     def __init__(self,verbose=False,database='rcs3aws.db'):
        self._dbfile = database
        if os.path.sep not in database:
-           self._dbfile=os.path.join(myDirectory,database)
+           configPath = user_config_dir(__name__)
+           os.makedirs(configPath, exist_ok=True)
+           self._dbfile=os.path.join(configPath,database)
        if verbose:
            print(self._dbfile)
        callInitialize = True if not os.path.exists(self._dbfile) else False
@@ -60,7 +63,7 @@ class rcs3awsdb:
        self._tabledefs=os.path.join(resourceDir,"rcs3awsdb.sql")
 
        if self.verbose:
-           print("XXXX Initializing Database at '%s' XXXX" % self._dbfile, file=sys.stderr)
+           print(f"Initializing Database at '{self._dbfile}'. Just a few moments...", file=sys.stderr)
        # Build out the structure
        with open(self._tabledefs,"r") as td:
            sqlscript = td.read() 
