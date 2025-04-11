@@ -42,7 +42,8 @@ class rcs3awsdb:
     def __init__(self,verbose=False,database='rcs3aws.db'):
        self._dbfile = database
        if os.path.sep not in database:
-           configPath = user_config_dir(__name__)
+           pkgOrName = __name__ if len(__package__) == 0 else __package__
+           configPath = user_config_dir(pkgOrName)
            os.makedirs(configPath, exist_ok=True)
            self._dbfile=os.path.join(configPath,database)
        if verbose:
