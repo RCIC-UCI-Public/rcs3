@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "rcs3py"
 version = "0.0.5"
@@ -15,6 +19,13 @@ classifiers = [
 ]
 license = "GPL-3.0-or-later"
 license-files = ["LICEN[CS]E*"]
+dependencies = [ 
+     "Jinja2>=3.0",
+]
+
+[project.scripts]
+awspolicy = "rcs3py.awspolicy:main"
+
 
 [project.urls]
 Homepage = "https://github.com/RCIC-UCI-Public/rcs3"
@@ -24,3 +35,4 @@ where = ["src"]  # list of folders that contain the packages (["."] by default)
 include = ["rcs3py"]  # package names should match these glob patterns (["*"] by default)
 exclude = ["rcs3py.tests*"]  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+
