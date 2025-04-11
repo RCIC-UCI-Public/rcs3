@@ -3,6 +3,7 @@
 import sqlite3
 import os
 import sys
+import shlex
 import json
 from jinja2 import Template
 
@@ -38,16 +39,48 @@ class elements:
 
 class rcs3awsdb:
     def __init__(self,verbose=False,database='rcs3aws.db'):
-       dbfile = database
+       self._dbfile = database
        if os.path.sep not in database:
-           dbfile=os.path.join(myDirectory,database)
+           self._dbfile=os.path.join(myDirectory,database)
        if verbose:
-           print(dbfile)
-       self.connection=sqlite3.connect(dbfile)
+           print(self._dbfile)
+       callInitialize = True if not os.path.exists(self._dbfile) else False
+       self.connection=sqlite3.connect(self._dbfile)
        self.cursor = self.connection.cursor()
        self.cursor.execute("PRAGMA foreign_keys=on")
        self.verbose = verbose
        self.elem = elements()
+       if callInitialize:
+           self.initializeDB()
+
+    def initializeDB(self):
+       """ Construct the database and populate """ 
+       resourceDir = os.path.join(myDirectory,'resources')
+       self._dbconfig=os.path.join(resourceDir,"rcs3awsdb.config")
+       self._tabledefs=os.path.join(resourceDir,"rcs3awsdb.sql")
+
+       if self.verbose:
+           print("XXXX Initializing Database at '%s' XXXX" % self._dbfile, file=sys.stderr)
+       # Build out the structure
+       with open(self._tabledefs,"r") as td:
+           sqlscript = td.read() 
+       self.cursor.executescript(sqlscript)
+       self.connection.commit()
+
+       # Populate the database
+       try:
+           import awspolicy
+       except:
+           from rcs3py import awspolicy   
+       with open(self._dbconfig,"r") as dbc:
+           for l in dbc.readlines():
+               if l.startswith('#') or len(l) < 3:
+                   pass
+               else:
+                   args = shlex.split(l)
+                   awspolicy.main(args)
+
+
 
     def execute(self,stmt,errorsToCaller=False):
        try:
