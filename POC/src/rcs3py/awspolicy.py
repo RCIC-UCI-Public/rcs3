@@ -4,7 +4,7 @@ import argparse
 import sys
 import json
 import os
-from jinja2 import Template
+from jinja2 import Environment,BaseLoader,meta
 
 # Make sure that we can import local items
 # myDirectory=os.path.realpath(os.path.dirname(__file__))
@@ -60,7 +60,7 @@ def main(Args=sys.argv[1:]):
 
     commands = ('add', 'addSet', 'addToSet',
        'delete','deleteSet','deleteFromSet',
-       'format','generate','getVal','list','listSet','listView','modify','setNames','variables')
+       'format','generate','getVal','getVars','list','listSet','listView','modify','setNames','variables')
 
     spaces = ('action', 'policy', 'principal','resource','condition','all')
 
@@ -115,6 +115,8 @@ def main(Args=sys.argv[1:]):
             db.deleteFromSet(space,spaceArg,extra)
     elif command == "getVal":
             print(db.getVal(space,spaceArg))
+    elif command == "getVars":
+            print(db.getVars(space,spaceArg))
     elif command == "list":
             print(db.list(space,spaceArg))
     elif command == "listSet":
@@ -132,15 +134,19 @@ def main(Args=sys.argv[1:]):
         textDoc=db.document(setView=space,setName=spaceArg)
 
         if args.variables is not None:
-            j2template = Template(textDoc)
-            textDoc = j2template.render(eval(args.variables))
-
+            environment = Environment()
+            j2template = environment.from_string(textDoc)
+            ast = environment.parse(textDoc)
+            #j2template = Template(textDoc)
+            #textDoc = j2template.render(eval(args.variables))
+            print(meta.find_undeclared_variables(ast)) 
         try:
             # Try to load as a JSON -- might fail with certain jinja2 constructs
             theDoc=json.loads(textDoc)
             print(json.dumps(theDoc,indent=4))
         except:
-            print(textDoc)
+            pass
+            # print(textDoc)
        
         
         

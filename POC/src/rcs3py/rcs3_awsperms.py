@@ -5,8 +5,8 @@ import os
 import sys
 import shlex
 import json
-from jinja2 import Template
-from platformdirs import user_config_dir
+from jinja2 import Template,Environment,meta
+from appdirs import user_config_dir
 
 # Make sure that we can import local items
 myDirectory=os.path.realpath(os.path.dirname(__file__))
@@ -300,6 +300,7 @@ class rcs3awsdb:
        return self.printRows(fieldNames,rows)
 
     def getVal(self, space,key='%',view=False,setNames=False,field=None):
+       """ Get the value -- database lookup """
        if field is None:
           field=self.elem.cols(space)[1]
        (fieldNames,rows) = self.listRaw(space,key,view,setNames)
@@ -309,6 +310,13 @@ class rcs3awsdb:
            return rvals
        else:
            return rvals[0]
+
+    def getVars(self,space,key='%',view=False,setNames=False):
+       """ Get the Jinja2 variables on the entry """
+       srep = "".join(self.getVal(space,key,view,setNames))
+       env = Environment()
+       ast = env.parse(srep)
+       return meta.find_undeclared_variables(ast)
        
 
 
