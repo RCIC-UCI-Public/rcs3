@@ -86,6 +86,7 @@
             },
             "End": true,
             "ResultSelector": {
+              "QueryId.$": "$.QueryExecution.QueryExecutionId",
               "ResultsFile.$": "$.QueryExecution.ResultConfiguration.OutputLocation",
               "State.$": "$.QueryExecution.Status.State"
             }
