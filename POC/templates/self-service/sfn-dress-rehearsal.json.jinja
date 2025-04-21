@@ -1,5 +1,5 @@
 {
-  "Comment": "Use Athena to query files in {{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }} that have been moved to Glacier",
+  "Comment": "Use Athena to query files in {{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }} that have been moved to Glacier",
   "StartAt": "create Athena queries",
   "States": {
     "create database": {
@@ -20,9 +20,9 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload": {
-          "BackupBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}",
+          "BackupBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}",
           "InventoryBucket": "{{ OWNER }}-{{ SYSTEM }}-{{ INVENTORY_POSTFIX }}",
-          "HiveDir": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}/{{ OWNER }}-{{ SYSTEM }}-daily/hive/dt={}-01-00/",
+          "HiveDir": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}/{{ OWNER }}-{{ SYSTEM }}-daily/hive/dt={}-01-00/",
           "RestoreList.$": "$.RestoreList",
           "ExpireDays.$": "$.ExpireDays"
         },
@@ -242,7 +242,7 @@
     "add event bridge notifications to bucket": {
       "Type": "Task",
       "Parameters": {
-        "Bucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}",
+        "Bucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}",
         "NotificationConfiguration": {
           "LambdaFunctionConfigurations": [
             {
@@ -316,7 +316,7 @@
             "ReadCapacityUnits": 5,
             "WriteCapacityUnits": 5
           },
-          "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}"
+          "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}"
         }
       },
       "Resource": "arn:aws:states:::aws-sdk:dynamodb:importTable",
@@ -330,7 +330,7 @@
     "DescribeTable": {
       "Type": "Task",
       "Parameters": {
-        "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}"
+        "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}"
       },
       "Resource": "arn:aws:states:::aws-sdk:dynamodb:describeTable",
       "Next": "check if table is ready"
@@ -362,11 +362,11 @@
     "Check Glacier Restore Completed": {
       "Type": "Task",
       "Parameters": {
-        "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}",
+        "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}",
         "Select": "COUNT",
         "FilterExpression": "#v = :s",
         "ExpressionAttributeNames": {
-          "#v": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}"
+          "#v": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}"
         },
         "ExpressionAttributeValues": {
           ":s": {
@@ -396,7 +396,7 @@
     "remove event bridge notification from bucket": {
       "Type": "Task",
       "Parameters": {
-        "Bucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}",
+        "Bucket": "{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}",
         "NotificationConfiguration": {}
       },
       "Resource": "arn:aws:states:::aws-sdk:s3:putBucketNotificationConfiguration",
@@ -405,7 +405,7 @@
     "DeleteTable": {
       "Type": "Task",
       "Parameters": {
-        "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTIFX }}"
+        "TableName": "rcs3-{{ OWNER }}-{{ SYSTEM }}-{{ BUCKET_POSTFIX }}"
       },
       "Resource": "arn:aws:states:::aws-sdk:dynamodb:deleteTable",
       "Next": "notify user restore ready"
