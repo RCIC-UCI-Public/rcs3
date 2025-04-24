@@ -11,26 +11,20 @@ def lambda_handler(event, context):
     # limit FileToken to 64 characters, needed for CreateJob idempotency
     l = []
     arnprefix = "arn:aws:s3:::"
-    d = event[ "ExpireDays" ]
-    b = event[ "QueryList" ][0][ "ResultsBucket" ]
-    p = event[ "QueryList" ][0][ "ResultsPrefix" ]
     s3 = boto3.client( "s3" )
     athena = boto3.client( "athena" )
-    for n in event[ "taskresult" ]:
+    for n in event[ "resultlist" ]:
         if n[ "State" ] == "SUCCEEDED":
-            # check if we have results vs a successful but empty set
+            # check if we have results vs successful but empty search
             q = athena.get_query_runtime_statistics( QueryExecutionId=n[ "QueryId" ] )
             if q["QueryRuntimeStatistics"]["Rows"]["OutputRows"] > 0:
-            
                 m = re.match( '^s3://([^/]+)/(.+)', n[ "ResultsFile" ] )
                 if m:
                     r = s3.head_object( Bucket=m.group(1), Key=m.group(2) )
                     l.append( {
                         'ResultsFile': arnprefix + m.group(1) + "/" + m.group(2),
-                        'ResultsPrefix': p,
                         'ETag': r[ "ETag" ].strip( '\"' ),
-                        'FileToken': m.group(2)[:64],
-                        'ExpireDays': d
+                        'FileToken': m.group(2)[:64]
                     } )
                 else:
                     # unable to get ETag, cannot process file
@@ -41,5 +35,5 @@ def lambda_handler(event, context):
         else:
             # search was not successful, drop for now
             pass
-    # save inputs needed for future steps
+    # return list files for processing
     return { 'CreateJobItems': l }
