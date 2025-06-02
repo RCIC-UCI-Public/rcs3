@@ -1,5 +1,5 @@
 # Use the latest version of Rocky Linux 8 as the base image
-FROM rockylinux/rockylinux:8.9
+FROM rockylinux/rockylinux:8.10
 
 # Note: all supported tags @ https://hub.docker.com/_/rockylinux
 

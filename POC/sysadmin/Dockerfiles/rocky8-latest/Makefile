@@ -5,7 +5,7 @@ REPO_NAME=rcs3uci
 IMAGE_NAME=rcs3-rocky8
 
 # Define tags for different versions
-TAG_VERSION_SPECIFIC=8.9
+TAG_VERSION_SPECIFIC=8.10
 TAG_LATEST=latest
 
 # Target to build the image - once
