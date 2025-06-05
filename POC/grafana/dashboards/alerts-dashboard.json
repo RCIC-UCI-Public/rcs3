@@ -1,0 +1,870 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 2,
+    "id": 7,
+    "links": [],
+    "panels": [
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 14,
+        "panels": [],
+        "title": "Row title",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cekknu1sj9af4b"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisGridShow": true,
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "log": 2,
+                "type": "log"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "line"
+              }
+            },
+            "decimals": 1,
+            "mappings": [],
+            "max": 1000000000000,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 1000000000000
+                }
+              ]
+            },
+            "unit": "bytes"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 4,
+          "x": 0,
+          "y": 1
+        },
+        "id": 13,
+        "options": {
+          "legend": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "desc"
+          }
+        },
+        "pluginVersion": "11.6.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {
+              "BucketName": "$bucket"
+            },
+            "expression": "",
+            "hide": false,
+            "id": "",
+            "label": "",
+            "logGroups": [],
+            "matchExact": false,
+            "metricEditorMode": 0,
+            "metricName": "BucketSizeBytes",
+            "metricQueryType": 0,
+            "namespace": "AWS/S3",
+            "period": "",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "A",
+            "region": "default",
+            "sqlExpression": "",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "Storage Quota",
+        "transformations": [
+          {
+            "id": "calculateField",
+            "options": {
+              "mode": "reduceRow",
+              "reduce": {
+                "reducer": "sum"
+              },
+              "replaceFields": true
+            }
+          }
+        ],
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cekknu1sj9af4b"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisGridShow": true,
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "log": 10,
+                "type": "log"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "line"
+              }
+            },
+            "decimals": 1,
+            "mappings": [],
+            "max": 1000000,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 1000000
+                }
+              ]
+            },
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 4,
+          "x": 4,
+          "y": 1
+        },
+        "id": 15,
+        "options": {
+          "legend": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "desc"
+          }
+        },
+        "pluginVersion": "11.6.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {
+              "BucketName": "$bucket"
+            },
+            "expression": "",
+            "hide": false,
+            "id": "",
+            "label": "",
+            "logGroups": [],
+            "matchExact": false,
+            "metricEditorMode": 0,
+            "metricName": "NumberOfObjects",
+            "metricQueryType": 0,
+            "namespace": "AWS/S3",
+            "period": "",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "A",
+            "region": "default",
+            "sqlExpression": "",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "Object Quota",
+        "transformations": [
+          {
+            "id": "calculateField",
+            "options": {
+              "mode": "reduceRow",
+              "reduce": {
+                "reducer": "sum"
+              },
+              "replaceFields": true
+            }
+          }
+        ],
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cekknu1sj9af4b"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "line"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 3.5
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 4,
+          "x": 8,
+          "y": 1
+        },
+        "id": 9,
+        "options": {
+          "legend": {
+            "calcs": [
+              "last"
+            ],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.6.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {
+              "bucket_name": "$bucket",
+              "record_type": "BUCKET",
+              "storage_class": "*"
+            },
+            "expression": "",
+            "hide": false,
+            "id": "requests",
+            "label": "",
+            "logGroups": [],
+            "matchExact": false,
+            "metricEditorMode": 0,
+            "metricName": "AllRequests",
+            "metricQueryType": 0,
+            "namespace": "AWS/S3/Storage-Lens",
+            "period": "86400",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "A",
+            "region": "us-west-2",
+            "sqlExpression": "",
+            "statistic": "Sum"
+          },
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {
+              "bucket_name": "$bucket",
+              "record_type": "BUCKET"
+            },
+            "expression": "",
+            "hide": false,
+            "id": "object_count",
+            "label": "",
+            "logGroups": [],
+            "matchExact": false,
+            "metricEditorMode": 0,
+            "metricName": "ObjectCount",
+            "metricQueryType": 0,
+            "namespace": "AWS/S3/Storage-Lens",
+            "period": "86400",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "B",
+            "region": "us-west-2",
+            "sqlExpression": "",
+            "statistic": "Sum"
+          }
+        ],
+        "title": "Request:Object Ratio",
+        "transformations": [
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "request_total",
+              "mode": "reduceRow",
+              "reduce": {
+                "include": [
+                  "- AllRequests",
+                  "GLACIER AllRequests",
+                  "STANDARD AllRequests"
+                ],
+                "reducer": "sum"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "object_count_total",
+              "mode": "reduceRow",
+              "reduce": {
+                "include": [
+                  "GLACIER ObjectCount",
+                  "STANDARD ObjectCount"
+                ],
+                "reducer": "sum"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "binary": {
+                "left": {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "request_total"
+                  }
+                },
+                "operator": "/",
+                "right": {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "object_count_total"
+                  }
+                }
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              },
+              "replaceFields": true
+            }
+          }
+        ],
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cekknu1sj9af4b"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "line"
+              }
+            },
+            "mappings": [],
+            "noValue": "9",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 9
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 5,
+          "w": 4,
+          "x": 12,
+          "y": 1
+        },
+        "id": 16,
+        "options": {
+          "legend": {
+            "calcs": [
+              "last"
+            ],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.6.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {
+              "bucket_name": "$bucket",
+              "record_type": "BUCKET",
+              "storage_class": "-"
+            },
+            "expression": "",
+            "hide": true,
+            "id": "bucket_req",
+            "label": "",
+            "logGroups": [],
+            "matchExact": false,
+            "metricEditorMode": 0,
+            "metricName": "AllRequests",
+            "metricQueryType": 0,
+            "namespace": "AWS/S3/Storage-Lens",
+            "period": "86400",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "A",
+            "region": "us-west-2",
+            "sqlExpression": "",
+            "statistic": "Sum"
+          },
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {
+              "bucket_name": "$bucket",
+              "record_type": "BUCKET",
+              "storage_class": "STANDARD"
+            },
+            "expression": "",
+            "hide": true,
+            "id": "standard_req",
+            "label": "",
+            "logGroups": [],
+            "matchExact": false,
+            "metricEditorMode": 0,
+            "metricName": "AllRequests",
+            "metricQueryType": 0,
+            "namespace": "AWS/S3/Storage-Lens",
+            "period": "86400",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "B",
+            "region": "us-west-2",
+            "sqlExpression": "",
+            "statistic": "Sum"
+          },
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {
+              "bucket_name": "$bucket",
+              "record_type": "BUCKET",
+              "storage_class": "GLACIER"
+            },
+            "expression": "",
+            "hide": true,
+            "id": "glacier_req",
+            "label": "",
+            "logGroups": [],
+            "matchExact": false,
+            "metricEditorMode": 0,
+            "metricName": "AllRequests",
+            "metricQueryType": 0,
+            "namespace": "AWS/S3/Storage-Lens",
+            "period": "86400",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "C",
+            "region": "us-west-2",
+            "sqlExpression": "",
+            "statistic": "Sum"
+          },
+          {
+            "datasource": {
+              "type": "cloudwatch",
+              "uid": "cekknu1sj9af4b"
+            },
+            "dimensions": {},
+            "expression": "SUM([FILL(bucket_req,9), FILL(standard_req,9), FILL(glacier_req,9)])",
+            "hide": false,
+            "id": "all_requests",
+            "label": "All Requests",
+            "logGroups": [],
+            "matchExact": true,
+            "metricEditorMode": 1,
+            "metricName": "",
+            "metricQueryType": 0,
+            "namespace": "",
+            "period": "",
+            "queryLanguage": "CWLI",
+            "queryMode": "Metrics",
+            "refId": "D",
+            "region": "default",
+            "sqlExpression": "",
+            "statistic": "Average"
+          }
+        ],
+        "title": "Bucket Activity",
+        "type": "timeseries"
+      }
+    ],
+    "preload": false,
+    "schemaVersion": 41,
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "text": "lopez-fedaykin-uci-s-bkup-bucket",
+            "value": "lopez-fedaykin-uci-s-bkup-bucket"
+          },
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cekknu1sj9af4b"
+          },
+          "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
+          "includeAll": true,
+          "label": "Bucket",
+          "name": "bucket",
+          "options": [],
+          "query": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
+          "refresh": 1,
+          "regex": "",
+          "type": "query"
+        },
+        {
+          "current": {
+            "text": "0.45",
+            "value": "0.45"
+          },
+          "description": "Storage Cost Discount",
+          "includeAll": false,
+          "label": "Storage Discount",
+          "name": "SDISCOUNT",
+          "options": [
+            {
+              "selected": false,
+              "text": "0%",
+              "value": "0.00"
+            },
+            {
+              "selected": false,
+              "text": "18%",
+              "value": "0.18"
+            },
+            {
+              "selected": true,
+              "text": "45%",
+              "value": "0.45"
+            }
+          ],
+          "query": "0% : 0.00, 18% : 0.18, 45% : 0.45",
+          "type": "custom"
+        },
+        {
+          "current": {
+            "text": "0.18",
+            "value": "0.18"
+          },
+          "description": "Enterprise API Cost Discount",
+          "includeAll": false,
+          "label": "Enterprise Discount",
+          "name": "EDISCOUNT",
+          "options": [
+            {
+              "selected": false,
+              "text": "0%",
+              "value": "0.00"
+            },
+            {
+              "selected": true,
+              "text": "18%",
+              "value": "0.18"
+            }
+          ],
+          "query": "0% : 0.00, 18% : 0.18",
+          "type": "custom"
+        },
+        {
+          "current": {
+            "text": "0.021",
+            "value": "0.021"
+          },
+          "hide": 2,
+          "name": "S3STD",
+          "options": [
+            {
+              "selected": true,
+              "text": "0.021",
+              "value": "0.021"
+            }
+          ],
+          "query": "0.021",
+          "type": "custom"
+        },
+        {
+          "current": {
+            "text": "0.0036",
+            "value": "0.0036"
+          },
+          "description": "S3 Glacier Storage Cost",
+          "includeAll": false,
+          "label": "S3 Glacier Class",
+          "name": "S3GLACIER",
+          "options": [
+            {
+              "selected": false,
+              "text": "GLACIER INSTANT",
+              "value": "0.0040"
+            },
+            {
+              "selected": true,
+              "text": "GLACIER FLEXIBLE",
+              "value": "0.0036"
+            },
+            {
+              "selected": false,
+              "text": "GLACIER DEEP",
+              "value": "0.00099"
+            }
+          ],
+          "query": "GLACIER INSTANT : 0.0040, GLACIER FLEXIBLE : 0.0036, GLACIER DEEP : 0.00099",
+          "type": "custom"
+        },
+        {
+          "current": {
+            "text": "9.313225746e-10",
+            "value": "9.313225746e-10"
+          },
+          "hide": 2,
+          "name": "BYTES2GB",
+          "options": [
+            {
+              "selected": true,
+              "text": "9.313225746e-10",
+              "value": "9.313225746e-10"
+            }
+          ],
+          "query": "9.313225746e-10",
+          "type": "custom"
+        },
+        {
+          "current": {
+            "text": "30",
+            "value": "30"
+          },
+          "description": "Days in current month for GB-month calculations",
+          "name": "days_in_month",
+          "options": [
+            {
+              "selected": true,
+              "text": "30",
+              "value": "30"
+            }
+          ],
+          "query": "30",
+          "type": "custom"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-14d",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "UCI - System Alarms",
+    "uid": "system-alarms2",
+    "version": 4
+  }

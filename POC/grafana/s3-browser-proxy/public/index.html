@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 5px;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .folder-list, .file-list {
+            margin: 20px;
+        }
+
+        .folder-list h3, .file-list h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .icon {
+            margin-right: 12px;
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .folder-icon {
+            color: #ffd700;
+        }
+
+        .file-icon {
+            color: #6c757d;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            color: #007bff;
+        }
+
+        .item-name:hover {
+            text-decoration: underline;
+        }
+
+        .item-details {
+            font-size: 12px;
+            color: #6c757d;
+            display: flex;
+            gap: 15px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .selection-checkbox {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .selection-controls {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .selection-controls h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .selection-summary {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .selection-item {
+            padding: 2px 0;
+            color: #6c757d;
+        }
+
+        .selection-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item-actions {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ S3 Browser</h1>
+            <p>Browse AWS S3 buckets and objects with read-only access</p>
+        </div>
+
+        <div class="controls">
+            <select id="bucketSelect">
+                <option value="">Select a bucket...</option>
+            </select>
+            <button class="btn" onclick="refreshBuckets()">🔄 Refresh Buckets</button>
+            <button class="btn btn-secondary" onclick="reloadCredentials()">🔑 Reload Credentials</button>
+        </div>
+
+        <div id="breadcrumb" class="breadcrumb" style="display: none;">
+            <span id="breadcrumbContent"></span>
+        </div>
+
+        <div id="selectionControls" class="selection-controls">
+            <h3>📋 Selected Items</h3>
+            <div class="selection-buttons">
+                <button class="btn btn-small" onclick="selectAll()">Select All</button>
+                <button class="btn btn-small btn-secondary" onclick="clearSelection()">Clear Selection</button>
+                <button class="btn btn-small" onclick="showSelectionDetails()">Show Details</button>
+                <button class="btn btn-small" onclick="copySelectionToClipboard()">📋 Copy List</button>
+            </div>
+            <div id="selectionSummary" class="selection-summary" style="display: none;">
+                <div id="selectionList"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;"></div>
+
+            <div id="emptyState" class="empty-state">
+                <h3>👆 Select a bucket to get started</h3>
+                <p>Choose a bucket from the dropdown above to browse its contents</p>
+            </div>
+
+            <div id="folderList" class="folder-list" style="display: none;">
+                <h3>📁 Folders</h3>
+                <div id="folders"></div>
+            </div>
+
+            <div id="fileList" class="file-list" style="display: none;">
+                <h3>📄 Files</h3>
+                <div id="files"></div>
+            </div>
+
+            <div id="statusBar" class="status-bar" style="display: none;">
+                <span id="statusText"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBucket = '';
+        let currentPrefix = '';
+        let selectedItems = new Set(); // Stores selected paths
+        let currentFolders = []; // Cache current folder list
+        let currentFiles = []; // Cache current file list
+
+        // Get filtered buckets from URL parameters
+        function getFilteredBuckets() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            return filter ? filter.split(',').map(b => b.trim()) : null;
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            checkRuntimeEnvironment(); // Check if server-hosted and hide client features
+            loadBuckets();
+            
+            document.getElementById('bucketSelect').addEventListener('change', function() {
+                const selectedBucket = this.value;
+                if (selectedBucket) {
+                    currentBucket = selectedBucket;
+                    currentPrefix = '';
+                    selectedItems.clear(); // Clear selections when switching buckets
+                    loadObjects();
+                } else {
+                    showEmptyState();
+                    document.getElementById('selectionControls').style.display = 'none';
+                }
+            });
+        });
+
+        // Check runtime environment and hide client-side features when server-hosted
+        async function checkRuntimeEnvironment() {
+            try {
+                const response = await fetch('/api/runtime-info');
+                if (response.ok) {
+                    const runtimeInfo = await response.json();
+                    
+                    console.log('Runtime environment:', runtimeInfo);
+                    
+                    if (runtimeInfo.isServerHosted) {
+                        // Hide reload credentials button when server-hosted (using IAM role)
+                        const reloadCredentialsBtn = document.querySelector('button[onclick="reloadCredentials()"]');
+                        if (reloadCredentialsBtn) {
+                            reloadCredentialsBtn.style.display = 'none';
+                        }
+                        
+                        // Hide refresh buckets button when server-hosted (not needed on server)
+                        const refreshBucketsBtn = document.querySelector('button[onclick="refreshBuckets()"]');
+                        if (refreshBucketsBtn) {
+                            refreshBucketsBtn.style.display = 'none';
+                        }
+                        
+                        console.log('Server-hosted environment detected - hiding client-only buttons');
+                    } else {
+                        console.log('Local development environment detected - showing all buttons');
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not determine runtime environment:', error);
+                // Assume local environment if API call fails
+            }
+        }
+
+        // Load available buckets
+        async function loadBuckets() {
+            try {
+                showLoading();
+                const response = await fetch('/api/buckets');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const buckets = await response.json();
+                const select = document.getElementById('bucketSelect');
+                
+                // Clear existing options except the first one
+                select.innerHTML = '<option value="">Select a bucket...</option>';
+                
+                // Get filtered bucket list if filter parameter exists
+                const filteredBucketNames = getFilteredBuckets();
+                const bucketsToShow = filteredBucketNames ? 
+                    buckets.filter(bucket => filteredBucketNames.includes(bucket.Name)) : 
+                    buckets;
+                
+                bucketsToShow.forEach(bucket => {
+                    const option = document.createElement('option');
+                    option.value = bucket.Name;
+                    option.textContent = `${bucket.Name} (Created: ${new Date(bucket.CreationDate).toLocaleDateString()})`;
+                    select.appendChild(option);
+                });
+                
+                hideLoading();
+                if (bucketsToShow.length === 0) {
+                    if (filteredBucketNames) {
+                        showError(`No accessible buckets found from filter: ${filteredBucketNames.join(', ')}`);
+                    } else {
+                        showError('No buckets found. Please check your AWS credentials and permissions.');
+                    }
+                } else {
+                    showEmptyState();
+                    
+                    // If only one bucket is available, auto-select it
+                    if (bucketsToShow.length === 1) {
+                        select.value = bucketsToShow[0].Name;
+                        currentBucket = bucketsToShow[0].Name;
+                        currentPrefix = '';
+                        selectedItems.clear();
+                        loadObjects();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading buckets:', error);
+                showError(`Failed to load buckets: ${error.message}`);
+                hideLoading();
+            }
+        }
+
+        // Load objects in current bucket/prefix
+        async function loadObjects() {
+            if (!currentBucket) return;
+            
+            try {
+                showLoading();
+                const url = `/api/buckets/${encodeURIComponent(currentBucket)}/objects?prefix=${encodeURIComponent(currentPrefix)}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayObjects(data);
+                updateBreadcrumb();
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading objects:', error);
+                showError(`Failed to load objects: ${error.message}`);
+                hideLoading();
+            }
+        }
+
+        // Display folders and files
+        function displayObjects(data) {
+            hideError();
+            
+            // Cache the current data
+            currentFolders = data.folders || [];
+            currentFiles = data.files || [];
+            
+            const foldersContainer = document.getElementById('folders');
+            const filesContainer = document.getElementById('files');
+            const folderList = document.getElementById('folderList');
+            const fileList = document.getElementById('fileList');
+            
+            // Clear previous content
+            foldersContainer.innerHTML = '';
+            filesContainer.innerHTML = '';
+            
+            // Show/hide sections based on content
+            const hasFolders = currentFolders.length > 0;
+            const hasFiles = currentFiles.length > 0;
+            
+            folderList.style.display = hasFolders ? 'block' : 'none';
+            fileList.style.display = hasFiles ? 'block' : 'none';
+            
+            if (!hasFolders && !hasFiles) {
+                showEmptyFolder();
+                return;
+            }
+            
+            hideEmptyState();
+            
+            // Display folders
+            if (hasFolders) {
+                currentFolders.forEach(folder => {
+                    const folderElement = createFolderElement(folder);
+                    foldersContainer.appendChild(folderElement);
+                });
+            }
+            
+            // Display files
+            if (hasFiles) {
+                currentFiles.forEach(file => {
+                    const fileElement = createFileElement(file);
+                    filesContainer.appendChild(fileElement);
+                });
+            }
+            
+            // Update status bar
+            updateStatusBar(currentFolders.length, currentFiles.length);
+            
+            // Show selection controls if we have content
+            document.getElementById('selectionControls').style.display = (hasFolders || hasFiles) ? 'block' : 'none';
+            
+            // Update selection states
+            updateSelectionUI();
+        }
+
+        // Create folder element
+        function createFolderElement(folder) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            
+            const folderName = folder.Prefix.slice(currentPrefix.length).replace(/\/$/, '');
+            const folderPath = folder.Prefix;
+            const isSelected = isItemSelected(folderPath);
+            
+            div.innerHTML = `
+                <input type="checkbox" class="selection-checkbox" 
+                       data-path="${folderPath}" 
+                       data-type="folder"
+                       ${isSelected ? 'checked' : ''}
+                       onchange="toggleSelection('${folderPath}', 'folder', this.checked)">
+                <span class="icon folder-icon">📁</span>
+                <div class="item-info">
+                    <div class="item-name" onclick="navigateToFolder('${folder.Prefix}')">${folderName}</div>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Create file element
+        function createFileElement(file) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            
+            const fileName = file.Key.slice(currentPrefix.length);
+            const fileSize = formatFileSize(file.Size);
+            const lastModified = new Date(file.LastModified).toLocaleString();
+            const isSelected = isItemSelected(file.Key);
+            
+            div.innerHTML = `
+                <input type="checkbox" class="selection-checkbox" 
+                       data-path="${file.Key}" 
+                       data-type="file"
+                       ${isSelected ? 'checked' : ''}
+                       onchange="toggleSelection('${file.Key}', 'file', this.checked)">
+                <span class="icon file-icon">📄</span>
+                <div class="item-info">
+                    <div class="item-name">${fileName}</div>
+                    <div class="item-details">
+                        <span>Size: ${fileSize}</span>
+                        <span>Modified: ${lastModified}</span>
+                        <span>Storage: ${file.StorageClass || 'STANDARD'}</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-small" onclick="showMetadata('${file.Key}')">ℹ️ Info</button>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Navigate to folder
+        function navigateToFolder(prefix) {
+            currentPrefix = prefix;
+            loadObjects();
+        }
+
+        // Navigate up (breadcrumb navigation)
+        function navigateUp(targetPrefix) {
+            currentPrefix = targetPrefix;
+            loadObjects();
+        }
+
+        // Update breadcrumb
+        function updateBreadcrumb() {
+            const breadcrumb = document.getElementById('breadcrumb');
+            const breadcrumbContent = document.getElementById('breadcrumbContent');
+            
+            if (!currentPrefix) {
+                breadcrumb.style.display = 'none';
+                return;
+            }
+            
+            breadcrumb.style.display = 'block';
+            
+            let html = `<a href="#" onclick="navigateUp('')">🏠 ${currentBucket}</a> / `;
+            
+            const parts = currentPrefix.split('/').filter(part => part);
+            let path = '';
+            
+            parts.forEach((part, index) => {
+                path += part + '/';
+                if (index === parts.length - 1) {
+                    html += `<span>${part}</span>`;
+                } else {
+                    html += `<a href="#" onclick="navigateUp('${path}')">${part}</a> / `;
+                }
+            });
+            
+            breadcrumbContent.innerHTML = html;
+        }
+
+        // Show file metadata
+        async function showMetadata(key) {
+            try {
+                const response = await fetch(`/api/buckets/${encodeURIComponent(currentBucket)}/objects/${encodeURIComponent(key)}/metadata`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const metadata = await response.json();
+                
+                let info = `File: ${key}\n\n`;
+                info += `Size: ${formatFileSize(metadata.ContentLength)}\n`;
+                info += `Last Modified: ${new Date(metadata.LastModified).toLocaleString()}\n`;
+                info += `Content Type: ${metadata.ContentType || 'Unknown'}\n`;
+                info += `ETag: ${metadata.ETag}\n`;
+                
+                if (metadata.StorageClass) {
+                    info += `Storage Class: ${metadata.StorageClass}\n`;
+                }
+                
+                if (metadata.Metadata && Object.keys(metadata.Metadata).length > 0) {
+                    info += `\nCustom Metadata:\n`;
+                    Object.entries(metadata.Metadata).forEach(([key, value]) => {
+                        info += `  ${key}: ${value}\n`;
+                    });
+                }
+                
+                alert(info);
+            } catch (error) {
+                console.error('Error fetching metadata:', error);
+                alert(`Failed to load metadata: ${error.message}`);
+            }
+        }
+
+        // Download file
+        // No download functionality - read-only access
+
+        // Refresh buckets
+        function refreshBuckets() {
+            document.getElementById('bucketSelect').selectedIndex = 0;
+            currentBucket = '';
+            currentPrefix = '';
+            showEmptyState();
+            loadBuckets();
+        }
+
+        // Reload credentials
+        async function reloadCredentials() {
+            try {
+                const response = await fetch('/api/reload-credentials', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Credentials reloaded successfully!');
+                    refreshBuckets();
+                } else {
+                    alert(`Failed to reload credentials: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error reloading credentials:', error);
+                alert(`Error reloading credentials: ${error.message}`);
+            }
+        }
+
+        // Selection management functions
+        function toggleSelection(path, type, isChecked) {
+            console.log(`Toggle selection: ${path}, type: ${type}, checked: ${isChecked}`);
+            
+            if (isChecked) {
+                // Adding an item to selection
+                if (type === 'folder') {
+                    // Standardize folder pattern - always use path/* format (without trailing slash before /*)
+                    const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
+                    const folderPattern = normalizedPath + '/*';
+                    
+                    // Remove any existing patterns for this folder first
+                    const existingPatterns = Array.from(selectedItems).filter(item => {
+                        const itemPath = item.replace('/*', '').replace(/\*$/, '');
+                        return itemPath === normalizedPath;
+                    });
+                    existingPatterns.forEach(pattern => selectedItems.delete(pattern));
+                    
+                    selectedItems.add(folderPattern);
+                    console.log(`Added folder pattern: ${folderPattern}`);
+                    
+                    // Remove any individual files under this folder that were previously selected
+                    const filesToRemove = Array.from(selectedItems).filter(item => 
+                        item.startsWith(normalizedPath + '/') && !item.includes('*')
+                    );
+                    filesToRemove.forEach(file => selectedItems.delete(file));
+                } else {
+                    // For files, check if parent folder is already selected
+                    const parentSelected = Array.from(selectedItems).some(item => {
+                        if (item.includes('*')) {
+                            const folderPath = item.replace('/*', '');
+                            return path.startsWith(folderPath + '/');
+                        }
+                        return false;
+                    });
+                    
+                    if (!parentSelected) {
+                        selectedItems.add(path);
+                        console.log(`Added file: ${path}`);
+                    }
+                }
+            } else {
+                // Removing an item from selection
+                if (type === 'folder') {
+                    const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
+                    
+                    // Find parent folder patterns that might contain this folder
+                    const parentPatterns = Array.from(selectedItems).filter(item => {
+                        if (!item.includes('*')) return false;
+                        const parentPath = item.replace('/*', '').replace(/\*$/, '');
+                        return normalizedPath.startsWith(parentPath + '/') && parentPath !== normalizedPath;
+                    });
+                    
+                    if (parentPatterns.length > 0) {
+                        // This folder is under a parent selection - need to break up the parent
+                        parentPatterns.forEach(parentPattern => {
+                            selectedItems.delete(parentPattern);
+                            console.log(`Removed parent pattern: ${parentPattern}`);
+                            
+                            const parentPath = parentPattern.replace('/*', '');
+                            
+                            // Re-add all items under the parent except the one being deselected
+                            currentFolders.forEach(folder => {
+                                const folderNormalized = folder.Prefix.endsWith('/') ? 
+                                    folder.Prefix.slice(0, -1) : folder.Prefix;
+                                if (folderNormalized.startsWith(parentPath + '/') && folderNormalized !== normalizedPath) {
+                                    selectedItems.add(folderNormalized + '/*');
+                                }
+                            });
+                            
+                            currentFiles.forEach(file => {
+                                if (file.Key.startsWith(parentPath + '/') && !file.Key.startsWith(normalizedPath + '/')) {
+                                    selectedItems.add(file.Key);
+                                }
+                            });
+                        });
+                    } else {
+                        // Direct folder selection - just remove it
+                        const patterns = [
+                            normalizedPath + '/*',
+                            path.endsWith('/') ? path + '*' : path + '/*',
+                            path
+                        ];
+                        
+                        patterns.forEach(pattern => {
+                            if (selectedItems.has(pattern)) {
+                                selectedItems.delete(pattern);
+                                console.log(`Removed folder pattern: ${pattern}`);
+                            }
+                        });
+                    }
+                } else {
+                    // For files, check if it's part of a selected folder pattern
+                    const parentFolderPattern = Array.from(selectedItems).find(item => {
+                        if (item.includes('*')) {
+                            const folderPath = item.replace('/*', '');
+                            return path.startsWith(folderPath + '/');
+                        }
+                        return false;
+                    });
+                    
+                    if (parentFolderPattern) {
+                        // Remove the folder pattern and add individual files except the deselected one
+                        selectedItems.delete(parentFolderPattern);
+                        console.log(`Removed parent folder pattern: ${parentFolderPattern}`);
+                        
+                        const folderPath = parentFolderPattern.replace('/*', '');
+                        
+                        // Add back all other items under this folder except the unchecked one
+                        currentFiles.forEach(file => {
+                            if (file.Key.startsWith(folderPath + '/') && file.Key !== path) {
+                                selectedItems.add(file.Key);
+                            }
+                        });
+                        
+                        // Add other folders in current view that were under the parent
+                        currentFolders.forEach(folder => {
+                            const normalizedFolderPath = folder.Prefix.endsWith('/') ? 
+                                folder.Prefix.slice(0, -1) : folder.Prefix;
+                            if (normalizedFolderPath.startsWith(folderPath + '/')) {
+                                const subFolderPattern = normalizedFolderPath + '/*';
+                                selectedItems.add(subFolderPattern);
+                            }
+                        });
+                    } else {
+                        // File is individually selected, just remove it
+                        selectedItems.delete(path);
+                        console.log(`Removed file: ${path}`);
+                    }
+                }
+            }
+            
+            console.log('Final selections after toggle:', Array.from(selectedItems));
+            updateSelectionUI();
+        }
+
+        function isItemSelected(path) {
+            // Check if the item itself is selected
+            if (selectedItems.has(path)) return true;
+            
+            // For folders, check both possible patterns (with and without trailing slash)
+            const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
+            const folderPattern1 = normalizedPath + '/*';
+            const folderPattern2 = path.endsWith('/') ? path + '*' : path + '/*';
+            
+            if (selectedItems.has(folderPattern1) || selectedItems.has(folderPattern2)) return true;
+            
+            // Check if item is under a selected folder pattern
+            // Only consider it selected if there's a parent pattern that covers it
+            return Array.from(selectedItems).some(item => {
+                if (item.includes('*')) {
+                    const folderPath = item.replace('/*', '').replace(/\*$/, '');
+                    // Make sure the folder path is actually a parent (not the same path)
+                    return folderPath !== normalizedPath && 
+                           (path.startsWith(folderPath + '/') || 
+                            (path.endsWith('/') && path.slice(0, -1).startsWith(folderPath + '/')));
+                }
+                return false;
+            });
+        }
+
+        function updateSelectionUI() {
+            // Update checkboxes to reflect current selection state
+            document.querySelectorAll('.selection-checkbox').forEach(checkbox => {
+                const path = checkbox.dataset.path;
+                checkbox.checked = isItemSelected(path);
+            });
+            
+            // Update selection count display
+            updateSelectionCount();
+        }
+
+        function updateSelectionCount() {
+            const count = selectedItems.size;
+            if (count > 0) {
+                document.getElementById('selectionControls').style.display = 'block';
+            }
+        }
+
+        function selectAll() {
+            selectedItems.clear();
+            
+            // Select all folders
+            currentFolders.forEach(folder => {
+                const folderPattern = folder.Prefix.endsWith('/') ? 
+                    folder.Prefix + '*' : folder.Prefix + '/*';
+                selectedItems.add(folderPattern);
+            });
+            
+            // Select all files that aren't under selected folders
+            currentFiles.forEach(file => {
+                const underSelectedFolder = currentFolders.some(folder => 
+                    file.Key.startsWith(folder.Prefix)
+                );
+                
+                if (!underSelectedFolder) {
+                    selectedItems.add(file.Key);
+                }
+            });
+            
+            updateSelectionUI();
+        }
+
+        function clearSelection() {
+            selectedItems.clear();
+            updateSelectionUI();
+            document.getElementById('selectionSummary').style.display = 'none';
+        }
+
+        function showSelectionDetails() {
+            const summaryDiv = document.getElementById('selectionSummary');
+            const listDiv = document.getElementById('selectionList');
+            
+            if (selectedItems.size === 0) {
+                listDiv.innerHTML = '<div class="selection-item">No items selected</div>';
+            } else {
+                const items = Array.from(selectedItems).sort();
+                listDiv.innerHTML = items.map(item => 
+                    `<div class="selection-item">${item}</div>`
+                ).join('');
+            }
+            
+            summaryDiv.style.display = summaryDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Copy selection list to clipboard
+        function copySelectionToClipboard() {
+            if (selectedItems.size === 0) {
+                alert('No items selected to copy');
+                return;
+            }
+
+            const items = Array.from(selectedItems).sort();
+            const text = items.join('\n');
+            
+            // Use the Clipboard API if available
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert(`Copied ${items.length} items to clipboard`);
+                }).catch(err => {
+                    console.error('Failed to copy to clipboard:', err);
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        }
+
+        // Fallback copy method for older browsers or non-secure contexts
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.padding = '0';
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                const items = Array.from(selectedItems);
+                if (successful) {
+                    alert(`Copied ${items.length} items to clipboard`);
+                } else {
+                    alert('Failed to copy to clipboard');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                alert('Copy to clipboard not supported in this browser');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // Utility functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            hideError();
+            hideEmptyState();
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            hideEmptyState();
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function showEmptyState() {
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('folderList').style.display = 'none';
+            document.getElementById('fileList').style.display = 'none';
+            document.getElementById('statusBar').style.display = 'none';
+        }
+
+        function hideEmptyState() {
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function showEmptyFolder() {
+            document.getElementById('emptyState').innerHTML = `
+                <h3>📂 Empty Folder</h3>
+                <p>This folder contains no files or subfolders</p>
+            `;
+            showEmptyState();
+        }
+
+        function updateStatusBar(folderCount, fileCount) {
+            const statusBar = document.getElementById('statusBar');
+            const statusText = document.getElementById('statusText');
+            
+            let text = '';
+            if (folderCount > 0) {
+                text += `${folderCount} folder${folderCount !== 1 ? 's' : ''}`;
+            }
+            if (fileCount > 0) {
+                if (text) text += ', ';
+                text += `${fileCount} file${fileCount !== 1 ? 's' : ''}`;
+            }
+            
+            statusText.textContent = text;
+            statusBar.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

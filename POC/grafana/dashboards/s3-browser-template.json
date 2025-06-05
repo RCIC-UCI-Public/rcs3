@@ -1,0 +1,96 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "text",
+        "uid": "text"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 24,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "code": {
+          "language": "html",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<div style=\"height: 100%; width: 100%; min-height: 800px; overflow: hidden;\">\n  <iframe \n    src=\"http://{{GRAFANA_HOST}}:3001?filter={{TEAM_BUCKETS}}\" \n    style=\"width: 100%; height: 100%; min-height: 800px; border: none; overflow: hidden;\"\n    frameborder=\"0\"\n    scrolling=\"auto\"\n    onload=\"console.log('S3 Browser iframe loaded successfully')\">\n  </iframe>\n</div>",
+        "mode": "html"
+      },
+      "pluginVersion": "10.2.2",
+      "title": "S3 Browser - {{TEAM_NAME}}",
+      "type": "text"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [
+    "s3-browser",
+    "{{TEAM_NAME}}"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "S3 Browser - {{TEAM_NAME}}",
+  "uid": "s3-browser-{{TEAM_UID}}",
+  "version": 1,
+  "weekStart": ""
+}

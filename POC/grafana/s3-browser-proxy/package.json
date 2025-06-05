@@ -1,0 +1,26 @@
+{
+  "name": "s3-browser-proxy",
+  "version": "1.0.0",
+  "description": "Node.js proxy server for S3 browsing with CORS handling",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js --watch"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "aws-sdk": "^2.1404.0",
+    "path": "^0.12.7",
+    "fs": "^0.0.1-security"
+  },
+  "keywords": [
+    "s3",
+    "browser",
+    "proxy",
+    "aws",
+    "grafana"
+  ],
+  "author": "RCS3 Team",
+  "license": "MIT"
+}
