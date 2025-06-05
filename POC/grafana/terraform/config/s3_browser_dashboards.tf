@@ -56,4 +56,11 @@ resource "grafana_dashboard" "admin_s3_browser" {
   )
   folder    = grafana_folder.admin_folder.id
   overwrite = true
+
+  # Ignore changes to fields that Grafana manages
+  lifecycle {
+    ignore_changes = [
+      config_json,  # Ignore JSON formatting differences
+    ]
+  }
 }

@@ -6,6 +6,13 @@ resource "grafana_dashboard" "common_dashboards" {
   config_json = jsonencode(each.value)
   folder      = grafana_folder.common_folder.id
   overwrite   = true
+
+  # Ignore changes to fields that Grafana manages
+  lifecycle {
+    ignore_changes = [
+      config_json,  # Ignore JSON formatting differences
+    ]
+  }
 }
 
 # Import team-restricted dashboards (only available to admins and teams)
@@ -16,4 +23,11 @@ resource "grafana_dashboard" "admin_dashboards" {
   config_json = jsonencode(each.value)
   folder      = grafana_folder.admin_folder.id
   overwrite   = true
+
+  # Ignore changes to fields that Grafana manages
+  lifecycle {
+    ignore_changes = [
+      config_json,  # Ignore JSON formatting differences
+    ]
+  }
 }
