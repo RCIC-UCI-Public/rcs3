@@ -1,0 +1,657 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 2,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 400,
+      "panels": [],
+      "title": "💰 Weekly Cost Optimization Dashboard",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "cekknu1sj9af4b"
+      },
+      "description": "Current weekly storage growth rate in GB",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": -50000000000
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 403,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "diff"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": true,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cekknu1sj9af4b"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET"
+          },
+          "expression": "",
+          "id": "total_storage",
+          "label": "Total Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "604800",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        }
+      ],
+      "title": "Weekly Growth Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "cekknu1sj9af4b"
+      },
+      "description": "Estimated monthly cost difference between Standard and Glacier",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 200
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "id": 402,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cekknu1sj9af4b"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "id": "standard_bytes",
+          "label": "Standard Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        }
+      ],
+      "title": "Potential Monthly Savings",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Monthly Savings",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Standard Storage"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byValue",
+                  "options": "0.0000000000174"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": true
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "cekknu1sj9af4b"
+      },
+      "description": "Storage efficiency: percentage of data in cost-effective storage classes",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "id": 404,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cekknu1sj9af4b"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "id": "standard",
+          "label": "Standard",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cekknu1sj9af4b"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "GLACIER"
+          },
+          "expression": "",
+          "id": "glacier",
+          "label": "Glacier",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        }
+      ],
+      "title": "Storage Efficiency Score",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total Storage",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Standard"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Glacier"
+                }
+              }
+            },
+            "mode": "binary"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Efficiency %",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Glacier"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total Storage"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": true
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 500,
+      "panels": [],
+      "title": "📈 Cost Trend Analysis",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "cekknu1sj9af4b"
+      },
+      "description": "Weekly cost trends showing storage costs by class",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Monthly Cost (USD)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
+            "pointSize": 6,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 501,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "diff",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cekknu1sj9af4b"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "id": "standard_cost",
+          "label": "Standard Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cekknu1sj9af4b"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "GLACIER"
+          },
+          "expression": "",
+          "id": "glacier_cost",
+          "label": "Glacier Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        }
+      ],
+      "title": "Monthly Storage Costs by Class",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Standard Monthly Cost",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Standard Storage"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byValue",
+                  "options": "0.000000000021"
+                }
+              }
+            },
+            "mode": "binary"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Glacier Monthly Cost",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Glacier Storage"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byValue",
+                  "options": "0.0000000000036"
+                }
+              }
+            },
+            "mode": "binary"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Standard Storage": true,
+              "Glacier Storage": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [
+    "cost",
+    "optimization",
+    "weekly",
+    "savings"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "lopez-fedaykin-uci-s-bkup-bucket",
+          "value": "lopez-fedaykin-uci-s-bkup-bucket"
+        },
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "cekknu1sj9af4b"
+        },
+        "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
+        "includeAll": true,
+        "label": "Bucket",
+        "name": "bucket",
+        "options": [],
+        "query": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Cost Optimization - Weekly Focus",
+  "uid": "cost-optimization-weekly",
+  "version": 1
+}

@@ -151,6 +151,34 @@
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Maximum"
+        },
+        {
+          "alias": "Deep Archive Storage",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "P034F075C744B399F"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "id": "deep_archive",
+          "label": "Deep Archive Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
         }
       ],
       "title": "Storage Class Trends",
@@ -285,6 +313,34 @@
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Maximum"
+        },
+        {
+          "alias": "Deep Archive Objects",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "P034F075C744B399F"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "id": "deep_archive_objects",
+          "label": "Deep Archive Objects",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "ObjectCount",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
         }
       ],
       "title": "Object Count Distribution",
@@ -390,6 +446,34 @@
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
           "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Deep Archive",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "P034F075C744B399F"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "id": "deep_archive",
+          "label": "Deep Archive",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Maximum"

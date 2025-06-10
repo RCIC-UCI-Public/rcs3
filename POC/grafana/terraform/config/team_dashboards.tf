@@ -38,13 +38,6 @@ resource "grafana_dashboard" "team_dashboards" {
 
   folder    = grafana_folder.team_folders[each.value.team_name].id
   overwrite = true
-
-  # Ignore changes to fields that Grafana manages
-  lifecycle {
-    ignore_changes = [
-      config_json,  # Ignore JSON formatting differences
-    ]
-  }
 }
 
 # Create team-specific S3 browser dashboards in team folders
