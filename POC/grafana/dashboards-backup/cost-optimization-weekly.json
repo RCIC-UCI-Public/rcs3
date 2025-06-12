@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
-  "id": null,
+  "id": 28,
   "links": [],
   "panels": [
     {
@@ -37,9 +37,9 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cekknu1sj9af4b"
+        "uid": "aeo1xkxdi1jpcb"
       },
-      "description": "Current weekly storage growth rate in GB",
+      "description": "Week-over-week storage growth rate showing percentage change from previous week",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -54,15 +54,15 @@
               },
               {
                 "color": "yellow",
-                "value": 0
+                "value": 0.05
               },
               {
                 "color": "red",
-                "value": -50000000000
+                "value": 0.15
               }
             ]
           },
-          "unit": "decbytes"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -86,16 +86,16 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": true,
+        "showPercentChange": false,
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.1",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cekknu1sj9af4b"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -120,12 +120,51 @@
         }
       ],
       "title": "Weekly Growth Rate",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Growth Rate",
+            "mode": "reduceRow",
+            "reduce": {
+              "reducer": "diff"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Weekly Growth %",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Growth Rate"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total Storage"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
       "type": "stat"
     },
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cekknu1sj9af4b"
+        "uid": "aeo1xkxdi1jpcb"
       },
       "description": "Estimated monthly cost difference between Standard and Glacier",
       "fieldConfig": {
@@ -178,12 +217,12 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.1",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cekknu1sj9af4b"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -223,10 +262,7 @@
               },
               "operator": "*",
               "right": {
-                "matcher": {
-                  "id": "byValue",
-                  "options": "0.0000000000174"
-                }
+                "value": "0.0000000000174"
               }
             },
             "mode": "binary",
@@ -239,7 +275,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cekknu1sj9af4b"
+        "uid": "aeo1xkxdi1jpcb"
       },
       "description": "Storage efficiency: percentage of data in cost-effective storage classes",
       "fieldConfig": {
@@ -294,12 +330,12 @@
         "textMode": "value_and_name",
         "wideLayout": true
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.1",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cekknu1sj9af4b"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -326,7 +362,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cekknu1sj9af4b"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -417,7 +453,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cekknu1sj9af4b"
+        "uid": "aeo1xkxdi1jpcb"
       },
       "description": "Weekly cost trends showing storage costs by class",
       "fieldConfig": {
@@ -495,12 +531,12 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.0.1",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cekknu1sj9af4b"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -527,7 +563,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cekknu1sj9af4b"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -567,10 +603,7 @@
               },
               "operator": "*",
               "right": {
-                "matcher": {
-                  "id": "byValue",
-                  "options": "0.000000000021"
-                }
+                "value": "0.000000000021"
               }
             },
             "mode": "binary"
@@ -589,10 +622,7 @@
               },
               "operator": "*",
               "right": {
-                "matcher": {
-                  "id": "byValue",
-                  "options": "0.0000000000036"
-                }
+                "value": "0.0000000000036"
               }
             },
             "mode": "binary"
@@ -602,8 +632,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Standard Storage": true,
-              "Glacier Storage": true
+              "Glacier Storage": true,
+              "Standard Storage": true
             },
             "includeByName": {},
             "indexByName": {},
@@ -631,7 +661,7 @@
         },
         "datasource": {
           "type": "cloudwatch",
-          "uid": "cekknu1sj9af4b"
+          "uid": "aeo1xkxdi1jpcb"
         },
         "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
         "includeAll": true,
@@ -646,12 +676,12 @@
     ]
   },
   "time": {
-    "from": "now-30d",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Cost Optimization - Weekly Focus",
-  "uid": "cost-optimization-weekly",
-  "version": 1
+  "uid": "a64ca874-6309-47fb-815a-9f6ec91657ad",
+  "version": 21
 }

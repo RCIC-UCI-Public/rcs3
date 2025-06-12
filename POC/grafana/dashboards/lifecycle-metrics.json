@@ -18,12 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 39,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "P034F075C744B399F"
+        "uid": "aeo1xkxdi1jpcb"
       },
       "fieldConfig": {
         "defaults": {
@@ -31,11 +32,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 30,
             "gradientMode": "opacity",
@@ -44,6 +47,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
@@ -65,8 +69,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -83,7 +86,11 @@
       "id": 1,
       "options": {
         "legend": {
-          "calcs": ["lastNotNull", "max", "mean"],
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
@@ -91,16 +98,18 @@
           "sortDesc": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
+      "pluginVersion": "12.0.1",
       "targets": [
         {
           "alias": "Standard Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -128,7 +137,7 @@
           "alias": "Glacier Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -156,7 +165,7 @@
           "alias": "Deep Archive Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -187,7 +196,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "P034F075C744B399F"
+        "uid": "aeo1xkxdi1jpcb"
       },
       "fieldConfig": {
         "defaults": {
@@ -195,11 +204,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "bars",
             "fillOpacity": 80,
             "gradientMode": "none",
@@ -208,6 +219,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -229,8 +241,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -247,22 +258,27 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": ["lastNotNull", "sum"],
+          "calcs": [
+            "lastNotNull",
+            "sum"
+          ],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
+      "pluginVersion": "12.0.1",
       "targets": [
         {
           "alias": "Standard Objects",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -290,7 +306,7 @@
           "alias": "Glacier Objects",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -318,7 +334,7 @@
           "alias": "Deep Archive Objects",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -349,7 +365,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "P034F075C744B399F"
+        "uid": "aeo1xkxdi1jpcb"
       },
       "fieldConfig": {
         "defaults": {
@@ -361,8 +377,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
@@ -379,8 +394,16 @@
       "id": 3,
       "options": {
         "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -390,15 +413,16 @@
           "values": false
         },
         "showUnfilled": true,
+        "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "9.5.2",
+      "pluginVersion": "12.0.1",
       "targets": [
         {
           "alias": "Standard",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -426,7 +450,7 @@
           "alias": "Glacier",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -454,7 +478,7 @@
           "alias": "Deep Archive",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -480,35 +504,48 @@
         }
       ],
       "title": "Storage Distribution",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Standard",
+                "Glacier",
+                "Deep Archive"
+              ],
+              "reducer": "sum"
+            }
+          }
+        }
+      ],
       "type": "bargauge"
     }
   ],
+  "preload": false,
   "refresh": "",
-  "schemaVersion": 38,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "text": "All",
-          "value": "$__all"
+          "text": "ppapadop-mass-uci-s-bkup-bucket",
+          "value": "ppapadop-mass-uci-s-bkup-bucket"
         },
         "datasource": {
           "type": "cloudwatch",
-          "uid": "P034F075C744B399F"
+          "uid": "aeo1xkxdi1jpcb"
         },
         "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
-        "hide": 0,
         "includeAll": true,
         "label": "Bucket",
-        "multi": false,
         "name": "bucket",
         "options": [],
         "query": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       }
     ]
@@ -520,7 +557,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Storage Lifecycle",
-  "uid": "storage-lifecycle",
-  "version": 1,
-  "weekStart": ""
+  "uid": "9b451b3f-ded1-4451-b134-8c8fe598d07b",
+  "version": 2
 }

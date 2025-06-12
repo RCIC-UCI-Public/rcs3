@@ -10,7 +10,7 @@ dashboards_path = "../../dashboards"
 admin_users = ["admin2"]
 
 # Common dashboards available to all users
-common_dashboards = ["cost-estimates.json", "lifecycle-metrics.json", "storage-trends-health.json"]
+common_dashboards = ["cost-estimates.json", "cost-estimates-improved.json"]
 
 # Define teams and their bucket access permissions
 bucket_teams = {

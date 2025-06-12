@@ -1,445 +1,724 @@
 {
-    "annotations": {
-      "list": [
-        {
-          "builtIn": 1,
-          "datasource": {
-            "type": "grafana",
-            "uid": "-- Grafana --"
-          },
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "type": "dashboard"
-        }
-      ]
-    },
-    "editable": true,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": 7,
-    "links": [],
-    "panels": [
+  "annotations": {
+    "list": [
       {
+        "builtIn": 1,
         "datasource": {
-          "type": "cloudwatch",
-          "uid": "P034F075C744B399F"
+          "type": "grafana",
+          "uid": "-- Grafana --"
         },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              }
-            },
-            "mappings": [],
-            "unit": "bytes"
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 0,
-          "y": 0
-        },
-        "id": 1,
-        "options": {
-          "displayLabels": [
-            "name",
-            "percent"
-          ],
-          "legend": {
-            "displayMode": "list",
-            "placement": "right",
-            "showLegend": true,
-            "values": [
-              "value"
-            ]
-          },
-          "pieType": "pie",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "single",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "12.0.0",
-        "targets": [
-          {
-            "alias": "Standard",
-            "datasource": {
-              "type": "cloudwatch",
-              "uid": "P034F075C744B399F"
-            },
-            "dimensions": {
-              "bucket_name": "$bucket",
-              "record_type": "BUCKET",
-              "storage_class": "STANDARD"
-            },
-            "expression": "",
-            "id": "standard",
-            "label": "Standard",
-            "logGroups": [],
-            "matchExact": false,
-            "metricEditorMode": 0,
-            "metricName": "StorageBytes",
-            "metricQueryType": 0,
-            "namespace": "AWS/S3/Storage-Lens",
-            "period": "86400",
-            "queryLanguage": "CWLI",
-            "queryMode": "Metrics",
-            "refId": "A",
-            "region": "us-west-2",
-            "sqlExpression": "",
-            "statistic": "Maximum"
-          },
-          {
-            "alias": "Glacier",
-            "datasource": {
-              "type": "cloudwatch",
-              "uid": "P034F075C744B399F"
-            },
-            "dimensions": {
-              "bucket_name": "$bucket",
-              "record_type": "BUCKET",
-              "storage_class": "GLACIER"
-            },
-            "expression": "",
-            "id": "glacier",
-            "label": "Glacier",
-            "logGroups": [],
-            "matchExact": false,
-            "metricEditorMode": 0,
-            "metricName": "StorageBytes",
-            "metricQueryType": 0,
-            "namespace": "AWS/S3/Storage-Lens",
-            "period": "86400",
-            "queryLanguage": "CWLI",
-            "queryMode": "Metrics",
-            "refId": "B",
-            "region": "us-west-2",
-            "sqlExpression": "",
-            "statistic": "Maximum"
-          }
-        ],
-        "title": "Storage Distribution by Class",
-        "type": "piechart"
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 11,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aeo1xkxdi1jpcb"
       },
-      {
-        "datasource": {
-          "type": "cloudwatch",
-          "uid": "P034F075C744B399F"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 25,
-              "gradientMode": "opacity",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": false,
-              "lineInterpolation": "smooth",
-              "lineWidth": 2,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "never",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "normal"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green"
-                }
-              ]
-            },
-            "unit": "bytes"
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
           },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 12,
-          "y": 0
-        },
-        "id": 2,
-        "options": {
-          "legend": {
-            "calcs": [
-              "lastNotNull",
-              "max",
-              "mean"
-            ],
-            "displayMode": "table",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "multi",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "12.0.0",
-        "targets": [
-          {
-            "alias": "Active Storage",
-            "datasource": {
-              "type": "cloudwatch",
-              "uid": "P034F075C744B399F"
-            },
-            "dimensions": {
-              "bucket_name": "$bucket",
-              "record_type": "BUCKET",
-              "storage_class": "STANDARD"
-            },
-            "expression": "",
-            "id": "active",
-            "label": "Active Storage",
-            "logGroups": [],
-            "matchExact": false,
-            "metricEditorMode": 0,
-            "metricName": "StorageBytes",
-            "metricQueryType": 0,
-            "namespace": "AWS/S3/Storage-Lens",
-            "period": "86400",
-            "queryLanguage": "CWLI",
-            "queryMode": "Metrics",
-            "refId": "A",
-            "region": "us-west-2",
-            "sqlExpression": "",
-            "statistic": "Maximum"
-          },
-          {
-            "alias": "Snapshots",
-            "datasource": {
-              "type": "cloudwatch",
-              "uid": "P034F075C744B399F"
-            },
-            "dimensions": {
-              "bucket_name": "$bucket",
-              "record_type": "BUCKET",
-              "storage_class": "STANDARD"
-            },
-            "expression": "",
-            "hide": true,
-            "id": "ncv",
-            "label": "Snapshots",
-            "logGroups": [],
-            "matchExact": false,
-            "metricEditorMode": 0,
-            "metricName": "NonCurrentVersionStorageBytes",
-            "metricQueryType": 0,
-            "namespace": "AWS/S3/Storage-Lens",
-            "period": "86400",
-            "queryLanguage": "CWLI",
-            "queryMode": "Metrics",
-            "refId": "B",
-            "region": "us-west-2",
-            "sqlExpression": "",
-            "statistic": "Maximum"
-          },
-          {
-            "alias": "Delete Markers",
-            "datasource": {
-              "type": "cloudwatch",
-              "uid": "P034F075C744B399F"
-            },
-            "dimensions": {
-              "bucket_name": "$bucket",
-              "record_type": "BUCKET",
-              "storage_class": "STANDARD"
-            },
-            "expression": "",
-            "hide": true,
-            "id": "dm",
-            "label": "Delete Markers",
-            "logGroups": [],
-            "matchExact": false,
-            "metricEditorMode": 0,
-            "metricName": "DeleteMarkerStorageBytes",
-            "metricQueryType": 0,
-            "namespace": "AWS/S3/Storage-Lens",
-            "period": "86400",
-            "queryLanguage": "CWLI",
-            "queryMode": "Metrics",
-            "refId": "C",
-            "region": "us-west-2",
-            "sqlExpression": "",
-            "statistic": "Maximum"
-          }
-        ],
-        "title": "Storage Composition Over Time",
-        "type": "timeseries"
-      },
-      {
-        "datasource": {
-          "type": "cloudwatch",
-          "uid": "P034F075C744B399F"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "custom": {
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "scaleDistribution": {
-                "type": "linear"
-              }
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             }
           },
-          "overrides": []
+          "mappings": [],
+          "unit": "bytes"
         },
-        "gridPos": {
-          "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 8
-        },
-        "id": 3,
-        "options": {
-          "calculate": false,
-          "cellGap": 1,
-          "color": {
-            "exponent": 0.5,
-            "fill": "dark-orange",
-            "mode": "scheme",
-            "reverse": false,
-            "scale": "exponential",
-            "scheme": "Spectral",
-            "steps": 128
-          },
-          "exemplars": {
-            "color": "rgba(255,0,255,0.7)"
-          },
-          "filterValues": {
-            "le": 1e-9
-          },
-          "legend": {
-            "show": true
-          },
-          "rowsFrame": {
-            "layout": "auto"
-          },
-          "tooltip": {
-            "mode": "single",
-            "showColorScale": false,
-            "yHistogram": false
-          },
-          "yAxis": {
-            "axisPlacement": "left",
-            "reverse": false
-          }
-        },
-        "pluginVersion": "12.0.0",
-        "targets": [
-          {
-            "datasource": {
-              "type": "cloudwatch",
-              "uid": "P034F075C744B399F"
-            },
-            "dimensions": {
-              "bucket_name": "$bucket",
-              "record_type": "BUCKET",
-              "storage_class": "STANDARD"
-            },
-            "expression": "",
-            "id": "standard",
-            "label": "",
-            "logGroups": [],
-            "matchExact": false,
-            "metricEditorMode": 0,
-            "metricName": "StorageBytes",
-            "metricQueryType": 0,
-            "namespace": "AWS/S3/Storage-Lens",
-            "period": "86400",
-            "queryLanguage": "CWLI",
-            "queryMode": "Metrics",
-            "refId": "A",
-            "region": "us-west-2",
-            "sqlExpression": "",
-            "statistic": "Maximum"
-          }
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
         ],
-        "title": "Storage Heatmap",
-        "type": "heatmap"
-      }
-    ],
-    "preload": false,
-    "refresh": "",
-    "schemaVersion": 41,
-    "tags": [],
-    "templating": {
-      "list": [
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.1",
+      "targets": [
         {
-          "current": {
-            "text": "lopez-fedaykin-uci-s-bkup-bucket",
-            "value": "lopez-fedaykin-uci-s-bkup-bucket"
-          },
+          "alias": "Standard",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "P034F075C744B399F"
+            "uid": "aeo1xkxdi1jpcb"
           },
-          "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
-          "includeAll": true,
-          "label": "Bucket",
-          "name": "bucket",
-          "options": [],
-          "query": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
-          "refresh": 1,
-          "regex": "",
-          "type": "query"
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "id": "da",
+          "label": "Deep Archive",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Glacier",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "GLACIER"
+          },
+          "expression": "",
+          "id": "glacier",
+          "label": "Glacier",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Standard",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "standard",
+          "label": "Standard",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
         }
-      ]
+      ],
+      "title": "Storage Distribution by Class",
+      "type": "piechart"
     },
-    "time": {
-      "from": "now-7d",
-      "to": "now"
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aeo1xkxdi1jpcb"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.1",
+      "targets": [
+        {
+          "alias": "Active Storage",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "id": "active",
+          "label": "Active Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Snapshots",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "ncv",
+          "label": "Snapshots",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "NonCurrentVersionStorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Delete Markers",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "dm",
+          "label": "Delete Markers",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "DeleteMarkerStorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        }
+      ],
+      "title": "Storage Composition Over Time - Standard",
+      "type": "timeseries"
     },
-    "timepicker": {},
-    "timezone": "",
-    "title": "Storage Insights",
-    "uid": "ac75c5b9-fb68-46b2-840a-0f0722973064",
-    "version": 2
-  }
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aeo1xkxdi1jpcb"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.1",
+      "targets": [
+        {
+          "alias": "Active Storage",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "GLACIER"
+          },
+          "expression": "",
+          "id": "active",
+          "label": "Active Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Snapshots",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "GLACIER"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "ncv",
+          "label": "Snapshots",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "NonCurrentVersionStorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Delete Markers",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "GLACIER"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "dm",
+          "label": "Delete Markers",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "DeleteMarkerStorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        }
+      ],
+      "title": "Storage Composition Over Time - Glacier",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aeo1xkxdi1jpcb"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.1",
+      "targets": [
+        {
+          "alias": "Active Storage",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "id": "active",
+          "label": "Active Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Snapshots",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "ncv",
+          "label": "Snapshots",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "NonCurrentVersionStorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Delete Markers",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aeo1xkxdi1jpcb"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "dm",
+          "label": "Delete Markers",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "DeleteMarkerStorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        }
+      ],
+      "title": "Storage Composition Over Time - Deep Archive",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "lopez-fedaykin-uci-s-bkup-bucket",
+          "value": "lopez-fedaykin-uci-s-bkup-bucket"
+        },
+        "datasource": {
+          "type": "cloudwatch",
+          "uid": "aeo1xkxdi1jpcb"
+        },
+        "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
+        "includeAll": true,
+        "label": "Bucket",
+        "name": "bucket",
+        "options": [],
+        "query": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Storage Insights",
+  "uid": "1c34d1c9-a6f2-4871-a1ae-d78867f63951",
+  "version": 23
+}
