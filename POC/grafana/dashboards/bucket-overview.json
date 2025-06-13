@@ -882,7 +882,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "blue",
+                  "fixedColor": "yellow",
                   "mode": "fixed"
                 }
               }
@@ -951,6 +951,7 @@
           "expression": "",
           "hide": true,
           "id": "s_bytes",
+          "label": "",
           "matchExact": false,
           "metricEditorMode": 0,
           "metricName": "StorageBytes",
@@ -974,6 +975,7 @@
           "expression": "",
           "hide": true,
           "id": "g_bytes",
+          "label": "",
           "matchExact": false,
           "metricEditorMode": 0,
           "metricName": "StorageBytes",
@@ -1543,8 +1545,8 @@
     "list": [
       {
         "current": {
-          "text": "ppapadop-pi5-uci-s-bkup-bucket",
-          "value": "ppapadop-pi5-uci-s-bkup-bucket"
+          "text": "lopez-fedaykin-uci-s-inventory",
+          "value": "lopez-fedaykin-uci-s-inventory"
         },
         "datasource": {
           "type": "cloudwatch",
@@ -1703,5 +1705,5 @@
   "timezone": "",
   "title": "Bucket Overview",
   "uid": "af433813-4d72-4748-b8a7-77689f0703f8",
-  "version": 5
+  "version": 6
 }

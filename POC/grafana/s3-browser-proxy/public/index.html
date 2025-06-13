@@ -44,8 +44,14 @@
 
         .controls {
             display: flex;
+            flex-direction: column;
             gap: 15px;
             margin-bottom: 20px;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 15px;
             align-items: center;
             flex-wrap: wrap;
         }
@@ -82,6 +88,86 @@
             border-radius: 5px;
             font-size: 14px;
             background: white;
+        }
+
+        .version-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .version-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .item.version-item {
+            border-left: 3px solid #007bff;
+            margin-left: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .item.delete-marker {
+            border-left: 3px solid #dc3545;
+            background-color: #fff5f5;
+        }
+
+        .item.delete-marker .file-icon {
+            color: #dc3545;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .version-badge.latest {
+            background: #28a745;
+        }
+
+        .version-badge.delete-marker {
+            background: #dc3545;
+        }
+
+        .version-indicator {
+            display: inline-block;
+            background: #17a2b8;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: bold;
+            cursor: help;
+        }
+
+        .version-indicator:hover {
+            background: #138496;
+        }
+
+        .selection-checkbox:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .item-name.non-selectable {
+            color: #6c757d;
+            cursor: default;
+        }
+
+        .item-name.non-selectable:hover {
+            text-decoration: none;
         }
 
         .breadcrumb {
@@ -302,11 +388,23 @@
         </div>
 
         <div class="controls">
-            <select id="bucketSelect">
-                <option value="">Select a bucket...</option>
-            </select>
-            <button class="btn" onclick="refreshBuckets()">🔄 Refresh Buckets</button>
-            <button class="btn btn-secondary" onclick="reloadCredentials()">🔑 Reload Credentials</button>
+            <div class="controls-row">
+                <select id="bucketSelect">
+                    <option value="">Select a bucket...</option>
+                </select>
+                <button class="btn" onclick="refreshBuckets()">🔄 Refresh Buckets</button>
+                <button class="btn btn-secondary" onclick="reloadCredentials()">🔑 Reload Credentials</button>
+            </div>
+            <div class="controls-row">
+                <label class="version-toggle">
+                    <input type="checkbox" id="checkVersions" onchange="toggleVersionChecking()">
+                    📊 Show Version Badges
+                </label>
+                <label class="version-toggle">
+                    <input type="checkbox" id="showDeleted" onchange="toggleDeletedChecking()">
+                    🗑️ Show Deleted Files
+                </label>
+            </div>
         </div>
 
         <div id="breadcrumb" class="breadcrumb" style="display: none;">
@@ -476,13 +574,40 @@
             }
         }
 
+        // Toggle version checking on/off
+        function toggleVersionChecking() {
+            // Reload current view with new version checking setting
+            if (currentBucket) {
+                loadObjects();
+            }
+        }
+
+        // Toggle deleted files checking on/off
+        function toggleDeletedChecking() {
+            // If showing deleted files is enabled, automatically enable version badges
+            const showDeleted = document.getElementById('showDeleted').checked;
+            const checkVersions = document.getElementById('checkVersions');
+            
+            if (showDeleted && !checkVersions.checked) {
+                checkVersions.checked = true;
+                console.log('Auto-enabled version badges because deleted files requires version info');
+            }
+            
+            // Reload current view with new settings
+            if (currentBucket) {
+                loadObjects();
+            }
+        }
+
         // Load objects in current bucket/prefix
         async function loadObjects() {
             if (!currentBucket) return;
             
             try {
                 showLoading();
-                const url = `/api/buckets/${encodeURIComponent(currentBucket)}/objects?prefix=${encodeURIComponent(currentPrefix)}`;
+                const showVersionInfo = document.getElementById('checkVersions').checked;
+                const showDeleted = document.getElementById('showDeleted').checked;
+                const url = `/api/buckets/${encodeURIComponent(currentBucket)}/objects?prefix=${encodeURIComponent(currentPrefix)}&showVersionInfo=${showVersionInfo}&showDeleted=${showDeleted}`;
                 const response = await fetch(url);
                 
                 if (!response.ok) {
@@ -586,10 +711,27 @@
             const div = document.createElement('div');
             div.className = 'item';
             
+            // Special handling for deleted files
+            if (file.IsDeleted) {
+                div.classList.add('delete-marker');
+            }
+            
             const fileName = file.Key.slice(currentPrefix.length);
-            const fileSize = formatFileSize(file.Size);
+            const fileSize = file.IsDeleted ? 'Deleted' : formatFileSize(file.Size || 0);
             const lastModified = new Date(file.LastModified).toLocaleString();
             const isSelected = isItemSelected(file.Key);
+            
+            // Add version indicator if file has multiple versions
+            const versionIndicator = file.HasMultipleVersions ? 
+                `<span class="version-indicator" title="This file has ${file.VersionCount} versions">📊 ${file.VersionCount}</span>` : '';
+            
+            // Add deleted indicator for deleted files
+            const deletedIndicator = file.IsDeleted ? 
+                `<span class="version-badge delete-marker" title="This file has been deleted">🗑️ DELETED</span>` : '';
+            
+            const fileIcon = file.IsDeleted ? '🗑️' : '📄';
+            const storageClass = file.IsDeleted ? 'DELETE_MARKER' : (file.StorageClass || 'STANDARD');
+            const timeLabel = file.IsDeleted ? 'Deleted' : 'Modified';
             
             div.innerHTML = `
                 <input type="checkbox" class="selection-checkbox" 
@@ -597,13 +739,13 @@
                        data-type="file"
                        ${isSelected ? 'checked' : ''}
                        onchange="toggleSelection('${file.Key}', 'file', this.checked)">
-                <span class="icon file-icon">📄</span>
+                <span class="icon file-icon">${fileIcon}</span>
                 <div class="item-info">
-                    <div class="item-name">${fileName}</div>
+                    <div class="item-name" onclick="showFileDetails('${file.Key}')">${fileName}${versionIndicator}${deletedIndicator}</div>
                     <div class="item-details">
                         <span>Size: ${fileSize}</span>
-                        <span>Modified: ${lastModified}</span>
-                        <span>Storage: ${file.StorageClass || 'STANDARD'}</span>
+                        <span>${timeLabel}: ${lastModified}</span>
+                        <span>Storage: ${storageClass}</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -656,9 +798,14 @@
         }
 
         // Show file metadata
-        async function showMetadata(key) {
+        async function showMetadata(key, versionId = null) {
             try {
-                const response = await fetch(`/api/buckets/${encodeURIComponent(currentBucket)}/objects/${encodeURIComponent(key)}/metadata`);
+                let url = `/api/buckets/${encodeURIComponent(currentBucket)}/objects/${encodeURIComponent(key)}/metadata`;
+                if (versionId) {
+                    url += `?versionId=${encodeURIComponent(versionId)}`;
+                }
+                
+                const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -666,11 +813,19 @@
                 
                 const metadata = await response.json();
                 
-                let info = `File: ${key}\n\n`;
+                let info = `File: ${key}\n`;
+                if (versionId) {
+                    info += `Version ID: ${versionId}\n`;
+                }
+                info += `\n`;
                 info += `Size: ${formatFileSize(metadata.ContentLength)}\n`;
                 info += `Last Modified: ${new Date(metadata.LastModified).toLocaleString()}\n`;
                 info += `Content Type: ${metadata.ContentType || 'Unknown'}\n`;
                 info += `ETag: ${metadata.ETag}\n`;
+                
+                if (metadata.VersionId) {
+                    info += `Version ID: ${metadata.VersionId}\n`;
+                }
                 
                 if (metadata.StorageClass) {
                     info += `Storage Class: ${metadata.StorageClass}\n`;
@@ -688,6 +843,71 @@
                 console.error('Error fetching metadata:', error);
                 alert(`Failed to load metadata: ${error.message}`);
             }
+        }
+
+        // Show detailed file information including versions
+        async function showFileDetails(key) {
+            try {
+                // Get file versions
+                const versionsUrl = `/api/buckets/${encodeURIComponent(currentBucket)}/objects/${encodeURIComponent(key)}/versions`;
+                const versionsResponse = await fetch(versionsUrl);
+                
+                if (!versionsResponse.ok) {
+                    throw new Error(`HTTP ${versionsResponse.status}: ${versionsResponse.statusText}`);
+                }
+                
+                const versions = await versionsResponse.json();
+                
+                // Build details message
+                let message = `📄 File Details: ${key}\n\n`;
+                
+                if (versions.length === 0) {
+                    message += '⚠️ No versions found (versioning may not be enabled on this bucket)\n\n';
+                    message += '💡 To view version history:\n';
+                    message += '• Enable versioning on the S3 bucket\n';
+                    message += '• Upload new versions of the file\n\n';
+                    message += 'This is a read-only browser - use the "ℹ️ Info" button for metadata.';
+                } else if (versions.length === 1) {
+                    message += '📊 Version Information:\n';
+                    message += `• Single version (versioning may not be enabled)\n`;
+                    message += `• Size: ${formatFileSize(versions[0].Size || 0)}\n`;
+                    message += `• Modified: ${new Date(versions[0].LastModified).toLocaleString()}\n`;
+                    message += `• Storage: ${versions[0].StorageClass || 'STANDARD'}\n\n`;
+                    message += 'Use the "ℹ️ Info" button for detailed metadata.';
+                } else {
+                    message += `📊 Found ${versions.length} versions:\n\n`;
+                    
+                    versions.forEach((version, index) => {
+                        const isLatest = version.IsLatest || index === 0;
+                        const isDeleted = version.Type === 'deleteMarker';
+                        
+                        if (isDeleted) {
+                            message += `🗑️ [DELETED] Version ${index + 1}\n`;
+                            message += `   Deleted: ${new Date(version.LastModified).toLocaleString()}\n`;
+                        } else {
+                            message += `${isLatest ? '✅' : '📌'} Version ${index + 1}${isLatest ? ' (Current)' : ''}\n`;
+                            message += `   Size: ${formatFileSize(version.Size || 0)}\n`;
+                            message += `   Modified: ${new Date(version.LastModified).toLocaleString()}\n`;
+                            message += `   Storage: ${version.StorageClass || 'STANDARD'}\n`;
+                        }
+                        message += `   Version ID: ${version.VersionId || 'N/A'}\n\n`;
+                    });
+                    
+                    message += '💡 This is a read-only browser. Use "ℹ️ Info" for specific version metadata.';
+                }
+                
+                alert(message);
+                
+            } catch (error) {
+                console.error('Error fetching file details:', error);
+                // Fallback to basic message
+                alert(`📄 File: ${key}\n\n⚠️ Could not load version details: ${error.message}\n\n💡 This is a read-only browser.\nUse the "ℹ️ Info" button to view metadata for the current version.`);
+            }
+        }
+
+        // Show read-only message when user clicks on file names
+        function showReadOnlyMessage() {
+            alert('📥 Download not permitted. This viewer is read-only.\n\nUse the "ℹ️ Info" button to view file metadata.');
         }
 
         // Download file

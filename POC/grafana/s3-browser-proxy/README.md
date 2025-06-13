@@ -185,3 +185,13 @@ The service is automatically deployed and configured as a systemd service on the
 - **Browse S3 buckets**: Navigate to http://localhost:3001
 - **Team filtering**: Add `?filter=bucket1,bucket2` to URL for specific buckets
 - **Grafana integration**: Embedded via iframes in team-specific dashboards
+
+## Updates
+
+The easiest way to deploy changes to the html/JS is to: 
+- run the infra *terraform apply* process
+- ssh into the ec2 instance
+- run the following at the ec2 CLI:
+- aws s3 cp s3://backup-metrics-tfstate-dev/scripts/install-grafana-s3browser.sh /tmp/install-script.sh
+- chmod +x /tmp/install-script.sh
+- sudo /tmp/install-script.sh

@@ -96,6 +96,7 @@ resource "aws_iam_role_policy" "grafana_access_policy" {
           "s3:GetBucketLocation",
           # S3 Browser Read-only Permissions
           "s3:ListBucket",
+          "s3:ListBucketVersions",
           "s3:GetObject",
           "s3:GetObjectAttributes",
           "s3:GetBucketVersioning",
