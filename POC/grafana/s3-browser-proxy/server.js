@@ -1,3 +1,18 @@
+/**
+ * S3 Browser Proxy Server
+ * 
+ * A Node.js Express server that provides a read-only web interface for browsing AWS S3 buckets.
+ * Features include folder navigation, file metadata viewing, version history, and deleted file detection.
+ * 
+ * Technology Stack:
+ * - Node.js with Express.js framework
+ * - AWS SDK v2 for S3 operations
+ * - Vanilla JavaScript (ES5/ES6) - no frameworks
+ * - Static HTML/CSS frontend served by Express
+ * 
+ * Authentication: Supports both credential files (development) and IAM roles (production)
+ */
+
 const express = require('express');
 const cors = require('cors');
 const AWS = require('aws-sdk');
