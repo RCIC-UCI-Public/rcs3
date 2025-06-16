@@ -6,7 +6,10 @@ FROM rockylinux/rockylinux:8.10
 # Install desired packages via dnf
 RUN dnf -y update
 RUN dnf -y install \
-    epel-release
+    epel-release yum-utils
+
+# Enable Hashicorp repo
+RUN yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
 
 # Python3.9 and selected packages
 RUN dnf -y install alternatives python39 gcc python39-devel
@@ -36,7 +39,8 @@ RUN dnf -y install \
     curl \
     tcpdump \
     wget \
-    sqlite
+    sqlite \
+    terraform
 
 # Get the latest version of rclone - v1.69.3 as of this writing - released 2025-05-21
 RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[ \t]+' '{print $2}') && \
