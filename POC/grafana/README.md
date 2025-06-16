@@ -4,17 +4,152 @@ This system provides Grafana dashboards for monitoring S3 storage usage with tea
 
 ## Prerequisites
 
-Before starting, ensure you have:
-- AWS CLI installed and configured
-- Terraform installed (version 1.0+)
+Before starting, ensure you have the following installed on your system:
+
+### Required Software (All Platforms)
+- **AWS CLI** installed and configured
+- **Terraform** installed (version 1.0+)
+- **Python 3.6+** with pip (for team management script)
 - Access to an AWS account with appropriate permissions
+
+### Platform-Specific Requirements
+
+#### Windows
+- **PowerShell** or **Command Prompt** (built-in)
+
+#### macOS
+- **Terminal** (built-in)
+- **Homebrew** - Recommended for easy package installation
+
+#### Linux
+- **Terminal/Shell** (built-in)
+
+### Installation Instructions by Platform
+
+#### Windows Installation
+1. **Install AWS CLI**:
+   ```powershell
+   # Option 1: Download MSI installer from AWS website
+   # https://aws.amazon.com/cli/
+   
+   # Option 2: Using Chocolatey (if installed)
+   choco install awscli
+   
+   # Option 3: Using pip
+   pip install awscli
+   ```
+
+2. **Install Terraform**:
+   ```powershell
+   # Option 1: Download from HashiCorp website
+   # https://www.terraform.io/downloads.html
+   
+   # Option 2: Using Chocolatey (if installed)
+   choco install terraform
+   ```
+
+3. **Install Python 3**:
+   ```powershell
+   # Option 1: Download from Python.org (recommended)
+   # https://www.python.org/downloads/
+   
+   # Option 2: Microsoft Store (easiest)
+   # Search for "Python 3" in Microsoft Store
+   
+   # Option 3: Using Chocolatey (if installed)
+   choco install python
+   ```
+
+#### macOS Installation
+1. **Install Homebrew** (if not already installed):
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. **Install AWS CLI**:
+   ```bash
+   # Option 1: Using Homebrew (recommended)
+   brew install awscli
+   
+   # Option 2: Using pip
+   pip3 install awscli
+   ```
+
+3. **Install Terraform**:
+   ```bash
+   # Using Homebrew (recommended)
+   brew install terraform
+   ```
+
+4. **Install Python 3**:
+   ```bash
+   # Option 1: Using Homebrew (recommended)
+   brew install python3
+   
+   # Option 2: macOS usually has Python 3 pre-installed
+   # Check version: python3 --version
+   ```
+
+#### Linux Installation
+1. **Install AWS CLI**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt update
+   sudo apt install awscli
+   
+   # CentOS/RHEL/Fedora
+   sudo yum install awscli
+   # or
+   sudo dnf install awscli
+   
+   # Using pip (universal)
+   pip3 install awscli
+   ```
+
+2. **Install Terraform**:
+   ```bash
+   # Download and install manually
+   wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
+   unzip terraform_1.6.0_linux_amd64.zip
+   sudo mv terraform /usr/local/bin/
+   ```
+
+3. **Install Python 3**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt update
+   sudo apt install python3 python3-pip
+   
+   # CentOS/RHEL/Fedora
+   sudo yum install python3 python3-pip
+   # or
+   sudo dnf install python3 python3-pip
+   
+   # Most Linux distributions have Python 3 pre-installed
+   # Check version: python3 --version
+   ```
 
 ## Quick Start Guide
 
 ### Step 1: Configure AWS Credentials
 
-Paste your temporary AWS credentials in your terminal:
+Set your temporary AWS credentials:
 
+#### Windows (PowerShell)
+```powershell
+$env:AWS_ACCESS_KEY_ID="..."
+$env:AWS_SECRET_ACCESS_KEY="..."
+$env:AWS_SESSION_TOKEN="..."
+```
+
+#### Windows (Command Prompt)
+```cmd
+set AWS_ACCESS_KEY_ID=...
+set AWS_SECRET_ACCESS_KEY=...
+set AWS_SESSION_TOKEN=...
+```
+
+#### macOS/Linux (Bash/Terminal)
 ```bash
 export AWS_ACCESS_KEY_ID=...
 export AWS_SECRET_ACCESS_KEY=...
@@ -119,11 +254,29 @@ terraform apply -var-file="terraform.dev.tfvars"
 
 ### Step 6: Configure Team Memberships
 
-Run the team membership script to set up user access and admin privileges:
+First, install the required Python dependencies, then run the team membership script:
 
+#### All Platforms - Install Dependencies
 ```bash
 cd ../scripts
-./update_team_memberships.sh dev
+pip install -r requirements.txt
+```
+
+#### Run the Script
+
+#### All Platforms (Python Script)
+```bash
+python3 update_team_memberships.py dev
+```
+
+#### Windows (PowerShell)
+```powershell
+python update_team_memberships.py dev
+```
+
+#### Windows (Command Prompt)
+```cmd
+python update_team_memberships.py dev
 ```
 
 **When prompted**:
@@ -131,7 +284,7 @@ cd ../scripts
 - The script will automatically create teams and assign users
 - Admin privileges will be granted to users listed in `admin_users`
 
-**Note**: The script has been updated to properly handle configuration parsing and password management. It will always prompt for the admin password for security.
+**Note**: The script uses proper HCL parsing for reliable configuration reading and prompts for the admin password for security (never stores it in configuration files).
 
 ## Access Your System
 
@@ -176,6 +329,15 @@ grafana/
 - **Configuration parsing errors**: Check that config file has proper formatting with correct spacing around `=` operators
 - **Users not appearing**: Check that usernames match exactly in team configuration
 - **Missing grafana_url or grafana_username**: Ensure both values are properly set in terraform.dev.tfvars
+
+### Python Issues
+- **Python not found**: Ensure Python 3.6+ is installed and in your PATH
+  - Windows: Try `python` instead of `python3` if using Python from Microsoft Store
+  - Check version: `python --version` or `python3 --version`
+- **pip install fails**: Ensure you have internet access and pip is installed
+  - Try: `python -m pip install requests` instead of `pip install requests`
+- **Permission errors**: On macOS/Linux, you might need `pip3 install --user requests`
+- **Import errors**: The script requires `requests` and `python-hcl2` packages (install with `pip install -r requirements.txt`)
 
 ### Configuration Fixes
 The recent updates have fixed:
