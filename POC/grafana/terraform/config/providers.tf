@@ -1,8 +1,8 @@
 # Configure Terraform backend and required providers
 terraform {
   backend "s3" {
-    bucket  = "backup-metrics-tfstate-dev"
-    key     = "terraform_grafana_config.tfstate"
+    bucket  = "rcs3-godfather-uci-p-bucket"
+    key     = "tfstate/terraform_grafana_config.tfstate"
     region  = "us-west-2"
     encrypt = true
   }
