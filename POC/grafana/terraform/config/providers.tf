@@ -1,11 +1,6 @@
-# Configure Terraform backend and required providers
+# Configure Terraform backend and required providers - backend configured via backend config files
 terraform {
-  backend "s3" {
-    bucket  = "rcs3-godfather-uci-p-bucket"
-    key     = "tfstate/terraform_grafana_config.tfstate"
-    region  = "us-west-2"
-    encrypt = true
-  }
+  backend "s3" {}
 
   required_providers {
     grafana = {

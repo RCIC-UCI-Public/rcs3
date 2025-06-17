@@ -46,3 +46,9 @@ variable "allowed_cidr_blocks" {
   description = "List of CIDR blocks allowed to access Grafana"
   type        = list(string)
 }
+
+# S3 Configuration
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket for storing scripts and files"
+  type        = string
+}

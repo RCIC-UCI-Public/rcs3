@@ -100,7 +100,7 @@ cd /opt/s3-browser
 
 # Download package.json from S3
 echo "[INFO] Downloading package.json from S3..."
-aws s3 cp s3://rcs3-godfather-uci-p-bucket/s3-browser/package.json package.json
+aws s3 cp s3://${S3_BUCKET_NAME}/s3-browser/package.json package.json
 
 # Install dependencies
 npm install
@@ -109,11 +109,11 @@ npm install
 echo "[INFO] Downloading S3 browser application files from S3..."
 
 # Download server.js from S3
-aws s3 cp s3://rcs3-godfather-uci-p-bucket/s3-browser/server.js server.js
+aws s3 cp s3://${S3_BUCKET_NAME}/s3-browser/server.js server.js
 
 # Create public directory and download HTML interface from S3
 mkdir -p public
-aws s3 cp s3://rcs3-godfather-uci-p-bucket/s3-browser/public/index.html public/index.html
+aws s3 cp s3://${S3_BUCKET_NAME}/s3-browser/public/index.html public/index.html
 
 # Create systemd service for S3 browser
 cat > /etc/systemd/system/s3-browser.service << 'EOS3SERVICE'

@@ -145,7 +145,7 @@ resource "aws_iam_role_policy" "grafana_access_policy" {
           "s3:GetObject"
         ]
         Resource = [
-          "arn:aws:s3:::rcs3-godfather-uci-p-bucket/scripts/*"
+          "arn:aws:s3:::${var.s3_bucket_name}/scripts/*"
         ]
       }
     ]
@@ -177,7 +177,7 @@ data "aws_ami" "ubuntu" {
 
 # Upload install script to S3
 resource "aws_s3_object" "install_script" {
-  bucket = "rcs3-godfather-uci-p-bucket"
+  bucket = var.s3_bucket_name
   key    = "scripts/install-grafana-s3browser.sh"
   source = "${path.module}/install-grafana-s3browser.sh"
   etag   = filemd5("${path.module}/install-grafana-s3browser.sh")
@@ -187,7 +187,7 @@ resource "aws_s3_object" "install_script" {
 
 # Upload S3 browser source files to S3
 resource "aws_s3_object" "s3_browser_server" {
-  bucket = "rcs3-godfather-uci-p-bucket"
+  bucket = var.s3_bucket_name
   key    = "s3-browser/server.js"
   source = "${path.module}/../../s3-browser-proxy/server.js"
   etag   = filemd5("${path.module}/../../s3-browser-proxy/server.js")
@@ -196,7 +196,7 @@ resource "aws_s3_object" "s3_browser_server" {
 }
 
 resource "aws_s3_object" "s3_browser_package_json" {
-  bucket = "rcs3-godfather-uci-p-bucket"
+  bucket = var.s3_bucket_name
   key    = "s3-browser/package.json"
   source = "${path.module}/../../s3-browser-proxy/package.json"
   etag   = filemd5("${path.module}/../../s3-browser-proxy/package.json")
@@ -205,7 +205,7 @@ resource "aws_s3_object" "s3_browser_package_json" {
 }
 
 resource "aws_s3_object" "s3_browser_index_html" {
-  bucket = "rcs3-godfather-uci-p-bucket"
+  bucket = var.s3_bucket_name
   key    = "s3-browser/public/index.html"
   source = "${path.module}/../../s3-browser-proxy/public/index.html"
   etag   = filemd5("${path.module}/../../s3-browser-proxy/public/index.html")
@@ -257,11 +257,12 @@ systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service
 systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service
 
 # Download and execute the install script from S3
-aws s3 cp s3://rcs3-godfather-uci-p-bucket/scripts/install-grafana-s3browser.sh /tmp/install-script.sh
+aws s3 cp s3://${var.s3_bucket_name}/scripts/install-grafana-s3browser.sh /tmp/install-script.sh
 chmod +x /tmp/install-script.sh
 
-# Set environment variable for Grafana admin password
+# Set environment variables
 export GRAFANA_ADMIN_PASSWORD="${var.grafana_admin_password}"
+export S3_BUCKET_NAME="${var.s3_bucket_name}"
 
 # Execute the script
 /tmp/install-script.sh
