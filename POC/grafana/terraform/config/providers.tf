@@ -16,4 +16,7 @@ provider "grafana" {
 
   # Use API key if provided, otherwise use username/password
   auth = var.grafana_api_key != null ? var.grafana_api_key : "${var.grafana_username}:${var.grafana_password}"
+
+  # Skip SSL verification for self-signed certs
+  insecure_skip_verify = true
 }

@@ -1,7 +1,7 @@
 # Grafana Configuration
 # These values should come from the infra module's outputs:
 grafana_username = "admin"
-grafana_url      = "http://34.215.255.177:3000"
+grafana_url      = "https://52.24.103.227"
 
 # Path to dashboard JSON files
 dashboards_path = "../../dashboards"

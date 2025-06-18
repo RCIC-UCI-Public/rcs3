@@ -7,3 +7,6 @@ s3_bucket_name = "backup-metrics-tfstate-dev"
 
 # Allowed IP addresses in CIDR notation
 allowed_cidr_blocks = ["68.5.95.209/32"] # Replace with your IP blocks
+
+# Elastic IP Configuration
+use_elastic_ip = true  # Set to true for production, false for dev (saves $3.65/month)

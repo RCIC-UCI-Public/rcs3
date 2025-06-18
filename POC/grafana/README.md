@@ -129,6 +129,21 @@ Before starting, ensure you have the following installed on your system:
    # Check version: python3 --version
    ```
 
+## HTTPS Configuration
+
+This deployment now includes **HTTPS support with self-signed certificates** and **optional Elastic IP** for stable DNS.
+
+### HTTPS Features
+- **Self-signed SSL certificates** generated automatically for current IP
+- **Flexible Elastic IP** - enable for production stability, disable for dev cost savings
+- **Port 443** for HTTPS access (certificate warnings expected)
+- **Port 3000** HTTP fallback for troubleshooting
+- **Certificate regeneration** on instance restart (works with both static and dynamic IPs)
+
+### Elastic IP Options
+- **Development**: `use_elastic_ip = false` (FREE - dynamic IP, changes on restart)
+- **Production**: `use_elastic_ip = true` ($3.65/month - static IP, never changes)
+
 ## Quick Start Guide
 
 ### Step 1: Configure AWS Credentials
@@ -288,11 +303,34 @@ python update_team_memberships.py dev
 
 ## Access Your System
 
-After successful deployment:
+After successful deployment, you'll have multiple access options:
 
-1. **Grafana Dashboard**: Open the `grafana_url` from Step 3 in your browser
-2. **Login**: Use `admin` as username and the password from Step 3
-3. **Browse S3**: Navigate to the "S3 Browser" folder for team-specific S3 access
+### HTTPS Access (Only Public Method)
+1. **HTTPS URL**: Use `grafana_url` from terraform outputs (e.g., `https://1.2.3.4`)
+2. **Certificate Warning**: Your browser will show a certificate warning - this is expected with self-signed certificates
+3. **Accept Certificate**: Click "Advanced" → "Proceed to site" (Chrome) or similar in other browsers
+4. **Login**: Use `admin` as username and the password from terraform outputs
+
+### Internal Access (SSH Required)
+- **HTTP Internal**: `http://localhost:3000` (accessible only via SSH to the instance)
+- **S3 Browser Internal**: `http://localhost:3001` (accessible only via SSH to the instance)
+- **Use Case**: Troubleshooting when HTTPS has issues
+
+### S3 Browser Access
+- **Access Method**: Navigate to the "S3 Browser" folder within Grafana (accessed via HTTPS)
+- **No Direct Access**: S3 Browser port 3001 is not publicly accessible for security
+
+### URL Examples
+After deployment, terraform will output:
+```
+grafana_url = "https://52.12.34.56"               # Only public access method
+grafana_ip = "52.12.34.56"
+grafana_ip_type = "dynamic" (or "elastic" if enabled)
+grafana_internal_urls = {
+  http_internal = "http://localhost:3000"
+  s3_browser_internal = "http://localhost:3001"
+}
+```
 
 ## Project Structure
 

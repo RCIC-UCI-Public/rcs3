@@ -6,17 +6,9 @@ resource "aws_security_group" "grafana_sg" {
 
 
   ingress {
-    description = "Grafana Web Interface (requires NACL permission)"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
-  }
-
-  ingress {
-    description = "S3 Browser Web Interface (requires NACL permission)"
-    from_port   = 3001
-    to_port     = 3001
+    description = "Grafana HTTPS Interface (requires NACL permission)"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidr_blocks
   }
@@ -286,4 +278,21 @@ EOF
     {
       "ProtectionLevel" = "P1P2"
   })
+}
+
+# Optional Elastic IP (only created if use_elastic_ip is true)
+resource "aws_eip" "grafana" {
+  count  = var.use_elastic_ip ? 1 : 0
+  domain = "vpc"
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-${var.environment}-grafana-eip"
+  })
+}
+
+# Associate Elastic IP with EC2 instance (only if EIP exists)
+resource "aws_eip_association" "grafana" {
+  count       = var.use_elastic_ip ? 1 : 0
+  instance_id = aws_instance.grafana.id
+  allocation_id = aws_eip.grafana[0].id
 }

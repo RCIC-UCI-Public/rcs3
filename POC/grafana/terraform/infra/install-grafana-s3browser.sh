@@ -52,15 +52,39 @@ providers:
       path: /var/lib/grafana/dashboards
 EODS
 
-# Configure Grafana server
+# Get the current public IP address for SSL certificate
+echo "[INFO] Getting current public IP address..."
+PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+echo "[INFO] Public IP: $PUBLIC_IP"
+
+# Create SSL certificate directory
+mkdir -p /etc/grafana/ssl
+cd /etc/grafana/ssl
+
+# Generate self-signed SSL certificate
+echo "[INFO] Generating self-signed SSL certificate..."
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout grafana.key \
+    -out grafana.crt \
+    -subj "/C=US/ST=CA/L=Irvine/O=UCI/OU=RCS3/CN=$PUBLIC_IP" \
+    -addext "subjectAltName=IP:$PUBLIC_IP"
+
+# Set proper permissions for SSL files
+chown grafana:grafana /etc/grafana/ssl/grafana.key /etc/grafana/ssl/grafana.crt
+chmod 400 /etc/grafana/ssl/grafana.key
+chmod 444 /etc/grafana/ssl/grafana.crt
+
+# Configure Grafana server with HTTPS on port 3000 (internal)
 cat > /etc/grafana/grafana.ini << EODS
 [paths]
 provisioning = /etc/grafana/provisioning
 
 [server]
-protocol = http
+protocol = https
 http_port = 3000
-domain = localhost
+domain = $PUBLIC_IP
+cert_file = /etc/grafana/ssl/grafana.crt
+cert_key = /etc/grafana/ssl/grafana.key
 
 [security]
 admin_password = ${GRAFANA_ADMIN_PASSWORD}
@@ -84,6 +108,15 @@ chown -R grafana:grafana /var/lib/grafana/dashboards
 # Start Grafana
 systemctl enable grafana-server
 systemctl start grafana-server
+
+# Configure iptables to forward port 443 to 3000 for HTTPS access
+echo "[INFO] Configuring port forwarding from 443 to 3000..."
+iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3000
+iptables -t nat -A OUTPUT -p tcp -o lo --dport 443 -j REDIRECT --to-port 3000
+
+# Save iptables rules to persist across reboots
+apt-get install -y iptables-persistent
+iptables-save > /etc/iptables/rules.v4
 
 # Install Node.js and npm for S3 browser
 echo "[INFO] Installing Node.js..."
@@ -148,4 +181,9 @@ systemctl start s3-browser
 systemctl status grafana-server
 systemctl status s3-browser
 
-echo "[INFO] Installation complete - Grafana on port 3000, S3 Browser on port 3001"
+echo "[INFO] Installation complete!"
+echo "[INFO] - Grafana HTTPS: https://$PUBLIC_IP (port 443) - Certificate warnings expected"
+echo "[INFO] - Internal Grafana HTTP: http://localhost:3000 (SSH access only)"
+echo "[INFO] - Internal S3 Browser: http://localhost:3001 (SSH access only)"
+echo "[INFO] - SSL Certificate generated for IP: $PUBLIC_IP"
+echo "[INFO] - PUBLIC ACCESS: Only HTTPS (port 443) is accessible from internet"

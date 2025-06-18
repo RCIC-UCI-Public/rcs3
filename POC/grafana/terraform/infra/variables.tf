@@ -52,3 +52,10 @@ variable "s3_bucket_name" {
   description = "Name of the S3 bucket for storing scripts and files"
   type        = string
 }
+
+# Elastic IP Configuration
+variable "use_elastic_ip" {
+  description = "Whether to create and use an Elastic IP for the Grafana instance"
+  type        = bool
+  default     = false
+}
