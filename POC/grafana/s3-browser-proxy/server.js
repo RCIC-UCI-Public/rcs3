@@ -106,7 +106,12 @@ app.get('/api/buckets', async (req, res) => {
 app.get('/api/buckets/:bucketName/objects', async (req, res) => {
     try {
         const { bucketName } = req.params;
-        const { prefix = '', delimiter = '/', includeVersions = 'false' } = req.query;
+        const { 
+            prefix = '', 
+            delimiter = '/', 
+            includeVersions = 'false',
+            continuationToken = ''
+        } = req.query;
         
         const credentials = loadAWSCredentials();
         const s3 = initializeS3Client(credentials);
@@ -116,6 +121,7 @@ app.get('/api/buckets/:bucketName/objects', async (req, res) => {
         }
         
         console.log(`[DEBUG] includeVersions parameter: ${includeVersions}`);
+        console.log(`[DEBUG] continuationToken: ${continuationToken ? 'present' : 'none'}`);
         
         if (includeVersions === 'true') {
             try {
@@ -342,13 +348,19 @@ app.get('/api/buckets/:bucketName/objects', async (req, res) => {
                     res.json(response);
                 }
             } else {
-                // Option 2: Standard fast listing without version info
+                // Option 2: Standard fast listing without version info with pagination support
                 const params = {
                     Bucket: bucketName,
                     Prefix: prefix,
                     Delimiter: delimiter,
                     MaxKeys: 1000
                 };
+                
+                // Add continuation token if provided for pagination
+                if (continuationToken) {
+                    params.ContinuationToken = continuationToken;
+                    console.log(`[DEBUG] Using continuation token for pagination`);
+                }
                 
                 const data = await s3.listObjectsV2(params).promise();
                 
@@ -364,6 +376,8 @@ app.get('/api/buckets/:bucketName/objects', async (req, res) => {
                     versionsEnabled: false,
                     versionInfoIncluded: false
                 };
+                
+                console.log(`[DEBUG] Response summary: ${response.folders.length} folders, ${response.files.length} files, isTruncated: ${response.isTruncated}`);
                 
                 res.json(response);
             }
@@ -507,6 +521,7 @@ app.post('/api/reload-credentials', (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
 
 // Start server
 app.listen(PORT, () => {
