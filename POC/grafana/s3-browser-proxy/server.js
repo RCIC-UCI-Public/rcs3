@@ -83,12 +83,8 @@ function initializeS3Client(credentials) {
     return new AWS.S3();
 }
 
-// API Routes
-// Helper function to create route path with base path
-const routePath = (path) => BASE_PATH ? `${BASE_PATH}${path}` : path;
-
-// List buckets with optional filtering
-app.get(routePath('/api/buckets'), async (req, res) => {
+// Middleware to initialize S3 client for each request
+app.use((req, res, next) => {
     try {
         const credentials = loadAWSCredentials();
         const s3 = initializeS3Client(credentials);
@@ -97,7 +93,262 @@ app.get(routePath('/api/buckets'), async (req, res) => {
             return res.status(500).json({ error: 'AWS S3 client could not be initialized' });
         }
         
-        const data = await s3.listBuckets().promise();
+        req.s3 = s3;
+        req.awsCredentials = credentials;
+        next();
+    } catch (error) {
+        console.error('Error initializing S3 client:', error);
+        res.status(500).json({ error: 'Failed to initialize AWS S3 client' });
+    }
+});
+
+// Helper functions for S3 operations
+async function listObjectVersions(s3, params) {
+    try {
+        console.log(`[DEBUG] Calling listObjectVersions with params:`, params);
+        const data = await s3.listObjectVersions(params).promise();
+        console.log(`[DEBUG] listObjectVersions response:`, {
+            versionsCount: (data.Versions || []).length,
+            deleteMarkersCount: (data.DeleteMarkers || []).length,
+            commonPrefixesCount: (data.CommonPrefixes || []).length,
+            isTruncated: data.IsTruncated
+        });
+        return data;
+    } catch (error) {
+        console.error(`[ERROR] listObjectVersions failed:`, error.message);
+        throw error;
+    }
+}
+
+async function listStandardObjects(s3, params) {
+    try {
+        const data = await s3.listObjectsV2(params).promise();
+        console.log(`[DEBUG] Response summary: ${(data.CommonPrefixes || []).length} folders, ${(data.Contents || []).length} files, isTruncated: ${data.IsTruncated}`);
+        return data;
+    } catch (error) {
+        console.error(`[ERROR] listObjectsV2 failed:`, error.message);
+        throw error;
+    }
+}
+
+function processVersionGroups(versions, deleteMarkers) {
+    const versionGroups = {};
+    
+    // Process regular versions
+    versions.forEach(version => {
+        if (!versionGroups[version.Key]) {
+            versionGroups[version.Key] = [];
+        }
+        versionGroups[version.Key].push({
+            ...version,
+            Type: 'version',
+            IsLatest: version.IsLatest
+        });
+    });
+    
+    // Process delete markers
+    deleteMarkers.forEach(marker => {
+        if (!versionGroups[marker.Key]) {
+            versionGroups[marker.Key] = [];
+        }
+        versionGroups[marker.Key].push({
+            ...marker,
+            Type: 'deleteMarker',
+            IsLatest: marker.IsLatest,
+            Size: 0 // Delete markers have no size
+        });
+    });
+    
+    // Sort versions within each group by LastModified (newest first)
+    Object.keys(versionGroups).forEach(key => {
+        versionGroups[key].sort((a, b) => new Date(b.LastModified) - new Date(a.LastModified));
+    });
+    
+    return versionGroups;
+}
+
+function formatAllVersionsResponse(data, versionGroups) {
+    // Flatten to array with version info
+    const allVersions = [];
+    Object.keys(versionGroups).forEach(key => {
+        versionGroups[key].forEach((version, index) => {
+            allVersions.push({
+                ...version,
+                VersionIndex: index,
+                TotalVersions: versionGroups[key].length
+            });
+        });
+    });
+    
+    return {
+        folders: data.CommonPrefixes || [],
+        files: allVersions,
+        isTruncated: data.IsTruncated,
+        nextVersionIdMarker: data.NextVersionIdMarker,
+        versionsEnabled: true
+    };
+}
+
+function formatVersionInfoResponse(data, versionGroups, showDeleted) {
+    // Convert to file list showing current versions (and deleted if requested)
+    const filesWithVersionInfo = [];
+    Object.keys(versionGroups).forEach(key => {
+        const group = { versions: [], deleteMarkers: [], latest: null };
+        
+        // Separate versions and delete markers
+        versionGroups[key].forEach(item => {
+            if (item.Type === 'version') {
+                group.versions.push(item);
+                if (item.IsLatest) {
+                    group.latest = item;
+                }
+            } else {
+                group.deleteMarkers.push(item);
+                if (item.IsLatest) {
+                    group.latest = item;
+                }
+            }
+        });
+        
+        const totalVersions = group.versions.length + group.deleteMarkers.length;
+        const latest = group.latest;
+        
+        if (latest) {
+            const isDeleted = latest.Type === 'deleteMarker' || latest.Size === undefined;
+            
+            if (!isDeleted) {
+                // Current non-deleted file
+                filesWithVersionInfo.push({
+                    Key: key,
+                    Size: latest.Size,
+                    LastModified: latest.LastModified,
+                    StorageClass: latest.StorageClass,
+                    ETag: latest.ETag,
+                    HasMultipleVersions: totalVersions > 1,
+                    VersionCount: totalVersions,
+                    IsDeleted: false
+                });
+            } else if (showDeleted) {
+                // Deleted file (delete marker is latest) - only show if showDeleted is true
+                filesWithVersionInfo.push({
+                    Key: key,
+                    Size: 0,
+                    LastModified: latest.LastModified,
+                    StorageClass: 'DELETE_MARKER',
+                    ETag: latest.ETag || '',
+                    HasMultipleVersions: totalVersions > 1,
+                    VersionCount: totalVersions,
+                    IsDeleted: true,
+                    DeletedDate: latest.LastModified
+                });
+            }
+            // If isDeleted && !showDeleted, we don't add the file to the list at all
+        }
+    });
+    
+    return {
+        folders: data.CommonPrefixes || [],
+        files: filesWithVersionInfo,
+        isTruncated: data.IsTruncated,
+        nextVersionIdMarker: data.NextVersionIdMarker,
+        versionsEnabled: false,
+        versionInfoIncluded: true
+    };
+}
+
+function formatStandardResponse(data) {
+    return {
+        folders: data.CommonPrefixes || [],
+        files: (data.Contents || []).map(file => ({
+            ...file,
+            HasMultipleVersions: false,
+            VersionCount: 1
+        })),
+        isTruncated: data.IsTruncated,
+        nextContinuationToken: data.NextContinuationToken,
+        versionsEnabled: false,
+        versionInfoIncluded: false
+    };
+}
+
+async function handleVersionListing(s3, bucketName, prefix, delimiter) {
+    const params = {
+        Bucket: bucketName,
+        Prefix: prefix,
+        Delimiter: delimiter,
+        MaxKeys: 1000
+    };
+    
+    try {
+        console.log(`[DEBUG] Versioning enabled for bucket: ${bucketName}, prefix: ${prefix}`);
+        const data = await listObjectVersions(s3, params);
+        
+        // Log raw versions for debugging
+        if (data.Versions && data.Versions.length > 0) {
+            console.log(`[DEBUG] Sample versions:`, data.Versions.slice(0, 2));
+        }
+        
+        const versionGroups = processVersionGroups(data.Versions || [], data.DeleteMarkers || []);
+        return formatAllVersionsResponse(data, versionGroups);
+    } catch (error) {
+        console.log(`[DEBUG] Falling back to standard object listing`);
+        const data = await listStandardObjects(s3, params);
+        return {
+            folders: data.CommonPrefixes || [],
+            files: data.Contents || [],
+            isTruncated: data.IsTruncated,
+            nextContinuationToken: data.NextContinuationToken,
+            versionsEnabled: false
+        };
+    }
+}
+
+async function handleVersionInfoListing(s3, bucketName, prefix, delimiter, showDeleted) {
+    const params = {
+        Bucket: bucketName,
+        Prefix: prefix,
+        Delimiter: delimiter,
+        MaxKeys: 1000
+    };
+    
+    try {
+        console.log(`[DEBUG] Using listObjectVersions as primary listing method`);
+        const data = await listObjectVersions(s3, params);
+        const versionGroups = processVersionGroups(data.Versions || [], data.DeleteMarkers || []);
+        return formatVersionInfoResponse(data, versionGroups, showDeleted);
+    } catch (error) {
+        console.error(`[ERROR] listObjectVersions failed:`, error.message);
+        const data = await listStandardObjects(s3, params);
+        return formatStandardResponse(data);
+    }
+}
+
+async function handleStandardListing(s3, bucketName, prefix, delimiter, continuationToken) {
+    const params = {
+        Bucket: bucketName,
+        Prefix: prefix,
+        Delimiter: delimiter,
+        MaxKeys: 1000
+    };
+    
+    // Add continuation token if provided for pagination
+    if (continuationToken) {
+        params.ContinuationToken = continuationToken;
+        console.log(`[DEBUG] Using continuation token for pagination`);
+    }
+    
+    const data = await listStandardObjects(s3, params);
+    return formatStandardResponse(data);
+}
+
+// API Routes
+// Helper function to create route path with base path
+const routePath = (path) => BASE_PATH ? `${BASE_PATH}${path}` : path;
+
+// List buckets with optional filtering
+app.get(routePath('/api/buckets'), async (req, res) => {
+    try {
+        const data = await req.s3.listBuckets().promise();
         let buckets = data.Buckets;
         
         // Filter buckets based on query parameter
@@ -125,275 +376,28 @@ app.get(routePath('/api/buckets/:bucketName/objects'), async (req, res) => {
             continuationToken = ''
         } = req.query;
         
-        const credentials = loadAWSCredentials();
-        const s3 = initializeS3Client(credentials);
-        
-        if (!s3) {
-            return res.status(500).json({ error: 'AWS S3 client could not be initialized' });
-        }
-        
         console.log(`[DEBUG] includeVersions parameter: ${includeVersions}`);
         console.log(`[DEBUG] continuationToken: ${continuationToken ? 'present' : 'none'}`);
         
+        let response;
+        
         if (includeVersions === 'true') {
-            try {
-                // Use listObjectVersions for versioning support
-                console.log(`[DEBUG] Versioning enabled for bucket: ${bucketName}, prefix: ${prefix}`);
-                const params = {
-                    Bucket: bucketName,
-                    Prefix: prefix,
-                    Delimiter: delimiter,
-                    MaxKeys: 1000
-                };
-                
-                console.log(`[DEBUG] Calling listObjectVersions with params:`, params);
-                const data = await s3.listObjectVersions(params).promise();
-                console.log(`[DEBUG] listObjectVersions response:`, {
-                    versionsCount: (data.Versions || []).length,
-                    deleteMarkersCount: (data.DeleteMarkers || []).length,
-                    commonPrefixesCount: (data.CommonPrefixes || []).length,
-                    isTruncated: data.IsTruncated
-                });
-                
-                // Log raw versions for debugging
-                if (data.Versions && data.Versions.length > 0) {
-                    console.log(`[DEBUG] Sample versions:`, data.Versions.slice(0, 2));
-                }
-                
-                // Group versions by key and mark latest versions
-                const versionGroups = {};
-                const versions = data.Versions || [];
-                const deleteMarkers = data.DeleteMarkers || [];
-                
-                // Process regular versions
-                versions.forEach(version => {
-                    if (!versionGroups[version.Key]) {
-                        versionGroups[version.Key] = [];
-                    }
-                    versionGroups[version.Key].push({
-                        ...version,
-                        Type: 'version',
-                        IsLatest: version.IsLatest
-                    });
-                });
-                
-                // Process delete markers
-                deleteMarkers.forEach(marker => {
-                    if (!versionGroups[marker.Key]) {
-                        versionGroups[marker.Key] = [];
-                    }
-                    versionGroups[marker.Key].push({
-                        ...marker,
-                        Type: 'deleteMarker',
-                        IsLatest: marker.IsLatest,
-                        Size: 0 // Delete markers have no size
-                    });
-                });
-                
-                // Sort versions within each group by LastModified (newest first)
-                Object.keys(versionGroups).forEach(key => {
-                    versionGroups[key].sort((a, b) => new Date(b.LastModified) - new Date(a.LastModified));
-                });
-                
-                // Flatten to array with version info
-                const allVersions = [];
-                Object.keys(versionGroups).forEach(key => {
-                    versionGroups[key].forEach((version, index) => {
-                        allVersions.push({
-                            ...version,
-                            VersionIndex: index,
-                            TotalVersions: versionGroups[key].length
-                        });
-                    });
-                });
-                
-                const response = {
-                    folders: data.CommonPrefixes || [],
-                    files: allVersions,
-                    isTruncated: data.IsTruncated,
-                    nextVersionIdMarker: data.NextVersionIdMarker,
-                    versionsEnabled: true
-                };
-                
-                res.json(response);
-            } catch (versionError) {
-                console.error(`[ERROR] listObjectVersions failed:`, versionError.message);
-                console.log(`[DEBUG] Falling back to standard object listing`);
-                
-                // Fall back to standard listing
-                const params = {
-                    Bucket: bucketName,
-                    Prefix: prefix,
-                    Delimiter: delimiter,
-                    MaxKeys: 1000
-                };
-                
-                const data = await s3.listObjectsV2(params).promise();
-                
-                const response = {
-                    folders: data.CommonPrefixes || [],
-                    files: data.Contents || [],
-                    isTruncated: data.IsTruncated,
-                    nextContinuationToken: data.NextContinuationToken,
-                    versionsEnabled: false
-                };
-                
-                res.json(response);
-            }
+            // Full version listing mode
+            response = await handleVersionListing(req.s3, bucketName, prefix, delimiter);
         } else {
-            // Option 1: Use listObjectVersions as primary method to get version info efficiently
             const useVersionsAPI = req.query.showVersionInfo === 'true';
             const showDeleted = req.query.showDeleted === 'true';
             
             if (useVersionsAPI || showDeleted) {
-                try {
-                    console.log(`[DEBUG] Using listObjectVersions as primary listing method`);
-                    const params = {
-                        Bucket: bucketName,
-                        Prefix: prefix,
-                        Delimiter: delimiter,
-                        MaxKeys: 1000
-                    };
-                    
-                    const data = await s3.listObjectVersions(params).promise();
-                    
-                    // Group by key to get current versions with version counts
-                    const versionGroups = {};
-                    const versions = data.Versions || [];
-                    const deleteMarkers = data.DeleteMarkers || [];
-                    
-                    // Process versions
-                    versions.forEach(version => {
-                        if (!versionGroups[version.Key]) {
-                            versionGroups[version.Key] = { versions: [], deleteMarkers: [], latest: null };
-                        }
-                        versionGroups[version.Key].versions.push(version);
-                        if (version.IsLatest) {
-                            versionGroups[version.Key].latest = version;
-                        }
-                    });
-                    
-                    // Process delete markers
-                    deleteMarkers.forEach(marker => {
-                        if (!versionGroups[marker.Key]) {
-                            versionGroups[marker.Key] = { versions: [], deleteMarkers: [], latest: null };
-                        }
-                        versionGroups[marker.Key].deleteMarkers.push(marker);
-                        if (marker.IsLatest) {
-                            versionGroups[marker.Key].latest = marker;
-                        }
-                    });
-                    
-                    // Convert to file list showing current versions (and deleted if requested)
-                    const filesWithVersionInfo = [];
-                    Object.keys(versionGroups).forEach(key => {
-                        const group = versionGroups[key];
-                        const totalVersions = group.versions.length + group.deleteMarkers.length;
-                        const latest = group.latest;
-                        
-                        if (latest) {
-                            if (latest.Size !== undefined) {
-                                // Current non-deleted file
-                                filesWithVersionInfo.push({
-                                    Key: key,
-                                    Size: latest.Size,
-                                    LastModified: latest.LastModified,
-                                    StorageClass: latest.StorageClass,
-                                    ETag: latest.ETag,
-                                    HasMultipleVersions: totalVersions > 1,
-                                    VersionCount: totalVersions,
-                                    IsDeleted: false
-                                });
-                            } else if (showDeleted) {
-                                // Deleted file (delete marker is latest)
-                                filesWithVersionInfo.push({
-                                    Key: key,
-                                    Size: 0,
-                                    LastModified: latest.LastModified,
-                                    StorageClass: 'DELETE_MARKER',
-                                    ETag: latest.ETag || '',
-                                    HasMultipleVersions: totalVersions > 1,
-                                    VersionCount: totalVersions,
-                                    IsDeleted: true,
-                                    DeletedDate: latest.LastModified
-                                });
-                            }
-                        }
-                    });
-                    
-                    const response = {
-                        folders: data.CommonPrefixes || [],
-                        files: filesWithVersionInfo,
-                        isTruncated: data.IsTruncated,
-                        nextVersionIdMarker: data.NextVersionIdMarker,
-                        versionsEnabled: false,
-                        versionInfoIncluded: true
-                    };
-                    
-                    res.json(response);
-                    
-                } catch (versionError) {
-                    console.error(`[ERROR] listObjectVersions failed:`, versionError.message);
-                    // Fall back to standard listing without version info
-                    const params = {
-                        Bucket: bucketName,
-                        Prefix: prefix,
-                        Delimiter: delimiter,
-                        MaxKeys: 1000
-                    };
-                    
-                    const data = await s3.listObjectsV2(params).promise();
-                    
-                    const response = {
-                        folders: data.CommonPrefixes || [],
-                        files: (data.Contents || []).map(file => ({
-                            ...file,
-                            HasMultipleVersions: false,
-                            VersionCount: 1
-                        })),
-                        isTruncated: data.IsTruncated,
-                        nextContinuationToken: data.NextContinuationToken,
-                        versionsEnabled: false,
-                        versionInfoIncluded: false
-                    };
-                    
-                    res.json(response);
-                }
+                // Version info mode (current versions with metadata)
+                response = await handleVersionInfoListing(req.s3, bucketName, prefix, delimiter, showDeleted);
             } else {
-                // Option 2: Standard fast listing without version info with pagination support
-                const params = {
-                    Bucket: bucketName,
-                    Prefix: prefix,
-                    Delimiter: delimiter,
-                    MaxKeys: 1000
-                };
-                
-                // Add continuation token if provided for pagination
-                if (continuationToken) {
-                    params.ContinuationToken = continuationToken;
-                    console.log(`[DEBUG] Using continuation token for pagination`);
-                }
-                
-                const data = await s3.listObjectsV2(params).promise();
-                
-                const response = {
-                    folders: data.CommonPrefixes || [],
-                    files: (data.Contents || []).map(file => ({
-                        ...file,
-                        HasMultipleVersions: false,
-                        VersionCount: 1
-                    })),
-                    isTruncated: data.IsTruncated,
-                    nextContinuationToken: data.NextContinuationToken,
-                    versionsEnabled: false,
-                    versionInfoIncluded: false
-                };
-                
-                console.log(`[DEBUG] Response summary: ${response.folders.length} folders, ${response.files.length} files, isTruncated: ${response.isTruncated}`);
-                
-                res.json(response);
+                // Standard listing mode
+                response = await handleStandardListing(req.s3, bucketName, prefix, delimiter, continuationToken);
             }
         }
+        
+        res.json(response);
     } catch (error) {
         console.error('Error listing objects:', error);
         res.status(500).json({ error: error.message });
@@ -407,13 +411,6 @@ app.get(routePath('/api/buckets/:bucketName/objects/:objectKey/metadata'), async
         const { versionId } = req.query;
         const decodedKey = decodeURIComponent(objectKey);
         
-        const credentials = loadAWSCredentials();
-        const s3 = initializeS3Client(credentials);
-        
-        if (!s3) {
-            return res.status(500).json({ error: 'AWS S3 client could not be initialized' });
-        }
-        
         const params = {
             Bucket: bucketName,
             Key: decodedKey
@@ -424,7 +421,7 @@ app.get(routePath('/api/buckets/:bucketName/objects/:objectKey/metadata'), async
             params.VersionId = versionId;
         }
         
-        const data = await s3.headObject(params).promise();
+        const data = await req.s3.headObject(params).promise();
         res.json(data);
     } catch (error) {
         console.error('Error getting object metadata:', error);
@@ -438,13 +435,6 @@ app.get(routePath('/api/buckets/:bucketName/objects/:objectKey/versions'), async
         const { bucketName, objectKey } = req.params;
         const decodedKey = decodeURIComponent(objectKey);
         
-        const credentials = loadAWSCredentials();
-        const s3 = initializeS3Client(credentials);
-        
-        if (!s3) {
-            return res.status(500).json({ error: 'AWS S3 client could not be initialized' });
-        }
-        
         console.log(`[DEBUG] Getting versions for key: ${decodedKey} in bucket: ${bucketName}`);
         
         const params = {
@@ -453,7 +443,7 @@ app.get(routePath('/api/buckets/:bucketName/objects/:objectKey/versions'), async
             MaxKeys: 1000
         };
         
-        const data = await s3.listObjectVersions(params).promise();
+        const data = await req.s3.listObjectVersions(params).promise();
         console.log(`[DEBUG] listObjectVersions for file response:`, {
             versionsCount: (data.Versions || []).length,
             deleteMarkersCount: (data.DeleteMarkers || []).length

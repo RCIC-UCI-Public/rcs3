@@ -723,6 +723,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkRuntimeEnvironment(); // Check if server-hosted and hide client features
             loadBuckets();
+            setupEventDelegation(); // Set up event delegation
             
             document.getElementById('bucketSelect').addEventListener('change', function() {
                 const selectedBucket = this.value;
@@ -737,6 +738,60 @@
                 }
             });
         });
+
+        // Set up event delegation for dynamic content
+        function setupEventDelegation() {
+            // Event delegation for folders container
+            document.getElementById('folders').addEventListener('click', handleFolderClick);
+            document.getElementById('folders').addEventListener('change', handleCheckboxChange);
+            
+            // Event delegation for files container
+            document.getElementById('files').addEventListener('click', handleFileClick);
+            document.getElementById('files').addEventListener('change', handleCheckboxChange);
+        }
+
+        // Handle clicks in folders container
+        function handleFolderClick(event) {
+            const target = event.target;
+            
+            // Handle folder navigation
+            if (target.dataset.action === 'navigate-folder') {
+                event.preventDefault();
+                const prefix = target.dataset.prefix;
+                navigateToFolder(prefix);
+            }
+        }
+
+        // Handle clicks in files container
+        function handleFileClick(event) {
+            const target = event.target;
+            
+            // Handle file details
+            if (target.dataset.action === 'show-file-details') {
+                event.preventDefault();
+                const key = target.dataset.key;
+                showFileDetails(key);
+            }
+            
+            // Handle metadata button
+            if (target.dataset.action === 'show-metadata') {
+                event.preventDefault();
+                const key = target.dataset.key;
+                showMetadata(key);
+            }
+        }
+
+        // Handle checkbox changes using event delegation
+        function handleCheckboxChange(event) {
+            const target = event.target;
+            
+            if (target.classList.contains('selection-checkbox')) {
+                const path = target.dataset.path;
+                const type = target.dataset.type;
+                const isChecked = target.checked;
+                toggleSelection(path, type, isChecked);
+            }
+        }
 
         // Check runtime environment and hide client-side features when server-hosted
         async function checkRuntimeEnvironment() {
@@ -1078,7 +1133,7 @@
             }
         }
 
-        // Create folder element
+        // Create folder element using DOM API
         function createFolderElement(folder) {
             const div = document.createElement('div');
             div.className = 'item';
@@ -1087,22 +1142,41 @@
             const folderPath = folder.Prefix;
             const isSelected = isItemSelected(folderPath);
             
-            div.innerHTML = `
-                <input type="checkbox" class="selection-checkbox" 
-                       data-path="${folderPath}" 
-                       data-type="folder"
-                       ${isSelected ? 'checked' : ''}
-                       onchange="toggleSelection('${folderPath}', 'folder', this.checked)">
-                <span class="icon folder-icon">📁</span>
-                <div class="item-info">
-                    <div class="item-name" onclick="navigateToFolder('${folder.Prefix}')">${folderName}</div>
-                </div>
-            `;
+            // Create checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'selection-checkbox';
+            checkbox.dataset.path = folderPath;
+            checkbox.dataset.type = 'folder';
+            checkbox.checked = isSelected;
+            
+            // Create folder icon
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'icon folder-icon';
+            iconSpan.textContent = '📁';
+            
+            // Create item info container
+            const itemInfo = document.createElement('div');
+            itemInfo.className = 'item-info';
+            
+            // Create folder name element
+            const itemName = document.createElement('div');
+            itemName.className = 'item-name';
+            itemName.textContent = folderName;
+            itemName.dataset.action = 'navigate-folder';
+            itemName.dataset.prefix = folder.Prefix;
+            
+            itemInfo.appendChild(itemName);
+            
+            // Assemble the element
+            div.appendChild(checkbox);
+            div.appendChild(iconSpan);
+            div.appendChild(itemInfo);
             
             return div;
         }
 
-        // Create file element
+        // Create file element using DOM API
         function createFileElement(file) {
             const div = document.createElement('div');
             div.className = 'item';
@@ -1117,37 +1191,86 @@
             const lastModified = new Date(file.LastModified).toLocaleString();
             const isSelected = isItemSelected(file.Key);
             
+            // Create checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'selection-checkbox';
+            checkbox.dataset.path = file.Key;
+            checkbox.dataset.type = 'file';
+            checkbox.checked = isSelected;
+            
+            // Create file icon
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'icon file-icon';
+            iconSpan.textContent = file.IsDeleted ? '🗑️' : '📄';
+            
+            // Create item info container
+            const itemInfo = document.createElement('div');
+            itemInfo.className = 'item-info';
+            
+            // Create file name element
+            const itemName = document.createElement('div');
+            itemName.className = 'item-name';
+            itemName.textContent = fileName;
+            itemName.dataset.action = 'show-file-details';
+            itemName.dataset.key = file.Key;
+            
             // Add version indicator if file has multiple versions
-            const versionIndicator = file.HasMultipleVersions ? 
-                `<span class="version-indicator" title="This file has ${file.VersionCount} versions">📊 ${file.VersionCount}</span>` : '';
+            if (file.HasMultipleVersions) {
+                const versionIndicator = document.createElement('span');
+                versionIndicator.className = 'version-indicator';
+                versionIndicator.title = `This file has ${file.VersionCount} versions`;
+                versionIndicator.textContent = `📊 ${file.VersionCount}`;
+                itemName.appendChild(versionIndicator);
+            }
             
             // Add deleted indicator for deleted files
-            const deletedIndicator = file.IsDeleted ? 
-                `<span class="version-badge delete-marker" title="This file has been deleted">🗑️ DELETED</span>` : '';
+            if (file.IsDeleted) {
+                const deletedIndicator = document.createElement('span');
+                deletedIndicator.className = 'version-badge delete-marker';
+                deletedIndicator.title = 'This file has been deleted';
+                deletedIndicator.textContent = '🗑️ DELETED';
+                itemName.appendChild(deletedIndicator);
+            }
             
-            const fileIcon = file.IsDeleted ? '🗑️' : '📄';
-            const storageClass = file.IsDeleted ? 'DELETE_MARKER' : (file.StorageClass || 'STANDARD');
+            // Create file details
+            const itemDetails = document.createElement('div');
+            itemDetails.className = 'item-details';
+            
+            const sizeSpan = document.createElement('span');
+            sizeSpan.textContent = `Size: ${fileSize}`;
+            itemDetails.appendChild(sizeSpan);
+            
             const timeLabel = file.IsDeleted ? 'Deleted' : 'Modified';
+            const timeSpan = document.createElement('span');
+            timeSpan.textContent = `${timeLabel}: ${lastModified}`;
+            itemDetails.appendChild(timeSpan);
             
-            div.innerHTML = `
-                <input type="checkbox" class="selection-checkbox" 
-                       data-path="${file.Key}" 
-                       data-type="file"
-                       ${isSelected ? 'checked' : ''}
-                       onchange="toggleSelection('${file.Key}', 'file', this.checked)">
-                <span class="icon file-icon">${fileIcon}</span>
-                <div class="item-info">
-                    <div class="item-name" onclick="showFileDetails('${file.Key}')">${fileName}${versionIndicator}${deletedIndicator}</div>
-                    <div class="item-details">
-                        <span>Size: ${fileSize}</span>
-                        <span>${timeLabel}: ${lastModified}</span>
-                        <span>Storage: ${storageClass}</span>
-                    </div>
-                </div>
-                <div class="item-actions">
-                    <button class="btn btn-small" onclick="showMetadata('${file.Key}')">ℹ️ Info</button>
-                </div>
-            `;
+            const storageClass = file.IsDeleted ? 'DELETE_MARKER' : (file.StorageClass || 'STANDARD');
+            const storageSpan = document.createElement('span');
+            storageSpan.textContent = `Storage: ${storageClass}`;
+            itemDetails.appendChild(storageSpan);
+            
+            itemInfo.appendChild(itemName);
+            itemInfo.appendChild(itemDetails);
+            
+            // Create actions container
+            const itemActions = document.createElement('div');
+            itemActions.className = 'item-actions';
+            
+            const infoButton = document.createElement('button');
+            infoButton.className = 'btn btn-small';
+            infoButton.textContent = 'ℹ️ Info';
+            infoButton.dataset.action = 'show-metadata';
+            infoButton.dataset.key = file.Key;
+            
+            itemActions.appendChild(infoButton);
+            
+            // Assemble the element
+            div.appendChild(checkbox);
+            div.appendChild(iconSpan);
+            div.appendChild(itemInfo);
+            div.appendChild(itemActions);
             
             return div;
         }
