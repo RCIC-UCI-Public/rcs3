@@ -4,14 +4,9 @@ provider "aws" {
   region = "us-west-2" # Default region, can be overridden via variables
 }
 
-# Remote state configuration
+# Remote state configuration - backend configured via backend config files
 terraform {
-  backend "s3" {
-    bucket  = "rcs3-godfather-uci-p-bucket"
-    key     = "tfstate/terraform_infra.tfstate"
-    region  = "us-west-2"
-    encrypt = true
-  }
+  backend "s3" {}
 
   required_providers {
     aws = {

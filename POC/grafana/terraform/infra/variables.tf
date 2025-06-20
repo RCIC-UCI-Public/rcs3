@@ -46,3 +46,16 @@ variable "allowed_cidr_blocks" {
   description = "List of CIDR blocks allowed to access Grafana"
   type        = list(string)
 }
+
+# S3 Configuration
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket for storing scripts and files"
+  type        = string
+}
+
+# ALB Configuration
+variable "use_alb" {
+  description = "Whether to create an Application Load Balancer for HTTPS access"
+  type        = bool
+  default     = false
+}

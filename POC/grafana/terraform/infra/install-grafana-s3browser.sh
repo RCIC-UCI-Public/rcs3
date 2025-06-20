@@ -52,7 +52,7 @@ providers:
       path: /var/lib/grafana/dashboards
 EODS
 
-# Configure Grafana server
+# Configure Grafana server with simple HTTP on port 3000 (ALB handles HTTPS)
 cat > /etc/grafana/grafana.ini << EODS
 [paths]
 provisioning = /etc/grafana/provisioning
@@ -85,6 +85,7 @@ chown -R grafana:grafana /var/lib/grafana/dashboards
 systemctl enable grafana-server
 systemctl start grafana-server
 
+
 # Install Node.js and npm for S3 browser
 echo "[INFO] Installing Node.js..."
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -100,7 +101,7 @@ cd /opt/s3-browser
 
 # Download package.json from S3
 echo "[INFO] Downloading package.json from S3..."
-aws s3 cp s3://rcs3-godfather-uci-p-bucket/s3-browser/package.json package.json
+aws s3 cp s3://${S3_BUCKET_NAME}/s3-browser/package.json package.json
 
 # Install dependencies
 npm install
@@ -109,11 +110,11 @@ npm install
 echo "[INFO] Downloading S3 browser application files from S3..."
 
 # Download server.js from S3
-aws s3 cp s3://rcs3-godfather-uci-p-bucket/s3-browser/server.js server.js
+aws s3 cp s3://${S3_BUCKET_NAME}/s3-browser/server.js server.js
 
 # Create public directory and download HTML interface from S3
 mkdir -p public
-aws s3 cp s3://rcs3-godfather-uci-p-bucket/s3-browser/public/index.html public/index.html
+aws s3 cp s3://${S3_BUCKET_NAME}/s3-browser/public/index.html public/index.html
 
 # Create systemd service for S3 browser
 cat > /etc/systemd/system/s3-browser.service << 'EOS3SERVICE'
@@ -130,6 +131,7 @@ Restart=always
 RestartSec=10
 Environment=NODE_ENV=production
 Environment=PORT=3001
+Environment=BASE_PATH=/s3browser
 
 [Install]
 WantedBy=multi-user.target
@@ -148,4 +150,8 @@ systemctl start s3-browser
 systemctl status grafana-server
 systemctl status s3-browser
 
-echo "[INFO] Installation complete - Grafana on port 3000, S3 Browser on port 3001"
+echo "[INFO] Installation complete!"
+echo "[INFO] - Grafana HTTP: http://localhost:3000 (internal only)"
+echo "[INFO] - S3 Browser: http://localhost:3001 (internal only)"
+echo "[INFO] - PUBLIC ACCESS: Via ALB HTTPS only (ALB handles SSL termination)"
+echo "[INFO] - Instance ready to be attached to ALB target group"

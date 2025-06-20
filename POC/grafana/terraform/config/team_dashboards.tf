@@ -48,11 +48,9 @@ resource "grafana_dashboard" "team_s3_browser_dashboards" {
   folder      = grafana_folder.team_folders[each.key].id
   overwrite   = true
 
-  # Ignore changes to fields that Grafana manages
+  # Allow updates to config_json for iframe URL changes
   lifecycle {
-    ignore_changes = [
-      config_json,  # Ignore JSON formatting differences
-    ]
+    # Note: Removed ignore_changes for config_json to allow iframe URL updates
   }
 }
 

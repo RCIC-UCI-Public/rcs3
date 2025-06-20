@@ -1,11 +1,6 @@
-# Configure Terraform backend and required providers
+# Configure Terraform backend and required providers - backend configured via backend config files
 terraform {
-  backend "s3" {
-    bucket  = "rcs3-godfather-uci-p-bucket"
-    key     = "tfstate/terraform_grafana_config.tfstate"
-    region  = "us-west-2"
-    encrypt = true
-  }
+  backend "s3" {}
 
   required_providers {
     grafana = {
@@ -21,4 +16,7 @@ provider "grafana" {
 
   # Use API key if provided, otherwise use username/password
   auth = var.grafana_api_key != null ? var.grafana_api_key : "${var.grafana_username}:${var.grafana_password}"
+
+  # Skip SSL verification for self-signed certs
+  insecure_skip_verify = true
 }

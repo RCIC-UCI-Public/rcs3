@@ -8,11 +8,17 @@ locals {
   # Extract hostname from Grafana URL for iframe source (remove protocol and port)
   grafana_host = replace(
     replace(
-      replace(var.grafana_url, "http://", ""),
-      "https://", ""
+      replace(
+        replace(var.grafana_url, "http://", ""),
+        "https://", ""
+      ),
+      ":3000", ""
     ),
-    ":3000", ""
+    ":3001", ""
   )
+
+  # Extract protocol from Grafana URL
+  grafana_protocol = split("://", var.grafana_url)[0]
 
   # Generate S3 browser dashboards for each team
   team_s3_dashboards = { for team_name, team_config in var.bucket_teams : team_name =>
@@ -22,14 +28,17 @@ locals {
         replace(
           replace(
             replace(
-              jsonencode(local.s3_browser_template),
-              "{{TEAM_NAME}}", team_name
+              replace(
+                jsonencode(local.s3_browser_template),
+                "{{TEAM_NAME}}", team_name
+              ),
+              "{{TEAM_UID}}", replace(lower(team_name), " ", "-")
             ),
-            "{{TEAM_UID}}", replace(lower(team_name), " ", "-")
+            "{{TEAM_BUCKETS}}", join(",", team_config.buckets)
           ),
-          "{{TEAM_BUCKETS}}", join(",", team_config.buckets)
+          "{{GRAFANA_HOST}}", local.grafana_host
         ),
-        "{{GRAFANA_HOST}}", local.grafana_host
+        "{{GRAFANA_PROTOCOL}}", local.grafana_protocol
       )
     )
   }
@@ -43,24 +52,25 @@ resource "grafana_dashboard" "admin_s3_browser" {
         replace(
           replace(
             replace(
-              jsonencode(local.s3_browser_template),
-              "{{TEAM_NAME}}", "Admin"
+              replace(
+                jsonencode(local.s3_browser_template),
+                "{{TEAM_NAME}}", "Admin"
+              ),
+              "{{TEAM_UID}}", "admin"
             ),
-            "{{TEAM_UID}}", "admin"
+            "{{TEAM_BUCKETS}}", "" # No filter - show all buckets
           ),
-          "{{TEAM_BUCKETS}}", "" # No filter - show all buckets
+          "{{GRAFANA_HOST}}", local.grafana_host
         ),
-        "{{GRAFANA_HOST}}", local.grafana_host
+        "{{GRAFANA_PROTOCOL}}", local.grafana_protocol
       )
     )
   )
   folder    = grafana_folder.admin_folder.id
   overwrite = true
 
-  # Ignore changes to fields that Grafana manages
+  # Allow updates to config_json for iframe URL changes
   lifecycle {
-    ignore_changes = [
-      config_json,  # Ignore JSON formatting differences
-    ]
+    # Note: Removed ignore_changes for config_json to allow iframe URL updates
   }
 }

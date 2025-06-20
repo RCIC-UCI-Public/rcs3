@@ -18,13 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 39,
+  "id": 152,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "aeo1xkxdi1jpcb"
+        "uid": "dep5mm1138av4e"
       },
       "fieldConfig": {
         "defaults": {
@@ -73,9 +73,22 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "decgbytes"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Deep Archive Storage"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -103,13 +116,13 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.0.1",
+      "pluginVersion": "12.0.1+security-01",
       "targets": [
         {
           "alias": "Standard Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
+            "uid": "dep5mm1138av4e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -117,6 +130,7 @@
             "storage_class": "STANDARD"
           },
           "expression": "",
+          "hide": true,
           "id": "standard",
           "label": "Standard Storage",
           "logGroups": [],
@@ -134,38 +148,10 @@
           "statistic": "Maximum"
         },
         {
-          "alias": "Glacier Storage",
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
-          },
-          "dimensions": {
-            "bucket_name": "$bucket",
-            "record_type": "BUCKET",
-            "storage_class": "GLACIER"
-          },
-          "expression": "",
-          "id": "glacier",
-          "label": "Glacier Storage",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "StorageBytes",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "B",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Maximum"
-        },
-        {
           "alias": "Deep Archive Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
+            "uid": "dep5mm1138av4e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -173,6 +159,7 @@
             "storage_class": "DEEP_ARCHIVE"
           },
           "expression": "",
+          "hide": true,
           "id": "deep_archive",
           "label": "Deep Archive Storage",
           "logGroups": [],
@@ -188,6 +175,64 @@
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Maximum"
+        },
+        {
+          "alias": "Standard Storage",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "dep5mm1138av4e"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "standard * 9.313225746e-10",
+          "hide": false,
+          "id": "",
+          "label": "Standard Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 1,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Deep Archive Storage",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "dep5mm1138av4e"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "deep_archive * 9.313225746e-10",
+          "hide": false,
+          "id": "",
+          "label": "Deep Archive Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 1,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "D",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
         }
       ],
       "title": "Storage Class Trends",
@@ -196,7 +241,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "aeo1xkxdi1jpcb"
+        "uid": "dep5mm1138av4e"
       },
       "fieldConfig": {
         "defaults": {
@@ -247,7 +292,38 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Standard Objects"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Deep Archive Objects"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -272,13 +348,13 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.0.1",
+      "pluginVersion": "12.0.1+security-01",
       "targets": [
         {
           "alias": "Standard Objects",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
+            "uid": "dep5mm1138av4e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -303,38 +379,10 @@
           "statistic": "Maximum"
         },
         {
-          "alias": "Glacier Objects",
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
-          },
-          "dimensions": {
-            "bucket_name": "$bucket",
-            "record_type": "BUCKET",
-            "storage_class": "GLACIER"
-          },
-          "expression": "",
-          "id": "glacier_objects",
-          "label": "Glacier Objects",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "ObjectCount",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "B",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Maximum"
-        },
-        {
           "alias": "Deep Archive Objects",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
+            "uid": "dep5mm1138av4e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -365,7 +413,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "aeo1xkxdi1jpcb"
+        "uid": "dep5mm1138av4e"
       },
       "fieldConfig": {
         "defaults": {
@@ -381,7 +429,7 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "decgbytes"
         },
         "overrides": []
       },
@@ -416,13 +464,13 @@
         "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "12.0.1",
+      "pluginVersion": "12.0.1+security-01",
       "targets": [
         {
           "alias": "Standard",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
+            "uid": "dep5mm1138av4e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -430,6 +478,7 @@
             "storage_class": "STANDARD"
           },
           "expression": "",
+          "hide": true,
           "id": "standard",
           "label": "Standard",
           "logGroups": [],
@@ -447,22 +496,52 @@
           "statistic": "Maximum"
         },
         {
-          "alias": "Glacier",
+          "alias": "Deep Archive",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
+            "uid": "dep5mm1138av4e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
             "record_type": "BUCKET",
-            "storage_class": "GLACIER"
+            "storage_class": "DEEP_ARCHIVE"
           },
           "expression": "",
-          "id": "glacier",
-          "label": "Glacier",
+          "hide": true,
+          "id": "deep_archive",
+          "label": "Deep Archive",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "alias": "Standard",
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "dep5mm1138av4e"
+          },
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
+          "expression": "standard * 9.313225746e-10",
+          "hide": false,
+          "id": "",
+          "label": "Standard",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 1,
           "metricName": "StorageBytes",
           "metricQueryType": 0,
           "namespace": "AWS/S3/Storage-Lens",
@@ -478,26 +557,27 @@
           "alias": "Deep Archive",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "aeo1xkxdi1jpcb"
+            "uid": "dep5mm1138av4e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
             "record_type": "BUCKET",
             "storage_class": "DEEP_ARCHIVE"
           },
-          "expression": "",
-          "id": "deep_archive",
+          "expression": "deep_archive * 9.313225746e-10",
+          "hide": false,
+          "id": "",
           "label": "Deep Archive",
           "logGroups": [],
           "matchExact": false,
-          "metricEditorMode": 0,
+          "metricEditorMode": 1,
           "metricName": "StorageBytes",
           "metricQueryType": 0,
           "namespace": "AWS/S3/Storage-Lens",
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "C",
+          "refId": "D",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Maximum"
@@ -531,12 +611,12 @@
     "list": [
       {
         "current": {
-          "text": "ppapadop-mass-uci-s-bkup-bucket",
-          "value": "ppapadop-mass-uci-s-bkup-bucket"
+          "text": "rcic-admin-crsp-uci-p-bkup-bucket",
+          "value": "rcic-admin-crsp-uci-p-bkup-bucket"
         },
         "datasource": {
           "type": "cloudwatch",
-          "uid": "aeo1xkxdi1jpcb"
+          "uid": "dep5mm1138av4e"
         },
         "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
         "includeAll": true,
@@ -551,12 +631,12 @@
     ]
   },
   "time": {
-    "from": "now-7d",
+    "from": "now-30d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Storage Lifecycle",
-  "uid": "9b451b3f-ded1-4451-b134-8c8fe598d07b",
+  "uid": "b10a1f3b-2a2a-4c59-b2dc-236b177fbf51",
   "version": 2
 }

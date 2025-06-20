@@ -15,6 +15,10 @@ import getpass
 import json
 import os
 import sys
+import urllib3
+
+# Disable SSL warnings for self-signed certificates
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def check_dependencies():
     """Check for required Python packages."""
@@ -150,6 +154,8 @@ def get_grafana_session(grafana_url, admin_user, admin_password):
     
     session = requests.Session()
     session.auth = (admin_user, admin_password)
+    # Disable SSL verification for self-signed certificates
+    session.verify = False
     
     # Test connection and authentication
     try:
@@ -351,6 +357,7 @@ def process_admin_users(session, grafana_url, admin_users, users):
 def main():
     """Main entry point."""
     print("🚀 Grafana Team Membership Manager")
+    print("🔒 SSL verification disabled for self-signed certificates")
     print("=" * 50)
     
     # Check dependencies first

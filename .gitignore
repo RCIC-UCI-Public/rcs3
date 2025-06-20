@@ -1,1 +1,17 @@
 POC/grafana/terraform/infra/.terraform.lock.hcl
+.DS_Store
+POC/grafana/terraform/infra/.terraform
+POC/grafana/terraform/infra/.terraform-version
+POC/grafana/terraform/infra/.terraform.tfstate
+POC/grafana/terraform/infra/.terraform.tfstate.backup
+POC/grafana/terraform/infra/.terraform.tfstate.d
+POC/grafana/terraform/infra/.terraform.tfstate.d/terraform.tfstate
+POC/grafana/terraform/infra/.terraform.tfstate.d/terraform.tfstate.backup
+POC/grafana/terraform/infra/.terraform.tfstate.d/terraform.tfstate.lock.info
+POC/grafana/terraform/infra/.terraform.tfstate.d/terraform.tfstate.lock.info.backup
+POC/grafana/terraform/infra/.terraform.tfstate.d/terraform.tfstate.lock.info.old
+POC/grafana/terraform/infra/.terraform.tfstate.d/terraform.tfstate.old
+POC/grafana/terraform/infra/.terraform.tfstate.d/terraform.tfstate.old.backup        
+memory-bank
+.gitignore
+docs

@@ -377,6 +377,202 @@
             color: #6c757d;
         }
 
+        /* Modal Dialog Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(80vh - 80px);
+        }
+
+        .version-item {
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: white;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .version-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .version-item.current {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .version-item.deleted {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .version-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .version-title.current {
+            color: #28a745;
+        }
+
+        .version-title.deleted {
+            color: #dc3545;
+        }
+
+        .version-badge-modal {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .version-badge-modal.current {
+            background: #28a745;
+            color: white;
+        }
+
+        .version-badge-modal.deleted {
+            background: #dc3545;
+            color: white;
+        }
+
+        .version-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .version-detail {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .version-detail strong {
+            color: #495057;
+        }
+
+        .version-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Load More Button Styles */
+        .load-more-container {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #f8f9fa;
+        }
+
+        .load-more-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .load-more-btn:hover:not(:disabled) {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .load-more-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .load-more-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -391,6 +587,16 @@
             .item-actions {
                 margin-top: 10px;
                 align-self: flex-end;
+            }
+
+            .modal-content {
+                margin: 2% auto;
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .version-details {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -468,12 +674,43 @@
         </div>
     </div>
 
+    <!-- Version Details Modal -->
+    <div id="versionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="versionModalTitle">📄 File Versions</h3>
+                <button class="modal-close" onclick="closeVersionModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="versionModalBody">
+                <!-- Version details will be populated here -->
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentBucket = '';
         let currentPrefix = '';
         let selectedItems = new Set(); // Stores selected paths
         let currentFolders = []; // Cache current folder list
         let currentFiles = []; // Cache current file list
+        let currentContinuationToken = null; // For pagination
+        let isLoadingMore = false; // Prevent multiple concurrent loads
+
+        // Detect base path from current location and set it once
+        const BASE_PATH = (function() {
+            const path = window.location.pathname;
+            // If we're at /s3browser/, return /s3browser
+            // If we're at root /, return empty string
+            if (path.includes('/s3browser')) {
+                return '/s3browser';
+            }
+            return '';
+        })();
+
+        // Helper function to build API URLs with correct base path
+        function apiUrl(endpoint) {
+            return BASE_PATH + endpoint;
+        }
 
         // Get filtered buckets from URL parameters
         function getFilteredBuckets() {
@@ -486,6 +723,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkRuntimeEnvironment(); // Check if server-hosted and hide client features
             loadBuckets();
+            setupEventDelegation(); // Set up event delegation
             
             document.getElementById('bucketSelect').addEventListener('change', function() {
                 const selectedBucket = this.value;
@@ -501,10 +739,64 @@
             });
         });
 
+        // Set up event delegation for dynamic content
+        function setupEventDelegation() {
+            // Event delegation for folders container
+            document.getElementById('folders').addEventListener('click', handleFolderClick);
+            document.getElementById('folders').addEventListener('change', handleCheckboxChange);
+            
+            // Event delegation for files container
+            document.getElementById('files').addEventListener('click', handleFileClick);
+            document.getElementById('files').addEventListener('change', handleCheckboxChange);
+        }
+
+        // Handle clicks in folders container
+        function handleFolderClick(event) {
+            const target = event.target;
+            
+            // Handle folder navigation
+            if (target.dataset.action === 'navigate-folder') {
+                event.preventDefault();
+                const prefix = target.dataset.prefix;
+                navigateToFolder(prefix);
+            }
+        }
+
+        // Handle clicks in files container
+        function handleFileClick(event) {
+            const target = event.target;
+            
+            // Handle file details
+            if (target.dataset.action === 'show-file-details') {
+                event.preventDefault();
+                const key = target.dataset.key;
+                showFileDetails(key);
+            }
+            
+            // Handle metadata button
+            if (target.dataset.action === 'show-metadata') {
+                event.preventDefault();
+                const key = target.dataset.key;
+                showMetadata(key);
+            }
+        }
+
+        // Handle checkbox changes using event delegation
+        function handleCheckboxChange(event) {
+            const target = event.target;
+            
+            if (target.classList.contains('selection-checkbox')) {
+                const path = target.dataset.path;
+                const type = target.dataset.type;
+                const isChecked = target.checked;
+                toggleSelection(path, type, isChecked);
+            }
+        }
+
         // Check runtime environment and hide client-side features when server-hosted
         async function checkRuntimeEnvironment() {
             try {
-                const response = await fetch('/api/runtime-info');
+                const response = await fetch(apiUrl('/api/runtime-info'));
                 if (response.ok) {
                     const runtimeInfo = await response.json();
                     
@@ -538,7 +830,7 @@
         async function loadBuckets() {
             try {
                 showLoading();
-                const response = await fetch('/api/buckets');
+                const response = await fetch(apiUrl('/api/buckets'));
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -615,23 +907,48 @@
         }
 
         // Load objects in current bucket/prefix
-        async function loadObjects() {
+        async function loadObjects(isLoadMore = false) {
             if (!currentBucket) return;
             
             try {
-                showLoading();
+                if (!isLoadMore) {
+                    showLoading();
+                    // Reset pagination state for new folder
+                    currentContinuationToken = null;
+                }
+                
                 const showVersionInfo = document.getElementById('checkVersions').checked;
                 const showDeleted = document.getElementById('showDeleted').checked;
-                const url = `/api/buckets/${encodeURIComponent(currentBucket)}/objects?prefix=${encodeURIComponent(currentPrefix)}&showVersionInfo=${showVersionInfo}&showDeleted=${showDeleted}`;
-                const response = await fetch(url);
+                
+                // Build URL with pagination parameters
+                let url = `/api/buckets/${encodeURIComponent(currentBucket)}/objects?prefix=${encodeURIComponent(currentPrefix)}&showVersionInfo=${showVersionInfo}&showDeleted=${showDeleted}`;
+                
+                // Add continuation token for pagination
+                if (isLoadMore && currentContinuationToken) {
+                    url += `&continuationToken=${encodeURIComponent(currentContinuationToken)}`;
+                }
+                
+                
+                const response = await fetch(apiUrl(url));
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
-                displayObjects(data);
-                updateBreadcrumb();
+                
+                // Update pagination token
+                currentContinuationToken = data.nextContinuationToken || null;
+                
+                if (isLoadMore) {
+                    // Append new data to existing lists
+                    appendObjects(data);
+                } else {
+                    // Replace data for new folder
+                    displayObjects(data);
+                    updateBreadcrumb();
+                }
+                
                 hideLoading();
             } catch (error) {
                 console.error('Error loading objects:', error);
@@ -687,6 +1004,9 @@
                 });
             }
             
+            // Add "Load More" button if there are more items
+            addLoadMoreButton(data.isTruncated);
+            
             // Update status bar
             updateStatusBar(currentFolders.length, currentFiles.length);
             
@@ -697,7 +1017,123 @@
             updateSelectionUI();
         }
 
-        // Create folder element
+        // Append new objects for pagination
+        function appendObjects(data) {
+            hideError();
+            
+            // Append new data to existing arrays
+            const newFolders = data.folders || [];
+            const newFiles = data.files || [];
+            
+            currentFolders = currentFolders.concat(newFolders);
+            currentFiles = currentFiles.concat(newFiles);
+            
+            const foldersContainer = document.getElementById('folders');
+            const filesContainer = document.getElementById('files');
+            const folderList = document.getElementById('folderList');
+            const fileList = document.getElementById('fileList');
+            
+            // Show sections if they have content now
+            const hasFolders = currentFolders.length > 0;
+            const hasFiles = currentFiles.length > 0;
+            
+            folderList.style.display = hasFolders ? 'block' : 'none';
+            fileList.style.display = hasFiles ? 'block' : 'none';
+            
+            // Append new folders
+            newFolders.forEach(folder => {
+                const folderElement = createFolderElement(folder);
+                foldersContainer.appendChild(folderElement);
+            });
+            
+            // Append new files
+            newFiles.forEach(file => {
+                const fileElement = createFileElement(file);
+                filesContainer.appendChild(fileElement);
+            });
+            
+            // Update the "Load More" button
+            updateLoadMoreButton(data.isTruncated);
+            
+            // Update status bar with total counts
+            updateStatusBar(currentFolders.length, currentFiles.length);
+            
+            // Update selection states for new items
+            updateSelectionUI();
+        }
+
+        // Add or update "Load More" button
+        function addLoadMoreButton(isTruncated) {
+            // Remove existing load more container
+            const existingContainer = document.querySelector('.load-more-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+            
+            if (isTruncated) {
+                const contentDiv = document.querySelector('.content');
+                const loadMoreContainer = document.createElement('div');
+                loadMoreContainer.className = 'load-more-container';
+                loadMoreContainer.innerHTML = `
+                    <button class="load-more-btn" onclick="loadMoreItems()" id="loadMoreBtn">
+                        📄 Load More Items
+                    </button>
+                `;
+                contentDiv.appendChild(loadMoreContainer);
+            }
+        }
+
+        // Update existing "Load More" button
+        function updateLoadMoreButton(isTruncated) {
+            const existingContainer = document.querySelector('.load-more-container');
+            if (existingContainer && !isTruncated) {
+                existingContainer.remove();
+            } else if (!existingContainer && isTruncated) {
+                addLoadMoreButton(true);
+            }
+            
+            // Reset button state
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) {
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.innerHTML = '📄 Load More Items';
+                isLoadingMore = false;
+            }
+        }
+
+        // Load more items function
+        async function loadMoreItems() {
+            if (isLoadingMore || !currentContinuationToken) {
+                return;
+            }
+            
+            isLoadingMore = true;
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            
+            if (loadMoreBtn) {
+                loadMoreBtn.disabled = true;
+                loadMoreBtn.innerHTML = `
+                    <span class="load-more-spinner"></span>
+                    Loading...
+                `;
+            }
+            
+            try {
+                await loadObjects(true); // true indicates this is a "load more" operation
+            } catch (error) {
+                console.error('Error loading more items:', error);
+                showError(`Failed to load more items: ${error.message}`);
+                
+                // Reset button state on error
+                if (loadMoreBtn) {
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.innerHTML = '📄 Load More Items';
+                }
+                isLoadingMore = false;
+            }
+        }
+
+        // Create folder element using DOM API
         function createFolderElement(folder) {
             const div = document.createElement('div');
             div.className = 'item';
@@ -706,22 +1142,41 @@
             const folderPath = folder.Prefix;
             const isSelected = isItemSelected(folderPath);
             
-            div.innerHTML = `
-                <input type="checkbox" class="selection-checkbox" 
-                       data-path="${folderPath}" 
-                       data-type="folder"
-                       ${isSelected ? 'checked' : ''}
-                       onchange="toggleSelection('${folderPath}', 'folder', this.checked)">
-                <span class="icon folder-icon">📁</span>
-                <div class="item-info">
-                    <div class="item-name" onclick="navigateToFolder('${folder.Prefix}')">${folderName}</div>
-                </div>
-            `;
+            // Create checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'selection-checkbox';
+            checkbox.dataset.path = folderPath;
+            checkbox.dataset.type = 'folder';
+            checkbox.checked = isSelected;
+            
+            // Create folder icon
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'icon folder-icon';
+            iconSpan.textContent = '📁';
+            
+            // Create item info container
+            const itemInfo = document.createElement('div');
+            itemInfo.className = 'item-info';
+            
+            // Create folder name element
+            const itemName = document.createElement('div');
+            itemName.className = 'item-name';
+            itemName.textContent = folderName;
+            itemName.dataset.action = 'navigate-folder';
+            itemName.dataset.prefix = folder.Prefix;
+            
+            itemInfo.appendChild(itemName);
+            
+            // Assemble the element
+            div.appendChild(checkbox);
+            div.appendChild(iconSpan);
+            div.appendChild(itemInfo);
             
             return div;
         }
 
-        // Create file element
+        // Create file element using DOM API
         function createFileElement(file) {
             const div = document.createElement('div');
             div.className = 'item';
@@ -736,37 +1191,86 @@
             const lastModified = new Date(file.LastModified).toLocaleString();
             const isSelected = isItemSelected(file.Key);
             
+            // Create checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'selection-checkbox';
+            checkbox.dataset.path = file.Key;
+            checkbox.dataset.type = 'file';
+            checkbox.checked = isSelected;
+            
+            // Create file icon
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'icon file-icon';
+            iconSpan.textContent = file.IsDeleted ? '🗑️' : '📄';
+            
+            // Create item info container
+            const itemInfo = document.createElement('div');
+            itemInfo.className = 'item-info';
+            
+            // Create file name element
+            const itemName = document.createElement('div');
+            itemName.className = 'item-name';
+            itemName.textContent = fileName;
+            itemName.dataset.action = 'show-file-details';
+            itemName.dataset.key = file.Key;
+            
             // Add version indicator if file has multiple versions
-            const versionIndicator = file.HasMultipleVersions ? 
-                `<span class="version-indicator" title="This file has ${file.VersionCount} versions">📊 ${file.VersionCount}</span>` : '';
+            if (file.HasMultipleVersions) {
+                const versionIndicator = document.createElement('span');
+                versionIndicator.className = 'version-indicator';
+                versionIndicator.title = `This file has ${file.VersionCount} versions`;
+                versionIndicator.textContent = `📊 ${file.VersionCount}`;
+                itemName.appendChild(versionIndicator);
+            }
             
             // Add deleted indicator for deleted files
-            const deletedIndicator = file.IsDeleted ? 
-                `<span class="version-badge delete-marker" title="This file has been deleted">🗑️ DELETED</span>` : '';
+            if (file.IsDeleted) {
+                const deletedIndicator = document.createElement('span');
+                deletedIndicator.className = 'version-badge delete-marker';
+                deletedIndicator.title = 'This file has been deleted';
+                deletedIndicator.textContent = '🗑️ DELETED';
+                itemName.appendChild(deletedIndicator);
+            }
             
-            const fileIcon = file.IsDeleted ? '🗑️' : '📄';
-            const storageClass = file.IsDeleted ? 'DELETE_MARKER' : (file.StorageClass || 'STANDARD');
+            // Create file details
+            const itemDetails = document.createElement('div');
+            itemDetails.className = 'item-details';
+            
+            const sizeSpan = document.createElement('span');
+            sizeSpan.textContent = `Size: ${fileSize}`;
+            itemDetails.appendChild(sizeSpan);
+            
             const timeLabel = file.IsDeleted ? 'Deleted' : 'Modified';
+            const timeSpan = document.createElement('span');
+            timeSpan.textContent = `${timeLabel}: ${lastModified}`;
+            itemDetails.appendChild(timeSpan);
             
-            div.innerHTML = `
-                <input type="checkbox" class="selection-checkbox" 
-                       data-path="${file.Key}" 
-                       data-type="file"
-                       ${isSelected ? 'checked' : ''}
-                       onchange="toggleSelection('${file.Key}', 'file', this.checked)">
-                <span class="icon file-icon">${fileIcon}</span>
-                <div class="item-info">
-                    <div class="item-name" onclick="showFileDetails('${file.Key}')">${fileName}${versionIndicator}${deletedIndicator}</div>
-                    <div class="item-details">
-                        <span>Size: ${fileSize}</span>
-                        <span>${timeLabel}: ${lastModified}</span>
-                        <span>Storage: ${storageClass}</span>
-                    </div>
-                </div>
-                <div class="item-actions">
-                    <button class="btn btn-small" onclick="showMetadata('${file.Key}')">ℹ️ Info</button>
-                </div>
-            `;
+            const storageClass = file.IsDeleted ? 'DELETE_MARKER' : (file.StorageClass || 'STANDARD');
+            const storageSpan = document.createElement('span');
+            storageSpan.textContent = `Storage: ${storageClass}`;
+            itemDetails.appendChild(storageSpan);
+            
+            itemInfo.appendChild(itemName);
+            itemInfo.appendChild(itemDetails);
+            
+            // Create actions container
+            const itemActions = document.createElement('div');
+            itemActions.className = 'item-actions';
+            
+            const infoButton = document.createElement('button');
+            infoButton.className = 'btn btn-small';
+            infoButton.textContent = 'ℹ️ Info';
+            infoButton.dataset.action = 'show-metadata';
+            infoButton.dataset.key = file.Key;
+            
+            itemActions.appendChild(infoButton);
+            
+            // Assemble the element
+            div.appendChild(checkbox);
+            div.appendChild(iconSpan);
+            div.appendChild(itemInfo);
+            div.appendChild(itemActions);
             
             return div;
         }
@@ -820,7 +1324,7 @@
                     url += `?versionId=${encodeURIComponent(versionId)}`;
                 }
                 
-                const response = await fetch(url);
+                const response = await fetch(apiUrl(url));
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -860,12 +1364,12 @@
             }
         }
 
-        // Show detailed file information including versions
+        // Show detailed file information including versions in modal
         async function showFileDetails(key) {
             try {
                 // Get file versions
                 const versionsUrl = `/api/buckets/${encodeURIComponent(currentBucket)}/objects/${encodeURIComponent(key)}/versions`;
-                const versionsResponse = await fetch(versionsUrl);
+                const versionsResponse = await fetch(apiUrl(versionsUrl));
                 
                 if (!versionsResponse.ok) {
                     throw new Error(`HTTP ${versionsResponse.status}: ${versionsResponse.statusText}`);
@@ -873,50 +1377,165 @@
                 
                 const versions = await versionsResponse.json();
                 
-                // Build details message
-                let message = `📄 File Details: ${key}\n\n`;
+                // Update modal title
+                const modalTitle = document.getElementById('versionModalTitle');
+                modalTitle.textContent = `📄 ${key.split('/').pop()}`;
+                
+                // Build modal content
+                const modalBody = document.getElementById('versionModalBody');
                 
                 if (versions.length === 0) {
-                    message += '⚠️ No versions found (versioning may not be enabled on this bucket)\n\n';
-                    message += '💡 To view version history:\n';
-                    message += '• Enable versioning on the S3 bucket\n';
-                    message += '• Upload new versions of the file\n\n';
-                    message += 'This is a read-only browser - use the "ℹ️ Info" button for metadata.';
+                    modalBody.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #6c757d;">
+                            <h3>⚠️ No versions found</h3>
+                            <p>Versioning may not be enabled on this bucket</p>
+                            <br>
+                            <div style="text-align: left; max-width: 400px; margin: 0 auto;">
+                                <h4>💡 To view version history:</h4>
+                                <ul>
+                                    <li>Enable versioning on the S3 bucket</li>
+                                    <li>Upload new versions of the file</li>
+                                </ul>
+                                <p><strong>Note:</strong> This is a read-only browser - use the "ℹ️ Info" button for metadata.</p>
+                            </div>
+                        </div>
+                    `;
                 } else if (versions.length === 1) {
-                    message += '📊 Version Information:\n';
-                    message += `• Single version (versioning may not be enabled)\n`;
-                    message += `• Size: ${formatFileSize(versions[0].Size || 0)}\n`;
-                    message += `• Modified: ${new Date(versions[0].LastModified).toLocaleString()}\n`;
-                    message += `• Storage: ${versions[0].StorageClass || 'STANDARD'}\n\n`;
-                    message += 'Use the "ℹ️ Info" button for detailed metadata.';
+                    const version = versions[0];
+                    modalBody.innerHTML = `
+                        <div class="version-item current">
+                            <div class="version-header">
+                                <span class="version-title current">Single Version</span>
+                                <span class="version-badge-modal current">Current</span>
+                            </div>
+                            <div class="version-details">
+                                <div class="version-detail">
+                                    <strong>Size:</strong>
+                                    <span>${formatFileSize(version.Size || 0)}</span>
+                                </div>
+                                <div class="version-detail">
+                                    <strong>Modified:</strong>
+                                    <span>${new Date(version.LastModified).toLocaleString()}</span>
+                                </div>
+                                <div class="version-detail">
+                                    <strong>Storage:</strong>
+                                    <span>${version.StorageClass || 'STANDARD'}</span>
+                                </div>
+                                <div class="version-detail">
+                                    <strong>Version ID:</strong>
+                                    <span>${version.VersionId || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div class="version-actions">
+                                <button class="btn btn-small" onclick="showMetadata('${key}', '${version.VersionId || ''}')">ℹ️ View Metadata</button>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px; color: #6c757d;">
+                            <p><strong>Note:</strong> Versioning may not be enabled on this bucket. Use "ℹ️ Info" for detailed metadata.</p>
+                        </div>
+                    `;
                 } else {
-                    message += `📊 Found ${versions.length} versions:\n\n`;
+                    let versionsHtml = `
+                        <div style="margin-bottom: 15px; text-align: center;">
+                            <h4>📊 Found ${versions.length} versions</h4>
+                        </div>
+                    `;
                     
                     versions.forEach((version, index) => {
                         const isLatest = version.IsLatest || index === 0;
                         const isDeleted = version.Type === 'deleteMarker';
                         
+                        const versionClass = isDeleted ? 'deleted' : (isLatest ? 'current' : '');
+                        const versionTitle = isDeleted ? `🗑️ Deleted Version ${index + 1}` : 
+                                           `${isLatest ? '✅' : '📌'} Version ${index + 1}${isLatest ? ' (Current)' : ''}`;
+                        const badgeClass = isDeleted ? 'deleted' : (isLatest ? 'current' : '');
+                        const badgeText = isDeleted ? 'Deleted' : (isLatest ? 'Current' : 'Version');
+                        
+                        versionsHtml += `
+                            <div class="version-item ${versionClass}">
+                                <div class="version-header">
+                                    <span class="version-title ${versionClass}">${versionTitle}</span>
+                                    <span class="version-badge-modal ${badgeClass}">${badgeText}</span>
+                                </div>
+                                <div class="version-details">
+                        `;
+                        
                         if (isDeleted) {
-                            message += `🗑️ [DELETED] Version ${index + 1}\n`;
-                            message += `   Deleted: ${new Date(version.LastModified).toLocaleString()}\n`;
+                            versionsHtml += `
+                                <div class="version-detail">
+                                    <strong>Deleted:</strong>
+                                    <span>${new Date(version.LastModified).toLocaleString()}</span>
+                                </div>
+                                <div class="version-detail">
+                                    <strong>Version ID:</strong>
+                                    <span>${version.VersionId || 'N/A'}</span>
+                                </div>
+                            `;
                         } else {
-                            message += `${isLatest ? '✅' : '📌'} Version ${index + 1}${isLatest ? ' (Current)' : ''}\n`;
-                            message += `   Size: ${formatFileSize(version.Size || 0)}\n`;
-                            message += `   Modified: ${new Date(version.LastModified).toLocaleString()}\n`;
-                            message += `   Storage: ${version.StorageClass || 'STANDARD'}\n`;
+                            versionsHtml += `
+                                <div class="version-detail">
+                                    <strong>Size:</strong>
+                                    <span>${formatFileSize(version.Size || 0)}</span>
+                                </div>
+                                <div class="version-detail">
+                                    <strong>Modified:</strong>
+                                    <span>${new Date(version.LastModified).toLocaleString()}</span>
+                                </div>
+                                <div class="version-detail">
+                                    <strong>Storage:</strong>
+                                    <span>${version.StorageClass || 'STANDARD'}</span>
+                                </div>
+                                <div class="version-detail">
+                                    <strong>Version ID:</strong>
+                                    <span>${version.VersionId || 'N/A'}</span>
+                                </div>
+                            `;
                         }
-                        message += `   Version ID: ${version.VersionId || 'N/A'}\n\n`;
+                        
+                        versionsHtml += `
+                                </div>
+                        `;
+                        
+                        if (!isDeleted) {
+                            versionsHtml += `
+                                <div class="version-actions">
+                                    <button class="btn btn-small" onclick="showMetadata('${key}', '${version.VersionId || ''}')">ℹ️ View Metadata</button>
+                                </div>
+                            `;
+                        }
+                        
+                        versionsHtml += `</div>`;
                     });
                     
-                    message += '💡 This is a read-only browser. Use "ℹ️ Info" for specific version metadata.';
+                    versionsHtml += `
+                        <div style="text-align: center; margin-top: 20px; color: #6c757d;">
+                            <p><strong>Note:</strong> This is a read-only browser. Use "ℹ️ View Metadata" for specific version details.</p>
+                        </div>
+                    `;
+                    
+                    modalBody.innerHTML = versionsHtml;
                 }
                 
-                alert(message);
+                // Show the modal
+                document.getElementById('versionModal').style.display = 'block';
                 
             } catch (error) {
                 console.error('Error fetching file details:', error);
-                // Fallback to basic message
+                // Fallback to alert for errors
                 alert(`📄 File: ${key}\n\n⚠️ Could not load version details: ${error.message}\n\n💡 This is a read-only browser.\nUse the "ℹ️ Info" button to view metadata for the current version.`);
+            }
+        }
+
+        // Close version modal
+        function closeVersionModal() {
+            document.getElementById('versionModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('versionModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
             }
         }
 
@@ -940,7 +1559,7 @@
         // Reload credentials
         async function reloadCredentials() {
             try {
-                const response = await fetch('/api/reload-credentials', { method: 'POST' });
+                const response = await fetch(apiUrl('/api/reload-credentials'), { method: 'POST' });
                 const data = await response.json();
                 
                 if (data.success) {
