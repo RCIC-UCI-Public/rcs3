@@ -20,7 +20,7 @@ buckets = ["blsemler-littlebird-uci-p-bkup-bucket"]
 },
 "Team cestark" = {
 members = ["cestark"]
-buckets = ["cestark- bmc-uci-p-bkup-bucket",
+buckets = ["cestark-bmc-uci-p-bkup-bucket",
 "cestark-fibre-data-uci-p-bkup-bucket",
 "cestark-hippocampus-uci-p-bkup-bucket"]
 },
@@ -29,7 +29,7 @@ members = ["fmarango"]
 buckets = ["fmarango-f-ivm-uci-p-bkup-bucket"]
 },
 "Team kbeier" = {
-members = ["kbeier","ronp" ]
+members = ["kbeier","ronp","plozano"]
 buckets = ["kbeier-apollon-uci-p-bkup-bucket",
 "kbeier-balbina-uci-p-bkup-bucket",
 "kbeier-beier1-uci-p-bkup-bucket",
@@ -58,7 +58,7 @@ members = ["medhap"]
 buckets = ["medhap-rivendell-uci-p-bkup-bucket"]
 },
 "Team mfrose" = {
-members = ["mfrose"]
+members = ["mfrose", "ronp", "plozano"]
 buckets = ["mfrose-morandi1-uci-p-bkup-bucket"]
 },
 "Team middlebj" = {
@@ -83,7 +83,7 @@ buckets = ["rfrostig-cortex-uci-p-bkup-bucket",
 "rfrostig-sharat-uci-p-bkup-bucket"]
 },
 "Team xiangmix" = {
-members = ["xiangmix","ronp"]
+members = ["xiangmix","ronp","plozano"]
 buckets = ["xiangmix-brain-uci-p-bkup-bucket",
 "xiangmix-cncm2-uci-p-bkup-bucket",
 "xiangmix-cncm-uci-p-bkup-bucket",
