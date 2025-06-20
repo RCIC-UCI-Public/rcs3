@@ -6,7 +6,7 @@ project_name = "backup-metrics"
 s3_bucket_name = "backup-metrics-tfstate-dev"
 
 # Allowed IP addresses in CIDR notation
-allowed_cidr_blocks = ["68.5.95.209/32"] # Replace with your IP blocks
+allowed_cidr_blocks = ["68.5.95.209/32"] # Scott's IP
 
-# Elastic IP Configuration
-use_elastic_ip = true  # Set to true for production, false for dev (saves $3.65/month)
+# ALB Configuration
+use_alb = true  # Dev: Use simple EC2 direct access (saves ~$16/month)

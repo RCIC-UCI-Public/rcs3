@@ -696,6 +696,22 @@
         let currentContinuationToken = null; // For pagination
         let isLoadingMore = false; // Prevent multiple concurrent loads
 
+        // Detect base path from current location and set it once
+        const BASE_PATH = (function() {
+            const path = window.location.pathname;
+            // If we're at /s3browser/, return /s3browser
+            // If we're at root /, return empty string
+            if (path.includes('/s3browser')) {
+                return '/s3browser';
+            }
+            return '';
+        })();
+
+        // Helper function to build API URLs with correct base path
+        function apiUrl(endpoint) {
+            return BASE_PATH + endpoint;
+        }
+
         // Get filtered buckets from URL parameters
         function getFilteredBuckets() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -725,7 +741,7 @@
         // Check runtime environment and hide client-side features when server-hosted
         async function checkRuntimeEnvironment() {
             try {
-                const response = await fetch('/api/runtime-info');
+                const response = await fetch(apiUrl('/api/runtime-info'));
                 if (response.ok) {
                     const runtimeInfo = await response.json();
                     
@@ -759,7 +775,7 @@
         async function loadBuckets() {
             try {
                 showLoading();
-                const response = await fetch('/api/buckets');
+                const response = await fetch(apiUrl('/api/buckets'));
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -858,7 +874,7 @@
                 }
                 
                 
-                const response = await fetch(url);
+                const response = await fetch(apiUrl(url));
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1185,7 +1201,7 @@
                     url += `?versionId=${encodeURIComponent(versionId)}`;
                 }
                 
-                const response = await fetch(url);
+                const response = await fetch(apiUrl(url));
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1230,7 +1246,7 @@
             try {
                 // Get file versions
                 const versionsUrl = `/api/buckets/${encodeURIComponent(currentBucket)}/objects/${encodeURIComponent(key)}/versions`;
-                const versionsResponse = await fetch(versionsUrl);
+                const versionsResponse = await fetch(apiUrl(versionsUrl));
                 
                 if (!versionsResponse.ok) {
                     throw new Error(`HTTP ${versionsResponse.status}: ${versionsResponse.statusText}`);
@@ -1420,7 +1436,7 @@
         // Reload credentials
         async function reloadCredentials() {
             try {
-                const response = await fetch('/api/reload-credentials', { method: 'POST' });
+                const response = await fetch(apiUrl('/api/reload-credentials'), { method: 'POST' });
                 const data = await response.json();
                 
                 if (data.success) {

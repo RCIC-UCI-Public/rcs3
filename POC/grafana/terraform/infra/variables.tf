@@ -53,9 +53,9 @@ variable "s3_bucket_name" {
   type        = string
 }
 
-# Elastic IP Configuration
-variable "use_elastic_ip" {
-  description = "Whether to create and use an Elastic IP for the Grafana instance"
+# ALB Configuration
+variable "use_alb" {
+  description = "Whether to create an Application Load Balancer for HTTPS access"
   type        = bool
   default     = false
 }

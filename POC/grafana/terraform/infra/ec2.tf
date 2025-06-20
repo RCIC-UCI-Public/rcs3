@@ -5,12 +5,52 @@ resource "aws_security_group" "grafana_sg" {
   description = "Instance-level security for Grafana (requires compatible subnet NACLs)"
 
 
-  ingress {
-    description = "Grafana HTTPS Interface (requires NACL permission)"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
+  # When ALB is enabled: only allow ALB access
+  # When ALB is disabled: allow direct CIDR access for terraform/python tools
+  dynamic "ingress" {
+    for_each = var.use_alb ? [1] : []
+    content {
+      description     = "Grafana HTTP Interface from ALB only"
+      from_port       = 3000
+      to_port         = 3000
+      protocol        = "tcp"
+      security_groups = [aws_security_group.grafana_alb_sg[0].id]
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = var.use_alb ? [] : [1]
+    content {
+      description = "Grafana HTTP Interface direct access (no ALB)"
+      from_port   = 3000
+      to_port     = 3000
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_cidr_blocks
+    }
+  }
+
+  # S3 Browser access from ALB (when ALB enabled)
+  dynamic "ingress" {
+    for_each = var.use_alb ? [1] : []
+    content {
+      description     = "S3 Browser HTTP Interface from ALB only"
+      from_port       = 3001
+      to_port         = 3001
+      protocol        = "tcp"
+      security_groups = [aws_security_group.grafana_alb_sg[0].id]
+    }
+  }
+
+  # S3 Browser direct access (when ALB disabled) - Note: requires SSH tunnel for external access
+  dynamic "ingress" {
+    for_each = var.use_alb ? [] : [1]
+    content {
+      description = "S3 Browser HTTP Interface direct access (SSH tunnel only)"
+      from_port   = 3001
+      to_port     = 3001
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_cidr_blocks
+    }
   }
 
 
@@ -278,21 +318,4 @@ EOF
     {
       "ProtectionLevel" = "P1P2"
   })
-}
-
-# Optional Elastic IP (only created if use_elastic_ip is true)
-resource "aws_eip" "grafana" {
-  count  = var.use_elastic_ip ? 1 : 0
-  domain = "vpc"
-
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-${var.environment}-grafana-eip"
-  })
-}
-
-# Associate Elastic IP with EC2 instance (only if EIP exists)
-resource "aws_eip_association" "grafana" {
-  count       = var.use_elastic_ip ? 1 : 0
-  instance_id = aws_instance.grafana.id
-  allocation_id = aws_eip.grafana[0].id
 }

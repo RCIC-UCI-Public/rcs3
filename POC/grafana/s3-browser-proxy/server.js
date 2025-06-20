@@ -31,7 +31,17 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(express.static('public'));
+
+// Configure base path for ALB path-based routing
+const BASE_PATH = process.env.BASE_PATH || '';
+console.log(`Using base path: '${BASE_PATH}'`);
+
+// Serve static files with base path support
+if (BASE_PATH) {
+    app.use(BASE_PATH, express.static('public'));
+} else {
+    app.use(express.static('public'));
+}
 
 // Load AWS credentials from config or use EC2 IAM role
 function loadAWSCredentials() {
@@ -74,9 +84,11 @@ function initializeS3Client(credentials) {
 }
 
 // API Routes
+// Helper function to create route path with base path
+const routePath = (path) => BASE_PATH ? `${BASE_PATH}${path}` : path;
 
 // List buckets with optional filtering
-app.get('/api/buckets', async (req, res) => {
+app.get(routePath('/api/buckets'), async (req, res) => {
     try {
         const credentials = loadAWSCredentials();
         const s3 = initializeS3Client(credentials);
@@ -103,7 +115,7 @@ app.get('/api/buckets', async (req, res) => {
 });
 
 // List objects in bucket
-app.get('/api/buckets/:bucketName/objects', async (req, res) => {
+app.get(routePath('/api/buckets/:bucketName/objects'), async (req, res) => {
     try {
         const { bucketName } = req.params;
         const { 
@@ -389,7 +401,7 @@ app.get('/api/buckets/:bucketName/objects', async (req, res) => {
 });
 
 // Get object metadata
-app.get('/api/buckets/:bucketName/objects/:objectKey/metadata', async (req, res) => {
+app.get(routePath('/api/buckets/:bucketName/objects/:objectKey/metadata'), async (req, res) => {
     try {
         const { bucketName, objectKey } = req.params;
         const { versionId } = req.query;
@@ -421,7 +433,7 @@ app.get('/api/buckets/:bucketName/objects/:objectKey/metadata', async (req, res)
 });
 
 // Get object versions
-app.get('/api/buckets/:bucketName/objects/:objectKey/versions', async (req, res) => {
+app.get(routePath('/api/buckets/:bucketName/objects/:objectKey/versions'), async (req, res) => {
     try {
         const { bucketName, objectKey } = req.params;
         const decodedKey = decodeURIComponent(objectKey);
@@ -478,12 +490,12 @@ app.get('/api/buckets/:bucketName/objects/:objectKey/versions', async (req, res)
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(routePath('/api/health'), (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Runtime info endpoint - detect if running on server vs locally
-app.get('/api/runtime-info', (req, res) => {
+app.get(routePath('/api/runtime-info'), (req, res) => {
     // Check multiple indicators that we're running on a server/EC2 instance
     const isServerHosted = process.env.NODE_ENV === 'production' || 
                           process.env.AWS_EXECUTION_ENV || 
@@ -508,7 +520,7 @@ app.get('/api/runtime-info', (req, res) => {
 });
 
 // Reload credentials endpoint
-app.post('/api/reload-credentials', (req, res) => {
+app.post(routePath('/api/reload-credentials'), (req, res) => {
     try {
         const credentials = loadAWSCredentials();
         if (credentials) {
