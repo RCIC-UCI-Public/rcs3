@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
-  "id": 52,
+  "id": 20,
   "links": [],
   "panels": [
     {
@@ -37,7 +37,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -51,14 +51,6 @@
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 1000
-              },
-              {
-                "color": "red",
-                "value": 5000
               }
             ]
           },
@@ -86,16 +78,16 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": true,
+        "showPercentChange": false,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -122,7 +114,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -149,7 +141,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
           "expression": "((SUM(s_bytes) * $BYTES2GB) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(d_bytes) * $BYTES2GB) * $S3DEEP)",
@@ -177,7 +169,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -191,20 +183,43 @@
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 50
-              },
-              {
-                "color": "red",
-                "value": 200
               }
             ]
           },
           "unit": "currencyUSD"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Deep Archive"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Standard"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 5,
@@ -212,11 +227,11 @@
         "x": 6,
         "y": 1
       },
-      "id": 102,
+      "id": 181,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "justifyMode": "center",
+        "justifyMode": "auto",
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
@@ -230,12 +245,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -262,34 +277,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "GLACIER"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "g_bytes",
-          "label": "GLACIER",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "StorageBytes",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "B",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -316,13 +304,13 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
-          "expression": "((SUM(s_bytes) * $BYTES2GB / $days_in_month) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(g_bytes) * $BYTES2GB / $days_in_month) * $S3GLACIER * (1 - $SDISCOUNT)) + ((SUM(d_bytes) * $BYTES2GB / $days_in_month) * $S3DEEP)",
+          "expression": "((SUM(s_bytes) * $BYTES2GB / $days_in_month) * $S3STD * (1 - $SDISCOUNT))",
           "hide": false,
-          "id": "daily_cost",
-          "label": "Daily Storage Cost",
+          "id": "daily_cost_s",
+          "label": "Standard",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 1,
@@ -336,15 +324,45 @@
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "((SUM(d_bytes) * $BYTES2GB / $days_in_month) * $S3DEEP)",
+          "hide": false,
+          "id": "daily_cost_da",
+          "label": "Deep Archive",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
         }
       ],
-      "title": "Daily Storage Cost",
+      "title": "Daily Storage Cost by Class",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {}
+        }
+      ],
       "type": "stat"
     },
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -358,14 +376,6 @@
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 100
-              },
-              {
-                "color": "red",
-                "value": 1000
               }
             ]
           },
@@ -397,12 +407,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT"
@@ -427,7 +437,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT"
@@ -491,165 +501,6 @@
     },
     {
       "datasource": {
-        "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          },
-          "unit": "decgbytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 6,
-        "y": 6
-      },
-      "id": 107,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.0.1+security-01",
-      "targets": [
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "STANDARD"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "s_bytes",
-          "label": "Standard Storage",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "StorageBytes",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "A",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "GLACIER"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "g_bytes",
-          "label": "Glacier Storage",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "StorageBytes",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "B",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "DEEP_ARCHIVE"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "d_bytes",
-          "label": "Deep Archive Storage",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "StorageBytes",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "C",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {},
-          "expression": "(SUM(s_bytes) + SUM(g_bytes) + SUM(d_bytes)) * $BYTES2GB",
-          "hide": false,
-          "id": "total_gb",
-          "label": "Total Storage",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 1,
-          "metricName": "",
-          "metricQueryType": 0,
-          "namespace": "",
-          "period": "",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "D",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        }
-      ],
-      "title": "Total Storage",
-      "type": "stat"
-    },
-    {
-      "datasource": {
         "type": "datasource",
         "uid": "-- Dashboard --"
       },
@@ -658,21 +509,13 @@
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 6,
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 10
-              },
-              {
-                "color": "red",
-                "value": 50
               }
             ]
           },
@@ -683,7 +526,7 @@
       "gridPos": {
         "h": 5,
         "w": 6,
-        "x": 12,
+        "x": 6,
         "y": 6
       },
       "id": 103,
@@ -702,7 +545,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
@@ -779,7 +622,166 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "decgbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 6
+      },
+      "id": 107,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "s_bytes",
+          "label": "Standard Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "GLACIER"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "g_bytes",
+          "label": "Glacier Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "d_bytes",
+          "label": "Deep Archive Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "(SUM(s_bytes) + SUM(g_bytes) + SUM(d_bytes)) * $BYTES2GB",
+          "hide": false,
+          "id": "total_gb",
+          "label": "Total Storage",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "D",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "title": "Total Storage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -880,12 +882,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -912,7 +914,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -939,7 +941,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -966,7 +968,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -993,7 +995,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1020,7 +1022,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1051,7 +1053,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -1150,12 +1152,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1181,7 +1183,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1207,7 +1209,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1233,7 +1235,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
           "expression": "SUM([dm_s_bytes, ncv_s_bytes])",
@@ -1257,7 +1259,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1283,7 +1285,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1309,7 +1311,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1335,7 +1337,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
           "expression": "SUM([dm_da_bytes, ncv_da_bytes])",
@@ -1362,7 +1364,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Standard Overhead",
+            "alias": "Standard",
             "binary": {
               "left": {
                 "matcher": {
@@ -1414,7 +1416,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Deep Archive Overhead",
+            "alias": "Deep Archive",
             "binary": {
               "left": {
                 "matcher": {
@@ -1465,28 +1467,20 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 0,
+          "decimals": 1,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 10000000
-              },
-              {
-                "color": "red",
-                "value": 100000000
               }
             ]
           },
@@ -1518,19 +1512,20 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
-            "record_type": "ACCOUNT"
+            "record_type": "ACCOUNT",
+            "storage_class": "STANDARD"
           },
           "expression": "",
           "id": "",
-          "label": "",
+          "label": "Standard",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
@@ -1541,6 +1536,33 @@
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
           "refId": "A",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Maximum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "Deep Archive",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "ObjectCount",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Maximum"
@@ -1565,7 +1587,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -1676,8 +1698,7 @@
         "legend": {
           "calcs": [
             "mean",
-            "lastNotNull",
-            "max"
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -1689,12 +1710,12 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1722,7 +1743,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1750,7 +1771,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -1778,7 +1799,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
           "expression": "((SUM(s_bytes) * $BYTES2GB / $days_in_month) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(g_bytes) * $BYTES2GB / $days_in_month) * $S3GLACIER * (1 - $SDISCOUNT)) + ((SUM(d_bytes) * $BYTES2GB / $days_in_month) * $S3DEEP)",
@@ -1802,7 +1823,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
           "expression": "RUNNING_SUM(daily_storage_cost)",
@@ -1826,7 +1847,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT"
@@ -1852,7 +1873,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT"
@@ -1882,7 +1903,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -1908,11 +1929,11 @@
             "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 2,
-            "pointSize": 5,
+            "pointSize": 6,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "always",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1954,6 +1975,10 @@
                   "fixedColor": "red",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
               }
             ]
           },
@@ -1980,11 +2005,10 @@
         "x": 12,
         "y": 22
       },
-      "id": 160,
+      "id": 14,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
             "lastNotNull"
           ],
           "displayMode": "table",
@@ -1997,12 +2021,12 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -2021,7 +2045,7 @@
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "J",
+          "refId": "A",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Sum"
@@ -2029,34 +2053,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "STANDARD"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "standard_list",
-          "label": "",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "ListRequests",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "F",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -2075,7 +2072,7 @@
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "N",
+          "refId": "B",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Sum"
@@ -2083,43 +2080,16 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
-            "storage_class": "DEEP_ARCHIVE"
+            "storage_class": "STANDARD"
           },
           "expression": "",
           "hide": true,
-          "id": "deep_put",
-          "label": "deep_put",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "PutRequests",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "K",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "DEEP_ARCHIVE"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "deep_list",
-          "label": "deep_list",
+          "id": "standard_list",
+          "label": "",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
@@ -2129,7 +2099,7 @@
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "G",
+          "refId": "C",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Sum"
@@ -2137,7 +2107,34 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "deep_put",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "PutRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "D",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -2146,7 +2143,7 @@
           "expression": "",
           "hide": true,
           "id": "deep_post",
-          "label": "deep_post",
+          "label": "",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
@@ -2156,7 +2153,7 @@
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "O",
+          "refId": "E",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Sum"
@@ -2164,55 +2161,34 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
-          "dimensions": {},
-          "expression": "SUM([deep_put, deep_post, deep_list])",
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
           "hide": true,
-          "id": "deep_ppl",
-          "label": "Deep Archive - PutPostList",
+          "id": "deep_list",
+          "label": "",
           "logGroups": [],
-          "matchExact": true,
-          "metricEditorMode": 1,
-          "metricName": "",
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "ListRequests",
           "metricQueryType": 0,
-          "namespace": "",
+          "namespace": "AWS/S3/Storage-Lens",
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "S",
+          "refId": "F",
           "region": "us-west-2",
           "sqlExpression": "",
-          "statistic": "Average"
+          "statistic": "Sum"
         },
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {},
-          "expression": "SUM([standard_put, standard_post, standard_list])",
-          "hide": true,
-          "id": "standard_ppl",
-          "label": "Standard - PutPostList",
-          "logGroups": [],
-          "matchExact": true,
-          "metricEditorMode": 1,
-          "metricName": "",
-          "metricQueryType": 0,
-          "namespace": "",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "T",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Average"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -2231,7 +2207,7 @@
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "A",
+          "refId": "G",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Sum"
@@ -2239,34 +2215,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "-"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "bucket_list",
-          "label": "",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "ListRequests",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "B",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -2285,84 +2234,6 @@
           "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "C",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {},
-          "expression": "SUM([bucket_put, bucket_post, bucket_list])",
-          "hide": true,
-          "id": "bucket_ppl",
-          "label": "Bucket - PutPostList",
-          "logGroups": [],
-          "matchExact": true,
-          "metricEditorMode": 1,
-          "metricName": "",
-          "metricQueryType": 0,
-          "namespace": "",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "D",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Average"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "-"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "bucket_all",
-          "label": "bucket_all",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "AllRequests",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
-          "refId": "E",
-          "region": "us-west-2",
-          "sqlExpression": "",
-          "statistic": "Sum"
-        },
-        {
-          "datasource": {
-            "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
-          },
-          "dimensions": {
-            "record_type": "ACCOUNT",
-            "storage_class": "STANDARD"
-          },
-          "expression": "",
-          "hide": true,
-          "id": "standard_all",
-          "label": "standard_all",
-          "logGroups": [],
-          "matchExact": false,
-          "metricEditorMode": 0,
-          "metricName": "AllRequests",
-          "metricQueryType": 0,
-          "namespace": "AWS/S3/Storage-Lens",
-          "period": "86400",
-          "queryLanguage": "CWLI",
-          "queryMode": "Metrics",
           "refId": "H",
           "region": "us-west-2",
           "sqlExpression": "",
@@ -2371,20 +2242,20 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
-            "storage_class": "DEEP_ARCHIVE"
+            "storage_class": "-"
           },
           "expression": "",
           "hide": true,
-          "id": "deep_all",
-          "label": "deep_all",
+          "id": "bucket_list",
+          "label": "",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
-          "metricName": "AllRequests",
+          "metricName": "ListRequests",
           "metricQueryType": 0,
           "namespace": "AWS/S3/Storage-Lens",
           "period": "86400",
@@ -2398,23 +2269,104 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "standard_all",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "AllRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "J",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "deep_all",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "AllRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "K",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "-"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "bucket_all",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "AllRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "L",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
-          "expression": "SUM([bucket_all, standard_all, deep_all])",
-          "hide": true,
-          "id": "all_all",
-          "label": "all_all",
+          "expression": "SUM([standard_all, deep_all, bucket_all])",
+          "hide": false,
+          "id": "all_requests",
+          "label": "All Requests",
           "logGroups": [],
           "matchExact": true,
           "metricEditorMode": 1,
           "metricName": "",
           "metricQueryType": 0,
           "namespace": "",
-          "period": "",
+          "period": "86400",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "U",
+          "refId": "M",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Average"
@@ -2422,13 +2374,61 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
-          "expression": "(1-$EDISCOUNT) * (((all_all - (standard_ppl + deep_ppl + bucket_ppl)) * 0.0004) + (standard_ppl * 0.005) + (bucket_ppl * 0.005) + (deep_ppl * 0.05)) / 1000",
+          "expression": "SUM([standard_put, standard_post, standard_list, bucket_put, bucket_post, bucket_list])",
+          "hide": true,
+          "id": "standard_bucket_ppl",
+          "label": "Standard+Bucket - PutPostList",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "N",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "SUM([deep_put, deep_post, deep_list])",
+          "hide": true,
+          "id": "deep_ppl",
+          "label": "Deep Archive - PutPostList",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "O",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "(1-$EDISCOUNT) * (((all_requests - (standard_bucket_ppl + deep_ppl)) * 0.0004) + (standard_bucket_ppl * 0.005) + (deep_ppl * 0.05)) / 1000",
           "hide": false,
           "id": "api_cost",
-          "label": "API Cost",
+          "label": "API Cost (Enhanced)",
           "logGroups": [],
           "matchExact": true,
           "metricEditorMode": 1,
@@ -2438,13 +2438,37 @@
           "period": "",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "L",
+          "refId": "P",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "RUNNING_SUM(api_cost)",
+          "hide": false,
+          "id": "api_cost_sum",
+          "label": "Cumulative API Cost",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "Q",
           "region": "us-west-2",
           "sqlExpression": "",
           "statistic": "Average"
         }
       ],
-      "title": "API Usage & Costs",
+      "title": "API Costs",
       "type": "timeseries"
     },
     {
@@ -2463,7 +2487,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -2591,12 +2615,12 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -2623,7 +2647,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT",
@@ -2650,7 +2674,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
           "expression": "s_bytes * $BYTES2GB",
@@ -2674,7 +2698,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
           "expression": "d_bytes * $BYTES2GB",
@@ -2702,7 +2726,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "bepc7vewsmxoge"
+        "uid": "cepjsirsdknb4c"
       },
       "fieldConfig": {
         "defaults": {
@@ -2809,12 +2833,12 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT"
@@ -2839,7 +2863,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "bepc7vewsmxoge"
+            "uid": "cepjsirsdknb4c"
           },
           "dimensions": {
             "record_type": "ACCOUNT"
@@ -3155,6 +3179,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Cost Estimates (Improved)",
-  "uid": "97f68a1b-a1d3-4039-9095-5337b1886737",
-  "version": 2
+  "uid": "3ecdeb96-c56b-4fd8-b509-b149634f4c74",
+  "version": 7
 }
