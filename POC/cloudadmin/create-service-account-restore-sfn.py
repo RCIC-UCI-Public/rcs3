@@ -53,7 +53,7 @@ sfnJson = template.render( my_vars )
 if args.verbose:
     print( sfnJson )
 
-sys.exit(0)
+#sys.exit(0)
 
 # create the step function
 sfnName = "{}-{}-sfn-{}".format( args.owner, args.system, args.purpose )

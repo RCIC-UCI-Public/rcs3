@@ -8,7 +8,17 @@
                 "s3:GetObject"
             ],
             "Resource": [
-                "arn:aws:s3:::*xxxinventoryxxx/rcs3/*"
+                "arn:aws:s3:::*{{ INVENTORY_POSTFIX }}/rcs3/*"
+            ]
+        },
+                {
+            "Sid": "checkAthenaQueryResults",
+            "Effect": "Allow",
+            "Action": [
+                "athena:GetQueryRuntimeStatistics"
+            ],
+            "Resource": [
+                "arn:aws:athena:{{ REGION }}:{{ ACCOUNT }}:workgroup/rcs3"
             ]
         },
         {
@@ -19,7 +29,7 @@
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:xxxregionxxx:xxxaccountidxxx:log-group:/aws/lambda/createS3BatchInput:*"
+                "arn:aws:logs:{{ REGION }}:{{ ACCOUNT }}:log-group:/aws/lambda/createS3BatchInput:*"
             ]
         }
     ]

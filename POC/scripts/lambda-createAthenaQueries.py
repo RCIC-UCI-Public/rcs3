@@ -4,8 +4,8 @@ import datetime
 
 def lambda_handler(event, context):
     # create the SQL query to load a specific S3 inventory
-    # expects BackupBucket, InventoryBucket, HiveDir, RestoreList,
-    # and ExpireDays as inputs
+    # expects BackupBucket, InventoryBucket, HiveDir, and
+    # RestoreList as inputs
 
     # convert hyphens to underscores
     QueryDatabase = event[ "BackupBucket" ].replace( "-", "_" )
@@ -35,17 +35,17 @@ def lambda_handler(event, context):
     saveprefix = stamp.strftime( "rcs3/restore%Y%m%d-%H%M%S" )
 
     # create the SQL queries for a specific S3 inventory in Athena
-    a = []
+    QueryList = []
     t = "select bucketname as \"{}\", filename, version_id from {} where filename like '{}' and (storage_class = 'GLACIER' or storage_class = 'DEEP_ARCHIVE')"
     for request in event[ "RestoreList" ]:
         s = t.format( event[ "BackupBucket" ], QueryTable, request )
-        a.append( { "QueryDatabase": QueryDatabase, "SearchString": s, "ResultsBucket": savebucket, "ResultsPrefix": saveprefix } )
+        QueryList.append( { "SearchString": s } )
 
     return {
         "QueryDatabase": QueryDatabase,
         "QuerySchema": QuerySchema,
         "QueryInventory": {
-          "QueryList": a,
-          "ExpireDays": event[ "ExpireDays" ]
-        }
+            "QueryList": QueryList
+        },
+        "ResultsPrefix": saveprefix
     }
