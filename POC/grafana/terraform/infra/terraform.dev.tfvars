@@ -10,3 +10,7 @@ allowed_cidr_blocks = ["68.5.95.209/32"] # Scott's IP
 
 # ALB Configuration
 use_alb = true  # Dev: Use simple EC2 direct access (saves ~$16/month)
+
+# Domain Configuration
+domain_name = "rcs3dev.org"
+grafana_subdomain = "grafana"

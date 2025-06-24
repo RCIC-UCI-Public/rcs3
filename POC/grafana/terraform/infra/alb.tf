@@ -50,7 +50,55 @@ resource "aws_security_group" "grafana_alb_sg" {
   tags = local.common_tags
 }
 
-# Import self-signed certificate to ACM (optional)
+# Route 53 Hosted Zone (optional)
+resource "aws_route53_zone" "grafana_domain" {
+  count = var.use_alb && var.domain_name != "" ? 1 : 0
+  
+  name = var.domain_name
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-${var.environment}-${var.domain_name}"
+  })
+}
+
+# ACM Certificate with DNS validation (optional)
+resource "aws_acm_certificate" "grafana_cert" {
+  count = var.use_alb && var.domain_name != "" ? 1 : 0
+  
+  domain_name       = "${var.grafana_subdomain}.${var.domain_name}"
+  validation_method = "DNS"
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-${var.environment}-grafana-cert"
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Route 53 record for ACM certificate validation (optional)
+resource "aws_route53_record" "grafana_cert_validation" {
+  for_each = var.use_alb && var.domain_name != "" ? {
+    for dvo in aws_acm_certificate.grafana_cert[0].domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  } : {}
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.custom.zone_id
+}
+
+# Note: Certificate validation is automatic once DNS delegation is configured
+# The certificate will validate when ACM can resolve the validation records through the delegated DNS
+
+# Self-signed certificate for ALB (always created when ALB is used)
 resource "aws_acm_certificate" "grafana_wildcard" {
   count = var.use_alb ? 1 : 0
   
@@ -63,6 +111,21 @@ resource "aws_acm_certificate" "grafana_wildcard" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+# Route 53 A record for Grafana subdomain (optional)
+resource "aws_route53_record" "grafana_subdomain" {
+  count = var.use_alb && var.domain_name != "" ? 1 : 0
+
+  zone_id = aws_route53_zone.custom.zone_id
+  name    = "${var.grafana_subdomain}.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.grafana[0].dns_name
+    zone_id                = aws_lb.grafana[0].zone_id
+    evaluate_target_health = true
   }
 }
 
@@ -136,7 +199,8 @@ resource "aws_lb_target_group_attachment" "s3browser" {
   port             = 3001
 }
 
-# HTTPS Listener (optional)
+# HTTPS Listener with fallback certificate (optional)
+# Note: Uses self-signed certificate initially, can be updated to ACM cert after validation
 resource "aws_lb_listener" "grafana_https" {
   count = var.use_alb ? 1 : 0
   
@@ -152,6 +216,10 @@ resource "aws_lb_listener" "grafana_https" {
   }
 
   tags = local.common_tags
+
+  lifecycle {
+    ignore_changes = [certificate_arn]
+  }
 }
 
 # HTTP Listener (redirect to HTTPS) (optional)

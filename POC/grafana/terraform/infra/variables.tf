@@ -59,3 +59,16 @@ variable "use_alb" {
   type        = bool
   default     = false
 }
+
+# Domain Configuration
+variable "domain_name" {
+  description = "The base domain name (e.g., rcs3.uci.edu)"
+  type        = string
+  default     = ""
+}
+
+variable "grafana_subdomain" {
+  description = "The subdomain for Grafana (e.g., grafana)"
+  type        = string
+  default     = "grafana"
+}

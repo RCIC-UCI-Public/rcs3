@@ -5,6 +5,6 @@ resource "grafana_data_source" "cloudwatch" {
   json_data_encoded = jsonencode({
     authType                = "default"
     defaultRegion           = "us-west-2"
-    customMetricsNamespaces = "AWS/S3/Storage-Lens"
+    customMetricsNamespaces = "AWS/S3/Storage-Lens,rcs3"
   })
 }

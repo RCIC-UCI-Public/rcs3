@@ -10,3 +10,7 @@ allowed_cidr_blocks = ["68.5.95.209/32","128.200.0.0/16","128.195.0.0/16","192.5
 
 # ALB Configuration
 use_alb = true  # Prod: Use ALB for professional HTTPS setup (~$16/month)
+
+# Domain Configuration
+domain_name = "rcs3.uci.edu"
+grafana_subdomain = "grafana"
