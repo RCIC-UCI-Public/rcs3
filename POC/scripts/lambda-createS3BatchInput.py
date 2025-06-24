@@ -10,15 +10,16 @@ def lambda_handler(event, context):
     # requires athena:GetQueryRuntimeStatistics to check for empty results
     # limit FileToken to 64 characters, needed for CreateJob idempotency
     l = []
+    delObjs = []
     arnprefix = "arn:aws:s3:::"
     s3 = boto3.client( "s3" )
     athena = boto3.client( "athena" )
     for n in event[ "resultlist" ]:
         if n[ "State" ] == "SUCCEEDED":
-            # check if we have results vs successful but empty search
             q = athena.get_query_runtime_statistics( QueryExecutionId=n[ "QueryId" ] )
+            m = re.match( '^s3://([^/]+)/(.+)', n[ "ResultsFile" ] )
+            # check if we have results vs successful but empty search
             if q["QueryRuntimeStatistics"]["Rows"]["OutputRows"] > 0:
-                m = re.match( '^s3://([^/]+)/(.+)', n[ "ResultsFile" ] )
                 if m:
                     r = s3.head_object( Bucket=m.group(1), Key=m.group(2) )
                     l.append( {
@@ -26,14 +27,23 @@ def lambda_handler(event, context):
                         'ETag': r[ "ETag" ].strip( '\"' ),
                         'FileToken': m.group(2)[:64]
                     } )
+                    # delete associated metadata file to avoid DynamoDB import error
+                    md = m.group(2) + ".metadata"
+                    delObjs.append( { "Key": md } )
                 else:
-                    # unable to get ETag, cannot process file
+                    # unable to parse results file, cannot process file
                     pass
             else:
-                # we have an empty result, no need to process file
-                pass
+                # we have an empty result, delete results and metadata files
+                delObjs.append( { "Key": m.group(2) } )
+                md = m.group(2) + ".metadata"
+                delObjs.append( { "Key": md } )
         else:
             # search was not successful, drop for now
             pass
+    if delObjs:
+        # should we have an option to copy the files before deleting?
+        s3.delete_objects( Bucket=m.group(1), Delete={ 'Objects': delObjs, 'Quiet': True } )
+
     # return list files for processing
     return { 'CreateJobItems': l }
