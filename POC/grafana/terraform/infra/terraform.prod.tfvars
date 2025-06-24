@@ -14,3 +14,10 @@ use_alb = true  # Prod: Use ALB for professional HTTPS setup (~$16/month)
 # Domain Configuration
 domain_name = "rcs3.uci.edu"
 grafana_subdomain = "grafana"
+
+dev_subdomain_name_servers = [
+  "ns-1226.awsdns-25.org",
+  "ns-1664.awsdns-16.co.uk",
+  "ns-79.awsdns-09.com",
+  "ns-914.awsdns-50.net"
+]

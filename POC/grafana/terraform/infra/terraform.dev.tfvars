@@ -6,11 +6,13 @@ project_name = "backup-metrics"
 s3_bucket_name = "backup-metrics-tfstate-dev"
 
 # Allowed IP addresses in CIDR notation
-allowed_cidr_blocks = ["68.5.95.209/32"] # Scott's IP
+allowed_cidr_blocks = ["68.5.95.209/32","128.200.0.0/16","128.195.0.0/16","192.5.19.0/24","68.96.70.0/24"] # Replace with your IP blocks
 
 # ALB Configuration
 use_alb = true  # Dev: Use simple EC2 direct access (saves ~$16/month)
 
 # Domain Configuration
-domain_name = "rcs3dev.org"
-grafana_subdomain = "grafana"
+domain_name = "uci-dev.rcs3.org"
+grafana_subdomain = "dashboard"
+
+dev_subdomain_name_servers = []

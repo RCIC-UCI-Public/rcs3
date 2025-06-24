@@ -72,3 +72,9 @@ variable "grafana_subdomain" {
   type        = string
   default     = "grafana"
 }
+
+variable "dev_subdomain_name_servers" {
+  type        = list(string)
+  description = "Name servers for the dev delegated subdomain (for NS delegation in prod)"
+  default     = []
+}

@@ -24,3 +24,9 @@ output "custom_domain_enabled" {
   value       = var.domain_name != ""
   description = "Whether custom domain is configured"
 }
+
+# Hosted zone name servers for NS delegation (for cross-account or subdomain delegation)
+output "custom_hosted_zone_name_servers" {
+  value       = aws_route53_zone.custom.name_servers
+  description = "Name servers for the custom hosted zone (use for NS delegation in parent domain)"
+}
