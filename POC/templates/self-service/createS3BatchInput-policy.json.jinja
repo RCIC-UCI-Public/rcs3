@@ -2,10 +2,11 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "retrieveETag",
+            "Sid": "retrieveETagAndCleanup",
             "Effect": "Allow",
             "Action": [
-                "s3:GetObject"
+                "s3:GetObject",
+                "s3:DeleteObject"
             ],
             "Resource": [
                 "arn:aws:s3:::*{{ INVENTORY_POSTFIX }}/rcs3/*"
