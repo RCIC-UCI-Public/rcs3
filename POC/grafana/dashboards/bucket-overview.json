@@ -431,8 +431,8 @@
     },
     {
       "datasource": {
-        "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "type": "datasource",
+        "uid": "-- Mixed --"
       },
       "fieldConfig": {
         "defaults": {
@@ -541,7 +541,7 @@
             "uid": "cepjsirsdknb4c"
           },
           "dimensions": {},
-          "expression": "((SUM(s_bytes) * $BYTES2GB / $days_in_month) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(da_bytes) * $BYTES2GB / $days_in_month) * $S3DEEP) * $days_in_month",
+          "expression": "((SUM(s_bytes) * $BYTES2GB) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(da_bytes) * $BYTES2GB) * $S3DEEP)",
           "hide": false,
           "id": "monthly_cost",
           "label": "Monthly Cost Estimate",
@@ -554,9 +554,36 @@
           "refId": "C",
           "region": "us-west-2",
           "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "hide": false,
+          "panelId": 203,
+          "refId": "D",
+          "withTransforms": false
         }
       ],
       "title": "Estimated Monthly Cost",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Monthly Cost Estimate",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Monthly Cost Estimate",
+                "API Cost"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
       "type": "stat"
     },
     {
@@ -2326,8 +2353,8 @@
       },
       {
         "current": {
-          "text": "0.00",
-          "value": "0.00"
+          "text": "0.18",
+          "value": "0.18"
         },
         "description": "Storage Cost Discount",
         "includeAll": false,
@@ -2335,12 +2362,12 @@
         "name": "SDISCOUNT",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "0%",
             "value": "0.00"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "18%",
             "value": "0.18"
           },
@@ -2355,8 +2382,8 @@
       },
       {
         "current": {
-          "text": "0.00",
-          "value": "0.00"
+          "text": "0.18",
+          "value": "0.18"
         },
         "description": "Enterprise API Cost Discount",
         "includeAll": false,
@@ -2364,12 +2391,12 @@
         "name": "EDISCOUNT",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "0%",
             "value": "0.00"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "18%",
             "value": "0.18"
           }
@@ -2484,5 +2511,5 @@
   "timezone": "",
   "title": "Bucket Overview",
   "uid": "996a304a-52d0-4726-bb29-d01ef3113f1c",
-  "version": 9
+  "version": 10
 }
