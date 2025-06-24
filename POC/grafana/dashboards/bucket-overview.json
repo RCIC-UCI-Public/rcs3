@@ -856,6 +856,8 @@
         "groupWidth": 0.7,
         "legend": {
           "calcs": [
+            "mean",
+            "sum",
             "lastNotNull"
           ],
           "displayMode": "table",
@@ -2324,8 +2326,8 @@
       },
       {
         "current": {
-          "text": "0.45",
-          "value": "0.45"
+          "text": "0.00",
+          "value": "0.00"
         },
         "description": "Storage Cost Discount",
         "includeAll": false,
@@ -2333,7 +2335,7 @@
         "name": "SDISCOUNT",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "0%",
             "value": "0.00"
           },
@@ -2343,7 +2345,7 @@
             "value": "0.18"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "45%",
             "value": "0.45"
           }
@@ -2353,8 +2355,8 @@
       },
       {
         "current": {
-          "text": "0.18",
-          "value": "0.18"
+          "text": "0.00",
+          "value": "0.00"
         },
         "description": "Enterprise API Cost Discount",
         "includeAll": false,
@@ -2362,12 +2364,12 @@
         "name": "EDISCOUNT",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "0%",
             "value": "0.00"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "18%",
             "value": "0.18"
           }
@@ -2482,5 +2484,5 @@
   "timezone": "",
   "title": "Bucket Overview",
   "uid": "996a304a-52d0-4726-bb29-d01ef3113f1c",
-  "version": 8
+  "version": 9
 }

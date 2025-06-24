@@ -14,5 +14,3 @@ use_alb = true  # Dev: Use simple EC2 direct access (saves ~$16/month)
 # Domain Configuration
 domain_name = "uci-dev.rcs3.org"
 grafana_subdomain = "dashboard"
-
-dev_subdomain_name_servers = []

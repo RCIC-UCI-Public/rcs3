@@ -552,7 +552,7 @@
             "type": "datasource",
             "uid": "-- Dashboard --"
           },
-          "panelId": 160,
+          "panelId": 14,
           "refId": "A"
         }
       ],
@@ -561,44 +561,12 @@
         {
           "id": "calculateField",
           "options": {
-            "binary": {
-              "left": {
-                "matcher": {
-                  "id": "byName",
-                  "options": "API Cost"
-                }
-              },
-              "operator": "+",
-              "right": {
-                "matcher": {
-                  "id": "byName",
-                  "options": "$days_in_month"
-                }
-              }
-            },
-            "cumulative": {
-              "field": "API Cost",
-              "reducer": "sum"
-            },
-            "mode": "cumulativeFunctions",
-            "reduce": {
-              "include": [
-                "API Cost"
-              ],
-              "reducer": "sum"
-            },
-            "replaceFields": false
-          }
-        },
-        {
-          "id": "calculateField",
-          "options": {
             "alias": "API Cost - Daily Average ",
             "binary": {
               "left": {
                 "matcher": {
                   "id": "byName",
-                  "options": "cumulative sum(API Cost)"
+                  "options": "Cumulative API Cost"
                 }
               },
               "operator": "/",
@@ -2983,6 +2951,177 @@
         }
       ],
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "cepjsirsdknb4c"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Bytes Uploaded"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 45
+      },
+      "id": 182,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "",
+          "hide": true,
+          "id": "bytes_upload",
+          "label": "Total Bytes Uploaded",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "bytes_upload",
+          "metricQueryType": 0,
+          "namespace": "rcs3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "",
+          "hide": false,
+          "id": "operations_upload",
+          "label": "API Calls",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "operations_upload",
+          "metricQueryType": 0,
+          "namespace": "rcs3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "RUNNING_SUM(bytes_upload)",
+          "hide": false,
+          "id": "",
+          "label": "Total Bytes Uploaded",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "title": "Bytes and API Calls",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -3180,5 +3319,5 @@
   "timezone": "",
   "title": "Cost Estimates (Improved)",
   "uid": "3ecdeb96-c56b-4fd8-b509-b149634f4c74",
-  "version": 7
+  "version": 9
 }

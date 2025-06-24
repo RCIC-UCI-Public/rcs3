@@ -73,8 +73,20 @@ variable "grafana_subdomain" {
   default     = "grafana"
 }
 
-variable "dev_subdomain_name_servers" {
-  type        = list(string)
-  description = "Name servers for the dev delegated subdomain (for NS delegation in prod)"
-  default     = []
+variable "root_domain_name" {
+  type        = string
+  description = "The root domain for NS delegation (e.g., rcs3.org). Leave blank to skip delegation."
+  default     = ""
+}
+
+variable "dev_delegation" {
+  type = object({
+    subdomain : string
+    name_servers : list(string)
+  })
+  description = "Dev subdomain and its name servers for NS delegation (e.g., { subdomain = \"uci-dev\", name_servers = [...] })"
+  default = {
+    subdomain    = ""
+    name_servers = []
+  }
 }

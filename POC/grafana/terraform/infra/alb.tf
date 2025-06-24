@@ -50,17 +50,6 @@ resource "aws_security_group" "grafana_alb_sg" {
   tags = local.common_tags
 }
 
-# Route 53 Hosted Zone (optional)
-resource "aws_route53_zone" "grafana_domain" {
-  count = var.use_alb && var.domain_name != "" ? 1 : 0
-  
-  name = var.domain_name
-
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-${var.environment}-${var.domain_name}"
-  })
-}
-
 # ACM Certificate with DNS validation (optional)
 resource "aws_acm_certificate" "grafana_cert" {
   count = var.use_alb && var.domain_name != "" ? 1 : 0

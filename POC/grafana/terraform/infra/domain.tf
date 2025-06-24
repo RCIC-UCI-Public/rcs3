@@ -9,11 +9,17 @@ resource "aws_route53_zone" "custom" {
 }
 
 # NS delegation for dev subdomain (optional, only in prod)
+data "aws_route53_zone" "root" {
+  count        = var.root_domain_name != "" ? 1 : 0
+  name         = "${var.root_domain_name}."
+  private_zone = false
+}
+
 resource "aws_route53_record" "dev_delegation" {
-  count   = length(var.dev_subdomain_name_servers) > 0 ? 1 : 0
-  zone_id = aws_route53_zone.custom.zone_id
-  name    = "dev" # or your subdomain prefix
+  count   = var.root_domain_name != "" && var.dev_delegation.subdomain != "" && length(var.dev_delegation.name_servers) > 0 ? 1 : 0
+  zone_id = data.aws_route53_zone.root[0].zone_id
+  name    = var.dev_delegation.subdomain
   type    = "NS"
   ttl     = 300
-  records = var.dev_subdomain_name_servers
+  records = var.dev_delegation.name_servers
 }
