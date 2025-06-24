@@ -16,8 +16,8 @@ domain_name = "rcs3.uci.edu"
 grafana_subdomain = "grafana"
 
 dev_subdomain_name_servers = [
-  "ns-1226.awsdns-25.org",
-  "ns-1664.awsdns-16.co.uk",
-  "ns-79.awsdns-09.com",
-  "ns-914.awsdns-50.net"
+  "ns-1057.awsdns-04.org",
+  "ns-1997.awsdns-57.co.uk",
+  "ns-438.awsdns-54.com",
+  "ns-547.awsdns-04.net",
 ]
