@@ -20,9 +20,9 @@ root_domain_name = "rcs3.org"
 dev_delegation = {
   subdomain = "uci-dev"
   name_servers = [
-    "ns-1380.awsdns-44.org",
-    "ns-1725.awsdns-23.co.uk",
-    "ns-450.awsdns-56.com",
-    "ns-958.awsdns-55.net"
+    "ns-1211.awsdns-23.org",
+    "ns-1703.awsdns-20.co.uk",
+    "ns-199.awsdns-24.com",
+    "ns-848.awsdns-42.net"
   ]
 }

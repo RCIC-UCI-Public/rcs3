@@ -90,3 +90,9 @@ variable "dev_delegation" {
     name_servers = []
   }
 }
+
+variable "delegation_set_id" {
+  description = "Route 53 delegation set ID for custom DNS setup"
+  type        = string
+  default     = ""
+}

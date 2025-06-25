@@ -44,7 +44,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -59,28 +58,33 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 5,
         "x": 1,
         "y": 1
       },
-      "id": 101,
+      "id": 183,
       "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
         "orientation": "auto",
-        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": [],
           "fields": "",
           "values": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
       "pluginVersion": "12.0.2",
       "targets": [
@@ -95,12 +99,12 @@
           },
           "expression": "",
           "hide": true,
-          "id": "s_bytes",
-          "label": "STANDARD",
+          "id": "standard_put",
+          "label": "",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
-          "metricName": "StorageBytes",
+          "metricName": "PutRequests",
           "metricQueryType": 0,
           "namespace": "AWS/S3/Storage-Lens",
           "period": "86400",
@@ -118,16 +122,43 @@
           },
           "dimensions": {
             "record_type": "ACCOUNT",
-            "storage_class": "DEEP_ARCHIVE"
+            "storage_class": "STANDARD"
           },
           "expression": "",
           "hide": true,
-          "id": "d_bytes",
-          "label": "DEEP_ARCHIVE",
+          "id": "standard_post",
+          "label": "",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
-          "metricName": "StorageBytes",
+          "metricName": "PostRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "standard_list",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "ListRequests",
           "metricQueryType": 0,
           "namespace": "AWS/S3/Storage-Lens",
           "period": "86400",
@@ -143,13 +174,328 @@
             "type": "cloudwatch",
             "uid": "cepjsirsdknb4c"
           },
-          "dimensions": {},
-          "expression": "((SUM(s_bytes) * $BYTES2GB) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(d_bytes) * $BYTES2GB) * $S3DEEP)",
-          "hide": false,
-          "id": "monthly_cost",
-          "label": "Monthly Storage Cost",
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "deep_put",
+          "label": "",
           "logGroups": [],
           "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "PutRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "D",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "deep_post",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "PostRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "E",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "deep_list",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "ListRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "F",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "-"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "bucket_put",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "PutRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "G",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "-"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "bucket_post",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "PostRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "H",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "-"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "bucket_list",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "ListRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "I",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "standard_all",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "AllRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "J",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "deep_all",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "AllRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "K",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "-"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "bucket_all",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "AllRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "L",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "SUM([standard_all, deep_all, bucket_all])",
+          "hide": true,
+          "id": "all_requests",
+          "label": "All Requests",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "M",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "SUM([standard_put, standard_post, standard_list, bucket_put, bucket_post, bucket_list])",
+          "hide": true,
+          "id": "standard_bucket_ppl",
+          "label": "Standard+Bucket - PutPostList",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "N",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "SUM([deep_put, deep_post, deep_list])",
+          "hide": true,
+          "id": "deep_ppl",
+          "label": "Deep Archive - PutPostList",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "86400",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "O",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "(1-$EDISCOUNT) * (((all_requests - (standard_bucket_ppl + deep_ppl)) * 0.0004) + (standard_bucket_ppl * 0.005) + (deep_ppl * 0.05)) / 1000",
+          "hide": true,
+          "id": "api_cost",
+          "label": "API Cost (Enhanced)",
+          "logGroups": [],
+          "matchExact": true,
           "metricEditorMode": 1,
           "metricName": "",
           "metricQueryType": 0,
@@ -157,14 +503,164 @@
           "period": "",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
-          "refId": "D",
+          "refId": "P",
           "region": "us-west-2",
           "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "RUNNING_SUM(api_cost)",
+          "hide": false,
+          "id": "api_cost_sum",
+          "label": "Monthly API Cost",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "Q",
+          "region": "us-west-2",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "STANDARD"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "s_bytes",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "R",
+          "region": "default",
+          "sqlExpression": "",
           "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {
+            "record_type": "ACCOUNT",
+            "storage_class": "DEEP_ARCHIVE"
+          },
+          "expression": "",
+          "hide": true,
+          "id": "da_bytes",
+          "label": "",
+          "logGroups": [],
+          "matchExact": false,
+          "metricEditorMode": 0,
+          "metricName": "StorageBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "S",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "((SUM(s_bytes) * $BYTES2GB / $days_in_month) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(da_bytes) * $BYTES2GB / $days_in_month) * $S3DEEP)",
+          "hide": true,
+          "id": "storage_total",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "T",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "RUNNING_SUM(storage_total)",
+          "hide": false,
+          "id": "storage_running_total",
+          "label": "Monthly Storage Cost",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "U",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "cepjsirsdknb4c"
+          },
+          "dimensions": {},
+          "expression": "RUNNING_SUM(SUM([storage_total,api_cost]))",
+          "hide": false,
+          "id": "",
+          "label": "Monthly Total",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "V",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
         }
       ],
-      "title": "Monthly Cost Estimate",
-      "type": "stat"
+      "title": "API Costs",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -819,7 +1315,7 @@
         "h": 10,
         "w": 5,
         "x": 1,
-        "y": 11
+        "y": 9
       },
       "id": 104,
       "options": {
@@ -3319,5 +3815,5 @@
   "timezone": "",
   "title": "Cost Estimates (Improved)",
   "uid": "3ecdeb96-c56b-4fd8-b509-b149634f4c74",
-  "version": 9
+  "version": 12
 }

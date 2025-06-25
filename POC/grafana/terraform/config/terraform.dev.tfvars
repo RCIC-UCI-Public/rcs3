@@ -1,7 +1,7 @@
 # Grafana Configuration
 # These values should come from the infra module's outputs:
 grafana_username = "admin"
-grafana_url      = "https://backup-metrics-dev-grafana-alb-1773409288.us-west-2.elb.amazonaws.com"
+grafana_url      = "https://backup-metrics-dev-grafana-alb-1770820205.us-west-2.elb.amazonaws.com"
 
 # Path to dashboard JSON files
 dashboards_path = "../../dashboards"
