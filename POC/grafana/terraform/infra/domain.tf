@@ -24,3 +24,12 @@ resource "aws_route53_record" "dev_delegation" {
   ttl     = 300
   records = var.dev_delegation.name_servers
 }
+
+resource "aws_route53_record" "prod_delegation" {
+  count   = var.root_domain_name != "" ? 1 : 0
+  zone_id = data.aws_route53_zone.root[0].zone_id
+  name    = var.domain_name
+  type    = "NS"
+  ttl     = 300
+  records = aws_route53_zone.custom.name_servers
+}
