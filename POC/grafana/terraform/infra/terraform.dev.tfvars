@@ -6,7 +6,18 @@ project_name = "backup-metrics"
 s3_bucket_name = "backup-metrics-tfstate-dev"
 
 # Allowed IP addresses in CIDR notation
-allowed_cidr_blocks = ["68.5.95.209/32","128.200.0.0/16","128.195.0.0/16","192.5.19.0/24","68.96.70.0/24"] # Replace with your IP blocks
+allowed_cidr_blocks = [
+  # UCI Network Blocks (ASN299)
+  "128.195.0.0/16",  # General Public IPs
+  "128.200.0.0/16",  # General Public IPs
+  "160.87.0.0/16",   # UCI Health
+  "169.234.0.0/16",  # Mobile Access & ResNet Public IPs
+  "192.5.19.0/24",   # LightPath
+
+  # Non-UCI Blocks
+  "68.5.95.209/32",
+  "68.96.70.0/24"
+]
 
 # ALB Configuration
 use_alb = true  # Dev: Use simple EC2 direct access (saves ~$16/month)
