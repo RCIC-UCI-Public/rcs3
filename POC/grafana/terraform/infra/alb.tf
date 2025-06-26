@@ -81,33 +81,19 @@ resource "aws_route53_record" "grafana_cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = aws_route53_zone.custom.zone_id
+  zone_id         = aws_route53_zone.custom[0].zone_id
 }
 
 # Note: Certificate validation is automatic once DNS delegation is configured
 # The certificate will validate when ACM can resolve the validation records through the delegated DNS
 
-# Self-signed certificate for ALB (always created when ALB is used)
-resource "aws_acm_certificate" "grafana_wildcard" {
-  count = var.use_alb ? 1 : 0
-  
-  private_key      = file("${path.module}/certificates/wildcard-elb.key")
-  certificate_body = file("${path.module}/certificates/wildcard-elb.crt")
-
-  tags = merge(local.common_tags, {
-    Name = "grafana-wildcard-elb-cert"
-  })
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+# Self-signed certificate removed - ALB now uses ACM certificate directly
 
 # Route 53 A record for Grafana subdomain (optional)
 resource "aws_route53_record" "grafana_subdomain" {
   count = var.use_alb && var.domain_name != "" ? 1 : 0
 
-  zone_id = aws_route53_zone.custom.zone_id
+  zone_id = aws_route53_zone.custom[0].zone_id
   name    = "${var.grafana_subdomain}.${var.domain_name}"
   type    = "A"
 
@@ -188,16 +174,16 @@ resource "aws_lb_target_group_attachment" "s3browser" {
   port             = 3001
 }
 
-# HTTPS Listener with fallback certificate (optional)
-# Note: Uses self-signed certificate initially, can be updated to ACM cert after validation
+# HTTPS Listener with ACM certificate (optional)
+# Note: Uses ACM certificate directly - will show warnings until DNS validation completes
 resource "aws_lb_listener" "grafana_https" {
-  count = var.use_alb ? 1 : 0
+  count = var.use_alb && var.domain_name != "" ? 1 : 0
   
   load_balancer_arn = aws_lb.grafana[0].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = aws_acm_certificate.grafana_wildcard[0].arn
+  certificate_arn   = aws_acm_certificate.grafana_cert[0].arn
 
   default_action {
     type             = "forward"
@@ -205,10 +191,6 @@ resource "aws_lb_listener" "grafana_https" {
   }
 
   tags = local.common_tags
-
-  lifecycle {
-    ignore_changes = [certificate_arn]
-  }
 }
 
 # HTTP Listener (redirect to HTTPS) (optional)

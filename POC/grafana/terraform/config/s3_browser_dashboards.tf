@@ -5,20 +5,29 @@ locals {
   # S3 browser dashboard template
   s3_browser_template = jsondecode(file("${local.dashboard_path_absolute}/s3-browser-template.json"))
 
-  # Extract hostname from Grafana URL for iframe source (remove protocol and port)
-  grafana_host = replace(
+  # Extract hostname from Grafana URL for iframe source (remove protocol, port, and trailing slash)
+  grafana_host = trimsuffix(
     replace(
       replace(
-        replace(var.grafana_url, "http://", ""),
-        "https://", ""
+        replace(
+          replace(var.grafana_url, "http://", ""),
+          "https://", ""
+        ),
+        ":3000", ""
       ),
-      ":3000", ""
+      ":3001", ""
     ),
-    ":3001", ""
+    "/"
   )
 
   # Extract protocol from Grafana URL
   grafana_protocol = split("://", var.grafana_url)[0]
+
+  # Determine S3 browser URL based on whether ALB is used
+  # Both ALB and non-ALB setups need /s3browser path
+  # If no ALB: use host with port 3001 + /s3browser path
+  # If ALB: use same host with /s3browser path
+  s3_browser_url = strcontains(var.grafana_url, ":3000") ? "${local.grafana_protocol}://${local.grafana_host}:3001/s3browser" : "${local.grafana_protocol}://${local.grafana_host}/s3browser"
 
   # Generate S3 browser dashboards for each team
   team_s3_dashboards = { for team_name, team_config in var.bucket_teams : team_name =>
@@ -28,17 +37,14 @@ locals {
         replace(
           replace(
             replace(
-              replace(
-                jsonencode(local.s3_browser_template),
-                "{{TEAM_NAME}}", team_name
-              ),
-              "{{TEAM_UID}}", replace(lower(team_name), " ", "-")
+              jsonencode(local.s3_browser_template),
+              "{{TEAM_NAME}}", team_name
             ),
-            "{{TEAM_BUCKETS}}", join(",", team_config.buckets)
+            "{{TEAM_UID}}", replace(lower(team_name), " ", "-")
           ),
-          "{{GRAFANA_HOST}}", local.grafana_host
+          "{{TEAM_BUCKETS}}", join(",", team_config.buckets)
         ),
-        "{{GRAFANA_PROTOCOL}}", local.grafana_protocol
+        "{{S3_BROWSER_URL}}", local.s3_browser_url
       )
     )
   }
@@ -52,17 +58,14 @@ resource "grafana_dashboard" "admin_s3_browser" {
         replace(
           replace(
             replace(
-              replace(
-                jsonencode(local.s3_browser_template),
-                "{{TEAM_NAME}}", "Admin"
-              ),
-              "{{TEAM_UID}}", "admin"
+              jsonencode(local.s3_browser_template),
+              "{{TEAM_NAME}}", "Admin"
             ),
-            "{{TEAM_BUCKETS}}", "" # No filter - show all buckets
+            "{{TEAM_UID}}", "admin"
           ),
-          "{{GRAFANA_HOST}}", local.grafana_host
+          "{{TEAM_BUCKETS}}", "" # No filter - show all buckets
         ),
-        "{{GRAFANA_PROTOCOL}}", local.grafana_protocol
+        "{{S3_BROWSER_URL}}", local.s3_browser_url
       )
     )
   )

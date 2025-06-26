@@ -1,6 +1,6 @@
 # Grafana Deployment Playbook
 
-This playbook provides high-level steps to deploy the Grafana monitoring solution for RCS3.
+This playbook provides multiple deployment paths for the Grafana monitoring solution for RCS3.
 
 ## Prerequisites
 - AWS CLI access configured
@@ -8,125 +8,208 @@ This playbook provides high-level steps to deploy the Grafana monitoring solutio
 - Python environment set up
 - Required S3 buckets for Terraform state
 
-## Deployment Steps
+## Deployment Paths
 
-### 1. Domain Setup (High Level)
-- Pre-purchase domain in Route 53 **OR**
-- Let Terraform create the hosted zone, then purchase domain later
-- If domain was pre-purchased, import the hosted zone before first apply
-- [See Domain Setup Details below](#domain-setup-details)
+Choose your deployment path based on your needs:
 
-### 2. Verify S3 Bucket Exists
-Ensure the required S3 bucket for Terraform state storage exists:
-- **Dev**: `backup-metrics-tfstate-dev`
-- **Prod**: `rcs3-godfather-uci-p-bucket`
+### 🚀 **Path A: Simple Testing/Development (No ALB, No SSL)**
+- Direct EC2 access via IP and port 3000
+- No domain, no SSL, no monthly ALB costs
+- Perfect for testing and proof-of-concept
 
+### 🔒 **Path B: Production Only (Real Domain + SSL)**
+- Single production environment with custom domain
+- Full SSL via ALB and ACM
+- Professional setup for production use
+
+### 🌐 **Path C: Production + Development (Real Domains + SSL)**
+- Both prod and dev environments with custom domains
+- DNS delegation from prod to dev
+- Full SSL for both environments
+
+---
+
+## Path A: Simple Testing/Development
+
+### Setup
+1. Set `use_alb = false` in your terraform.tfvars
+2. Set `domain_name = ""` (or omit entirely)
+
+### Steps
+1. **Deploy Infrastructure:**
+   ```bash
+   cd POC/grafana/terraform/infra
+   ./deploy-dev.sh  # or ./deploy-prod.sh
+   ```
+
+2. **Get EC2 Public IP:**
+   ```bash
+   terraform output grafana_instance_id
+   # Use AWS console or CLI to get public IP
+   ```
+
+3. **Access Grafana:**
+   - URL: `http://[EC2-PUBLIC-IP]:3000`
+   - S3 Browser: `http://[EC2-PUBLIC-IP]:3001`
+
+### Costs
+- **EC2 instance only** (~$10-20/month depending on instance type)
+- **No ALB, DNS, or certificate costs**
+
+---
+
+## Path B: Production Only (Real Domain + SSL)
+
+### Prerequisites
+- Purchase domain in Route 53 in your prod account
+
+### Steps
+1. **Configure Terraform variables** (`terraform.prod.tfvars`):
+   ```hcl
+   use_alb = true
+   domain_name = "uci.yourdomain.com"
+   grafana_subdomain = "grafana"
+   root_domain_name = "yourdomain.com"
+   ```
+
+2. **Deploy Infrastructure:**
+   ```bash
+   cd POC/grafana/terraform/infra
+   ./deploy-prod.sh
+   ```
+
+3. **Access Grafana:**
+   - URL: `https://grafana.uci.yourdomain.com`
+   - Initial access via ALB DNS (with cert warnings) until DNS propagates
+
+### Result
+- Fully functional production environment with trusted SSL
+- DNS delegation and ACM validation automatic
+- Professional-grade setup
+
+---
+
+## Path C: Production + Development (Real Domains + SSL)
+
+This is the most complete setup with both environments having real domains.
+
+### Prerequisites
+- Purchase root domain in Route 53 in your prod account (e.g., `yourdomain.com`)
+
+### Step-by-Step Process
+
+#### 1. **Create Reusable Delegation Set (Dev Account)**
 ```bash
-aws s3 ls s3://[bucket-name]
+# Run in dev account
+aws route53 create-reusable-delegation-set --caller-reference "dev-delegation-$(date +%s)"
+```
+Save the returned `Id` value.
+
+#### 2. **Configure Dev Terraform** (`terraform.dev.tfvars`):
+```hcl
+use_alb = true
+domain_name = "uci-dev.yourdomain.com"
+grafana_subdomain = "grafana"
+delegation_set_id = "N1PA6795SAMPLE"  # From step 1
 ```
 
-### 3. Update Infrastructure Variables
-Update the appropriate Terraform variables file:
-- **Dev**: `POC/grafana/terraform/infra/terraform.dev.tfvars`
-- **Prod**: `POC/grafana/terraform/infra/terraform.prod.tfvars`
-
-Review and modify variables as needed for your environment.
-
-### 4. Authenticate to AWS CLI
-Ensure your AWS CLI is authenticated and configured for the target environment:
-
-```bash
-aws sts get-caller-identity
-```
-
-### 5. Deploy Infrastructure
-Run the infrastructure deployment script:
-
-**For Dev:**
+#### 3. **Deploy Dev Infrastructure:**
 ```bash
 cd POC/grafana/terraform/infra
 ./deploy-dev.sh
 ```
 
-**For Prod:**
+#### 4. **Get Dev Name Servers:**
+```bash
+terraform output custom_hosted_zone_name_servers
+```
+Copy these name servers.
+
+#### 5. **Configure Prod Terraform** (`terraform.prod.tfvars`):
+```hcl
+use_alb = true
+domain_name = "uci.yourdomain.com"
+grafana_subdomain = "grafana"
+root_domain_name = "yourdomain.com"
+
+dev_delegation = {
+  subdomain = "uci-dev"
+  name_servers = [
+    "ns-1226.awsdns-25.org",
+    "ns-1664.awsdns-16.co.uk",
+    "ns-79.awsdns-09.com",
+    "ns-914.awsdns-50.net"
+  ]
+}
+```
+
+#### 6. **Deploy Prod Infrastructure:**
 ```bash
 cd POC/grafana/terraform/infra
 ./deploy-prod.sh
 ```
 
-### 6. Capture Output DNS
-After infrastructure deployment, capture the Grafana DNS endpoint from Terraform outputs:
+### Result
+- **Dev**: `https://grafana.uci-dev.yourdomain.com`
+- **Prod**: `https://grafana.uci.yourdomain.com`
+- Both environments have trusted SSL certificates
+- DNS delegation working automatically
+- Stable name servers via delegation set
 
-```bash
-terraform output grafana_url
-```
+---
 
-Save this DNS value for the next step.
+## Configuration and Final Steps (All Paths)
 
-### 7. Update Configuration Variables
-Update the configuration Terraform variables file with the DNS from step 6:
+### 1. Update Configuration Variables
+Update the configuration Terraform variables file:
 - **Dev**: `POC/grafana/terraform/config/terraform.dev.tfvars`
 - **Prod**: `POC/grafana/terraform/config/terraform.prod.tfvars`
 
-Add or update the Grafana URL/DNS configuration.
+Add the Grafana URL from your deployment.
 
-### 8. Deploy Configuration
-Run the configuration deployment script:
-
-**For Dev:**
+### 2. Deploy Configuration
 ```bash
 cd POC/grafana/terraform/config
-./deploy-dev.sh
+./deploy-dev.sh  # or ./deploy-prod.sh
 ```
 
-**For Prod:**
-```bash
-cd POC/grafana/terraform/config
-./deploy-prod.sh
-```
-
-### 9. Configure User/Team Memberships
-Run the Python script to set up user and team memberships in Grafana:
-
+### 3. Configure User/Team Memberships
 ```bash
 cd POC/grafana/scripts
 python update_team_memberships.py
 ```
 
-## Domain Setup Details
+---
 
-- **Option A: Pre-purchase domain in Route 53**
-  1. Buy domain in Route 53
-  2. AWS creates hosted zone automatically
-  3. Import hosted zone:  
-     `terraform import aws_route53_zone.custom ZONE_ID`
-  4. Run `terraform apply`
+## Cost Summary
 
-- **Option B: Let Terraform create hosted zone, purchase domain later**
-  1. Run `terraform apply` (Terraform creates hosted zone, ACM cert, DNS records)
-  2. Purchase domain in Route 53 (must match hosted zone name exactly)
-  3. Re-run `terraform apply` to complete ACM validation
+| Component | Path A (Simple) | Path B (Prod Only) | Path C (Prod + Dev) |
+|-----------|-----------------|-------------------|-------------------|
+| **EC2** | ~$15/month | ~$15/month | ~$30/month |
+| **ALB** | $0 | ~$20/month | ~$40/month |
+| **Domain** | $0 | ~$15/year | ~$15/year |
+| **Route 53 Zones** | $0 | $0.50/month | $1.00/month |
+| **Total/Month** | **~$15** | **~$36** | **~$71** |
 
-- **ACM Certificate**
-  - ACM cert is free, auto-renews, and is validated via DNS records in the hosted zone.
-  - ALB uses self-signed cert until ACM cert is validated.
+---
 
-- **Route 53 Hosted Zone**
-  - $0.50/month per zone
-  - Managed by Terraform (import if pre-existing)
+## Troubleshooting
 
-- **Domain**
-  - $12–$15/year (typical)
+### Certificate Warnings
+- Normal during initial deployment
+- Certificates become trusted once DNS validation completes
+- Can take 5-30 minutes after DNS delegation is active
 
-- **ALB**
-  - $16–$25/month minimum
+### DNS Propagation
+- Global DNS propagation can take up to 48 hours
+- Test with `dig` or `nslookup` to verify delegation
 
-- **No ALB Option**
-  - See playbook notes for direct EC2 + Let's Encrypt/NGINX if you want to avoid ALB cost.
+### ALB Health Checks
+- Check target group health in AWS console
+- Ensure security groups allow ALB → EC2 traffic on port 3000
 
-## Verification
-After deployment:
-1. Access Grafana at the DNS endpoint from step 6
-2. Verify dashboards are loaded
-3. Test user access and permissions
-4. Confirm data sources are connected
+---
+
+## Why Reusable Delegation Sets?
+
+A reusable delegation set ensures your dev environment has stable name servers even if you destroy and recreate the infrastructure. Without it, you'd need to update the NS records in prod every time you rebuild dev.

@@ -13,7 +13,7 @@ use_alb = true  # Prod: Use ALB for professional HTTPS setup (~$16/month)
 
 # Domain Configuration
 domain_name = "uci.rcs3.org"
-grafana_subdomain = "grafana"
+grafana_subdomain = "dashboard"
 
 root_domain_name = "rcs3.org"
 

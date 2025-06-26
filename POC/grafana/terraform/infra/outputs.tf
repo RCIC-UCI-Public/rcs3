@@ -6,7 +6,7 @@ output "grafana_instance_id" {
 
 # Primary Grafana URL (conditional based on ALB and domain)
 output "grafana_url" {
-  value = "https://${var.grafana_subdomain}.${var.domain_name}"
+  value = var.use_alb && var.domain_name != "" ? "https://${var.grafana_subdomain}.${var.domain_name}" : null
 }
 
 # ALB DNS name (for reference)
@@ -21,12 +21,12 @@ output "alb_enabled" {
 }
 
 output "custom_domain_enabled" {
-  value       = var.domain_name != ""
+  value       = var.use_alb && var.domain_name != ""
   description = "Whether custom domain is configured"
 }
 
 # Hosted zone name servers for NS delegation (for cross-account or subdomain delegation)
 output "custom_hosted_zone_name_servers" {
-  value       = aws_route53_zone.custom.name_servers
+  value       = var.use_alb && var.domain_name != "" ? aws_route53_zone.custom[0].name_servers : []
   description = "Name servers for the custom hosted zone (use for NS delegation in parent domain)"
 }

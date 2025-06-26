@@ -26,6 +26,9 @@ use_alb = true  # Dev: Use simple EC2 direct access (saves ~$16/month)
 domain_name = "uci-dev.rcs3.org"
 grafana_subdomain = "dashboard"
 
+# The delegation set ID is used for custom domain delegation in Route 53.
+# If your prod account is hosting the root domain, it needs to delegate the subdomain to this dev account, and this set ID needs to be created
+# ahead of time in the dev account so that destruction and recreation of the dev account resources does not break the delegation.
 delegation_set_id = "N059266834246UBV0QBPY"
 
 # aws route53 create-reusable-delegation-set --caller-reference "setup-$(date +%s)"
