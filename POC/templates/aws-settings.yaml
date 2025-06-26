@@ -15,14 +15,19 @@ policy_postfix: "uci-bkup-policy"
 lensbucket: "rcs3-pane-uci-p-report"
 lens: "rcs3-pane"
 
-# 3. Where restore reports from Athena queries are stored
+# 3. The name of the cloudtrails bucket for logs/queue name for GDA transitions
+cloudtrailsbucket: "rcs3-cloudtrails-uci-p-bucket"
+s3writetrail: "rcs3-s3-write"
+sqs_gda: "rcs3_gda_transitions"
+
+# 4. Where restore reports from Athena queries are stored
 reports: "s3://rcs3-godfather-uci-p-bucket"
 
-# 4. Notification for the cloud admin team (region, account, sns-team name)
+# 5. Notification for the cloud admin team (region, account, sns-team name)
 admin_notify: "rcic-team-notify"
 owner_notify: "uci-notify"
 
-# 5. Settings needed to allow end-user to self-service restores
+# 6. Settings needed to allow end-user to self-service restores
 lambda_timeout: 60
 lambda_runtime: "python3.12"
 lambda_handler: "lambda_function.lambda_handler"
@@ -30,7 +35,7 @@ lambda_log_nameprefix: "/aws/lambda/"
 lambda_log_retention: 30
 s3_glacier_expire: 7
 
-# 6. Restrict service accounts to specific array of IP addresses using
+# 7. Restrict service accounts to specific array of IP addresses using
 # condition statements in policy definitions. Expected format is d.d.d.d/d
 iprestrictions:
   - "128.200.0.0/16"

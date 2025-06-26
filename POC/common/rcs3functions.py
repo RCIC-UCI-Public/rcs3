@@ -20,7 +20,7 @@ class boto3Clients():
 
        # create clients. Doesn't matter if they are used. 
        # compresses code
-       self._b3clients= ["athena","events","iam","lambda","logs","s3","sns","stepfunctions"]
+       self._b3clients= ["athena","cloudtrail","events","iam","lambda","logs","s3","sns","sqs","stepfunctions"]
        self._clients={}
        for c in self._b3clients:
            if "region" in self._aws:

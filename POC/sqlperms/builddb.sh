@@ -379,7 +379,8 @@ $AWSPOLICY add resource loggroupPostCloudwatchMetrics 'arn:aws:logs:{{REGION}}:{
 $AWSPOLICY add resource loggroupPrepDynamoImport 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/prepDynamoImport:*'
 $AWSPOLICY add resource loggroupQueryS3Restore 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/queryS3Restore:*'
 $AWSPOLICY add resource loggroupUpdateDynamodb 'arn:aws:logs:{{REGION}}:{{ACCOUNT}}:log-group:/aws/lambda/updateDynamodb:*'
-$AWSPOLICY add resource loggroupCloudtrails 'arn:aws:logs:{{REGION}}x:{{ACCOUNT}}:log-group:aws-cloudtrail-logs-xiangmix-cncm2:*'
+$AWSPOLICY add resource loggroupCloudtrail 'cloudtrail-logs-{{TRAIL}}'
+$AWSPOLICY add resource loggroupCloudtrailArn 'arn:aws:logs:{{REGION}}x:{{ACCOUNT}}:log-group:aws-cloudtrail-logs-{{TRAIL}}:*'
 $AWSPOLICY add resource inventoryPrefix 'arn:aws:s3:::*{{INVENTORY_POSTFIX}}'
 $AWSPOLICY add resource inventoryRCS3Path 'arn:aws:s3:::*{{INVENTORY_POSTFIX}}/rcs3/*'
 $AWSPOLICY add resource reports 'arn:aws:s3:::{{REPORTS}}'
@@ -472,8 +473,8 @@ $AWSPOLICY addToSet resource loggroupQueryS3Restore loggroupQueryS3Restore
 $AWSPOLICY addSet resource loggroupUpdateDynamodb
 $AWSPOLICY addToSet resource loggroupUpdateDynamodb loggroupUpdateDynamodb
 
-$AWSPOLICY addSet resource loggroupCloudtrails
-$AWSPOLICY addToSet resource loggroupCloudtrails loggroupCloudtrails
+$AWSPOLICY addSet resource loggroupCloudtrailArn
+$AWSPOLICY addToSet resource loggroupCloudtrailArn loggroupCloudtrailArn
 
 $AWSPOLICY addSet resource inventoryPrefix
 $AWSPOLICY addToSet resource inventoryPrefix inventoryPrefix
@@ -575,7 +576,6 @@ $AWSPOLICY addToSet condition s3PrefixOwner IPRestrictions
 #         1. Generate policy statements needed (if it doesn't already exist) 
 #         2. Generate the policy SET named as <existing file>  without the .json ending
 #         3. Add the policy statements to the SET to complete the file definition
-2
 ### template-policy2 component policies
 $AWSPOLICY add policy writeBackupBucket Allow --actionSet backupUserPermissions --resourceSet backupBucket --conditionSet IPRestrictions 
 $AWSPOLICY add policy readInventoryBucket Allow --actionSet readBucketAndAttributes --resourceSet inventoryBucket
@@ -609,7 +609,7 @@ $AWSPOLICY addToSet policy keyAgeMetric-policy publishMetrics
 
 
 ## calcUploadBytes-policy component policies
-$AWSPOLICY add policy processLogEvents Allow --actionSet processLogEvents --resourceSet loggroupCloudtrails 
+$AWSPOLICY add policy processLogEvents Allow --actionSet processLogEvents --resourceSet loggroupCloudtrailArn 
 $AWSPOLICY add policy stopLogQuery Allow --actionSet stopLogQuery --resourceSet anyResource 
 
 ## ====== calcUploadBytes-policy.json ======

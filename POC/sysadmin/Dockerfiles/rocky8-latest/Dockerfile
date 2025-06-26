@@ -1,5 +1,5 @@
 # Use the latest version of Rocky Linux 8 as the base image
-FROM rockylinux/rockylinux:8.9
+FROM rockylinux/rockylinux:8.10
 
 # Note: all supported tags @ https://hub.docker.com/_/rockylinux
 
@@ -38,7 +38,7 @@ RUN dnf -y install \
     wget \
     sqlite
 
-# Get the latest version of rclone - v1.69.1 as of this writing - released 2025-02-14
+# Get the latest version of rclone - v1.69.3 as of this writing - released 2025-05-21
 RUN RCLONE_VERSION=$(curl -s https://downloads.rclone.org/version.txt | awk -F'[ \t]+' '{print $2}') && \
     if [ "$(arch)" == "aarch64" ]; then PKGARCH="arm64"; else PKGARCH="amd64"; fi && \
     curl -O "https://downloads.rclone.org/$RCLONE_VERSION/rclone-$RCLONE_VERSION-linux-$PKGARCH.rpm" && \

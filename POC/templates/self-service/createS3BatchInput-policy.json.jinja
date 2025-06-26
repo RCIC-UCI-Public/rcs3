@@ -1,0 +1,37 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "retrieveETagAndCleanup",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::*{{ INVENTORY_POSTFIX }}/rcs3/*"
+            ]
+        },
+                {
+            "Sid": "checkAthenaQueryResults",
+            "Effect": "Allow",
+            "Action": [
+                "athena:GetQueryRuntimeStatistics"
+            ],
+            "Resource": [
+                "arn:aws:athena:{{ REGION }}:{{ ACCOUNT }}:workgroup/rcs3"
+            ]
+        },
+        {
+            "Sid": "writeLogEvents",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:{{ REGION }}:{{ ACCOUNT }}:log-group:/aws/lambda/createS3BatchInput:*"
+            ]
+        }
+    ]
+}
