@@ -98,6 +98,7 @@ $AWSPOLICY add action s3 UpdateJobStatus
 $AWSPOLICY add action sns GetTopicAttributes
 $AWSPOLICY add action sns ListTopics
 $AWSPOLICY add action sns Publish
+$AWSPOLICY add action sqs SendMessage
 $AWSPOLICY add action states StartExecution
 $AWSPOLICY add action states StartSyncExecution
 $AWSPOLICY add action sts AssumeRole
@@ -341,6 +342,9 @@ $AWSPOLICY addToSet action snsListTopics sns ListTopics
 $AWSPOLICY addSet action snsPublish
 $AWSPOLICY addToSet action snsPublish sns Publish
 
+$AWSPOLICY addSet action sqsSendMessage
+$AWSPOLICY addToSet action sqsSendMessage sqs SendMessage
+
 $AWSPOLICY addSet action sfnExecution
 $AWSPOLICY addToSet action sfnExecution states StartExecution
 $AWSPOLICY addToSet action sfnExecution states StartSyncExecution
@@ -394,7 +398,7 @@ $AWSPOLICY add resource inventoryBucketRCS3Path 'arn:aws:s3:::{{OWNER}}-{{SYSTEM
 $AWSPOLICY add resource snsRegionAccountAny 'arn:aws:sns:{{REGION}}:{{ACCOUNT}}:*'
 $AWSPOLICY add resource snsOwnerNotify 'arn:aws:sns:{{REGION}}:{{ACCOUNT}}:{{OWNER}}-{{SYSTEM}}-{{OWNER_NOTIFY}}'
 $AWSPOLICY add resource sfnFullMonty 'arn:aws:states:{{REGION}}:{{ACCOUNT}}:stateMachine:{{OWNER}}-{{SYSTEM}}-sfn-full-monty'
-
+$AWSPOLICY add resource sqsQueue 'arn:aws:sqs:{{REGION}}:{{ACCOUNT_ID}}:{{QUEUE}}'
 
 ## Resource Groups
 
@@ -520,6 +524,8 @@ $AWSPOLICY addToSet resource snsOwnerNotify snsOwnerNotify
 $AWSPOLICY addSet resource sfnFullMonty
 $AWSPOLICY addToSet resource sfnFullMonty sfnFullMonty
 
+$AWSPOLICY addSet resource sqsQueue 
+$AWSPOLICY addToSet resource sqsQueue sqsQueue
 # Principals
 
 $AWSPOLICY add principal serviceS3Batch '"Service":"batchoperations.s3.amazonaws.com"'
@@ -545,6 +551,7 @@ $AWSPOLICY addSet principal serviceStates
 $AWSPOLICY addToSet principal serviceStates serviceStates
 
 # Conditions
+$AWSPOLICY add condition arnAnyBucket '"ArnLike" : {"aws:SourceArn": "arn:aws:s3:::*"}'
 $AWSPOLICY add condition arnBackupBucket '"ArnLike" : {"aws:SourceArn": "arn:aws:s3:::{{OWNER}}-{{SYSTEM}}-{{BUCKET_POSTFIX}}"}'
 $AWSPOLICY add condition equalsAccount '"StringEquals" : {"aws:SourceAccount": "{{ACCOUNT}}"}'
 $AWSPOLICY add condition equalsAccountAndControl '"StringEquals" :  {"aws:SourceAccount": "{{ACCOUNT}}", "s3:x-amz-acl": "bucket-owner-full-control"}'
@@ -553,8 +560,12 @@ $AWSPOLICY add condition IPRestrictions "{%- if IP_ADDRESSES is defined %}\"IpAd
 
 # Condition Sets
 
+$AWSPOLICY addSet condition arnAnyBucket
+$AWSPOLICY addToSet condition arnAnyBucket arnAnyBucket
+
 $AWSPOLICY addSet condition arnBackupBucket
 $AWSPOLICY addToSet condition arnBackupBucket arnBackupBucket
+
 
 $AWSPOLICY addSet condition equalsAccountAndControl
 $AWSPOLICY addToSet condition equalsAccountAndControl equalsAccountAndControl
@@ -834,5 +845,9 @@ $AWSPOLICY add policy inventoryPermissions Allow --actionSet putObject --resourc
 $AWSPOLICY addSet policy inventory-permissions
 $AWSPOLICY addToSet policy inventory-permissions inventoryPermissions  
 
+## == sqs-send-message components ==
 
+$AWSPOLICY add policy sqsSendMessage Allow --actionSet sqsSendMessage --resourceSet  sqsQueue --conditionSet arnAnyBucket --principalSet serviceS3
 
+$AWSPOLICY addSet policy SQSSendMessage 
+$AWSPOLICY addToSet policy SQSSendMessage sqsSendMessage  
