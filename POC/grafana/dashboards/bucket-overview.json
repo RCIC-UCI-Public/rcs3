@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
-  "id": 25,
+  "id": 132,
   "links": [],
   "panels": [
     {
@@ -44,7 +44,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -54,25 +53,17 @@
               },
               {
                 "color": "#EAB839",
-                "value": 48
+                "value": 86400000
               },
               {
                 "color": "red",
-                "value": 72
+                "value": 172800000
               }
             ]
           },
-          "unit": "hours"
+          "unit": "dtdurationms"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "rcic-admin-crsp_key_age"
-            },
-            "properties": []
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -80,7 +71,7 @@
         "x": 0,
         "y": 1
       },
-      "id": 306,
+      "id": 304,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -91,7 +82,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^rcic\\-admin\\-crsp_key_age$/",
+          "fields": "/^age$/",
           "values": false
         },
         "showPercentChange": false,
@@ -103,35 +94,103 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
-          "dimensions": {},
+          "dimensions": {
+            "bucket_name": "$bucket",
+            "record_type": "BUCKET",
+            "storage_class": "STANDARD"
+          },
           "expression": "",
-          "hide": false,
-          "id": "x",
+          "id": "",
           "label": "",
           "logGroups": [],
           "matchExact": false,
           "metricEditorMode": 0,
-          "metricName": "rcic-admin-crsp_key_age",
+          "metricName": "PutRequests",
           "metricQueryType": 0,
-          "namespace": "rcs3",
-          "period": "3600",
+          "namespace": "AWS/S3/Storage-Lens",
+          "period": "300",
           "queryLanguage": "CWLI",
           "queryMode": "Metrics",
           "refId": "A",
           "region": "default",
           "sqlExpression": "",
           "statistic": "Maximum"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "${__to}",
+          "hide": false,
+          "refId": "B",
+          "type": "math"
         }
       ],
       "title": "Last Successful Backup",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "includeTimeField": true,
+            "mode": "reduceFields",
+            "reducers": [
+              "lastNotNull"
+            ]
+          }
+        },
+        {
+          "id": "formatTime",
+          "options": {
+            "outputFormat": "x",
+            "timeField": "Time",
+            "timezone": "browser",
+            "useTimezone": true
+          }
+        },
+        {
+          "id": "concatenate",
+          "options": {
+            "frameNameLabel": "frame",
+            "frameNameMode": "label"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "age",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "B"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Time {frame=\"PutRequests\"}"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        }
+      ],
       "type": "stat"
     },
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -193,7 +252,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -217,7 +276,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -241,7 +300,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "(SUM(standard_bytes) + SUM(da_bytes)) * $BYTES2GB",
@@ -278,7 +337,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -336,7 +395,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -432,7 +491,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -456,7 +515,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -480,7 +539,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "((SUM(s_bytes) * $BYTES2GB) * $S3STD * (1 - $SDISCOUNT)) + ((SUM(da_bytes) * $BYTES2GB) * $S3DEEP)",
@@ -544,7 +603,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -635,7 +694,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -659,7 +718,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -683,7 +742,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "da_bytes*$BYTES2GB",
@@ -707,7 +766,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "s_bytes*$BYTES2GB",
@@ -735,7 +794,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -849,7 +908,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -873,7 +932,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -897,7 +956,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "(SUM(s_bytes) * $BYTES2GB / $days_in_month) * $S3STD * (1 - $SDISCOUNT)",
@@ -917,7 +976,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "(SUM(g_bytes) * $BYTES2GB / $days_in_month) * $S3DEEP",
@@ -941,7 +1000,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -1026,7 +1085,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1050,7 +1109,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1074,7 +1133,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1098,7 +1157,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1122,7 +1181,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1146,7 +1205,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1170,7 +1229,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1194,7 +1253,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1218,7 +1277,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1242,7 +1301,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1266,7 +1325,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1290,7 +1349,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1314,7 +1373,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "SUM([s_put, s_post, s_list])",
@@ -1334,7 +1393,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "SUM([da_put, da_post, da_list])",
@@ -1354,7 +1413,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "SUM([b_put, b_post, b_list])",
@@ -1374,7 +1433,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "SUM([s_all, da_all, b_all])",
@@ -1394,7 +1453,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "all_requests - (standard_ppl + deep_ppl + bucket_ppl)",
@@ -1414,7 +1473,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "(1 - $EDISCOUNT) * ((other_requests * 0.0004) + (standard_ppl * 0.005) + (bucket_ppl * 0.005) + (deep_ppl * 0.05)) / 1000",
@@ -1472,7 +1531,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -1599,7 +1658,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1623,7 +1682,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1647,7 +1706,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "s_bytes * $BYTES2GB",
@@ -1671,7 +1730,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "da_bytes * $BYTES2GB",
@@ -1699,7 +1758,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -1784,7 +1843,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1807,7 +1866,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1848,7 +1907,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -1942,7 +2001,7 @@
           "alias": "Standard Snapshots",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1970,7 +2029,7 @@
           "alias": "Glacier Snapshots",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -1997,7 +2056,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "standard_snap * $BYTES2GB",
@@ -2021,7 +2080,7 @@
         {
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "da_snap * $BYTES2GB",
@@ -2049,7 +2108,7 @@
     {
       "datasource": {
         "type": "cloudwatch",
-        "uid": "cepjsirsdknb4c"
+        "uid": "feq5261la6by8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -2109,7 +2168,7 @@
           "alias": "Total Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -2137,7 +2196,7 @@
           "alias": "Snapshot Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -2165,7 +2224,7 @@
           "alias": "Snapshot Percentage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "(SUM(s_snapshot_storage) / SUM(s_total_storage)) * 100",
@@ -2186,7 +2245,7 @@
           "alias": "Total Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -2214,7 +2273,7 @@
           "alias": "Snapshot Storage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {
             "bucket_name": "$bucket",
@@ -2242,7 +2301,7 @@
           "alias": "Snapshot Percentage",
           "datasource": {
             "type": "cloudwatch",
-            "uid": "cepjsirsdknb4c"
+            "uid": "feq5261la6by8e"
           },
           "dimensions": {},
           "expression": "(SUM(d_snapshot_storage) / SUM(d_total_storage)) * 100",
@@ -2262,6 +2321,91 @@
       ],
       "title": "Standard Storage Snapshot %",
       "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "feq5261la6by8e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 48
+              },
+              {
+                "color": "red",
+                "value": 72
+              }
+            ]
+          },
+          "unit": "hours"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 38
+      },
+      "id": 307,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "feq5261la6by8e"
+          },
+          "dimensions": {},
+          "expression": "SEARCH('{rcs3,SourceBucket} MetricName=\"backup-bucket-key-age\" AND SourceBucket=\"$bucket\"', 'Maximum', 3600)",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 1,
+          "metricName": "",
+          "metricQueryType": 0,
+          "namespace": "",
+          "period": "3600",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "title": "Last Successful Backup2",
+      "type": "stat"
     }
   ],
   "preload": false,
@@ -2276,12 +2420,12 @@
     "list": [
       {
         "current": {
-          "text": "rcic-admin-crsp-uci-p-bkup-bucket",
-          "value": "rcic-admin-crsp-uci-p-bkup-bucket"
+          "text": "adeelas-obc-serv3-uci-p-bkup-bucket",
+          "value": "adeelas-obc-serv3-uci-p-bkup-bucket"
         },
         "datasource": {
           "type": "cloudwatch",
-          "uid": "cepjsirsdknb4c"
+          "uid": "feq5261la6by8e"
         },
         "definition": "dimension_values(us-west-2,AWS/S3/Storage-Lens,StorageBytes,bucket_name)",
         "includeAll": false,
@@ -2452,6 +2596,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Bucket Overview",
-  "uid": "996a304a-52d0-4726-bb29-d01ef3113f1c",
-  "version": 11
+  "uid": "8086214d-d39d-4403-92cc-935d02b1303e",
+  "version": 6
 }
