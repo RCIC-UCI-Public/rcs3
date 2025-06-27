@@ -68,7 +68,7 @@ Choose your deployment path based on your needs:
    ```hcl
    use_alb = true
    domain_name = "uci.yourdomain.com"
-   grafana_subdomain = "grafana"
+   grafana_subdomain = "dashboard"
    root_domain_name = "yourdomain.com"
    ```
 
@@ -109,7 +109,7 @@ Save the returned `Id` value.
 ```hcl
 use_alb = true
 domain_name = "uci-dev.yourdomain.com"
-grafana_subdomain = "grafana"
+grafana_subdomain = "dashboard"
 delegation_set_id = "N1PA6795SAMPLE"  # From step 1
 ```
 
@@ -129,7 +129,7 @@ Copy these name servers.
 ```hcl
 use_alb = true
 domain_name = "uci.yourdomain.com"
-grafana_subdomain = "grafana"
+grafana_subdomain = "dashboard"
 root_domain_name = "yourdomain.com"
 
 dev_delegation = {
