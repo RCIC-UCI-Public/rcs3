@@ -46,4 +46,7 @@ def lambda_handler(event, context):
         s3.delete_objects( Bucket=m.group(1), Delete={ 'Objects': delObjs, 'Quiet': True } )
 
     # return list files for processing
-    return { 'CreateJobItems': l }
+    if l:
+        return { 'CreateJobItems': l }
+    else:
+        return {}
