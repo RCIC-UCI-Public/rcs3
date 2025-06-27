@@ -44,7 +44,6 @@ def lambda_handler(event, context):
             sns_message += "Submission cancelled: {}\n".format( i )
 
         return {
-            'notifyUser': sns_message,
-            'CarryForward': event[ "CarryForward" ]
+            'notifyUser': sns_message
         }
 
