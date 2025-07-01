@@ -15,7 +15,7 @@ common_dashboards = ["cost-estimates.json", "cost-estimates-improved.json"]
 # Define teams and their bucket access permissions
 bucket_teams = {
 "Team blsemler" = {
-members = ["blsemler"]
+members = ["blsemler","ronp","plozano"]
 buckets = ["blsemler-littlebird-uci-p-bkup-bucket"]
 },
 "Team cestark" = {
@@ -25,7 +25,7 @@ buckets = ["cestark-bmc-uci-p-bkup-bucket",
 "cestark-hippocampus-uci-p-bkup-bucket"]
 },
 "Team fmarango" = {
-members = ["fmarango"]
+members = ["fmarango","ronp","plozano"]
 buckets = ["fmarango-f-ivm-uci-p-bkup-bucket"]
 },
 "Team kbeier" = {
@@ -38,23 +38,23 @@ buckets = ["kbeier-apollon-uci-p-bkup-bucket",
 "kbeier-faye-uci-p-bkup-bucket"]
 },
 "Team kngreen" = {
-members = ["kngreen"]
+members = ["kngreen","ronp","plozano"]
 buckets = ["kngreen-model-ad-uci-p-bkup-bucket"]
 },
 "Team lewell" = {
-members = ["lewell"]
+members = ["lewell","ronp","plozano"]
 buckets = ["lewell-cedar-uci-p-bkup-bucket"]
 },
 "Team lwagar" = {
-members = ["lwagar"]
+members = ["lwagar","ronp","plozano"]
 buckets = ["lwagar-wagarlab-uci-p-bkup-bucket"]
 },
 "Team macharya" = {
-members = ["macharya"]
+members = ["macharya","ronp","plozano"]
 buckets = ["macharya-mmanas-uci-p-bkup-bucket"]
 },
 "Team medhap" = {
-members = ["medhap"]
+members = ["medhap","ronp","plozano"]
 buckets = ["medhap-rivendell-uci-p-bkup-bucket"]
 },
 "Team mfrose" = {
@@ -62,15 +62,15 @@ members = ["mfrose", "ronp", "plozano"]
 buckets = ["mfrose-morandi1-uci-p-bkup-bucket"]
 },
 "Team middlebj" = {
-members = ["middlebj"]
+members = ["middlebj","ronp","plozano"]
 buckets = ["middlebj-middlab-uci-p-bkup-bucket"]
 },
 "Team mingt" = {
-members = ["mingt"]
+members = ["mingt","ronp","plozano"]
 buckets = ["mingt-chlamydia-uci-p-bkup-bucket"]
 },
 "Team piomelli" = {
-members = ["piomelli"]
+members = ["piomelli","ronp","plozano"]
 buckets = ["piomelli-piomellinas-uci-p-bkup-bucket"]
 },
 "Team rcic-admin" = {
