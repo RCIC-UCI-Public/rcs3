@@ -3,9 +3,9 @@
 # Any line that begins with a # is ignored
 # ID,Systems,Object Quota (Millions), Storage Quota (TB)
 ID,SYSTEM,QUOTA_OBJECT,QUOTA_STORAGE
-cestark, bmc,4,12 
+cestark,bmc,4,15
 cestark,fibre-data,12,18
-cestark,hippocampus,170,250
+cestark,hippocampus,180,275
 medhap,rivendell,6,115
 xiangmix,cncm,130,1600
 xiangmix,xuisebnas,35,260
@@ -26,12 +26,12 @@ mingt,chlamydia,1,10
 xiangmix,cncmviruscore,1,1
 xiangmix,xulabtissuecyte,20,25
 xiangmix,xu160,35,80
-rfrostig,sharat,3,15
-kngreen,model-ad,4,35
-xiangmix,cncm2,55,1000
+rfrostig,sharat,3,25
+kngreen,model-ad,4,60
+xiangmix,cncm2,360,3000
 piomelli,piomellinas,6,2
 middlebj,middlab,1,18
 rcic-admin,crsp,110,3000
-macharya,mmanas,1,36
+macharya,mmanas,1,45
 rfrostig,cortex,4,20
 adeelas,obc-serv3,1,50
