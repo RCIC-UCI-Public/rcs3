@@ -5,7 +5,7 @@
 MYDIR=$(dirname $(realpath $0))
 source $MYDIR/functions.sh
 # READ in the variables in the $CONFIG_DIR/aws-settings.yaml and present as bash variables 
-source  <($COMMON_DIR/aws-settings-to-bash.py)
+eval "$($COMMON_DIR/aws-settings-to-bash.py)"
 
 function helptext
 {
