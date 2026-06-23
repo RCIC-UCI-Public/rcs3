@@ -20,7 +20,7 @@ usage="""Create an SNS topic for email notifications related to a specific S3 bu
 AWS checks for duplicate addresses.  The subscribed address must confirm by responding to AWS confirmation message."""
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "owner",
-        help="user ID of ownser" )
+        help="user ID of owner" )
 p.add_argument( "host",
         help="hostname" )
 p.add_argument( "-e", "--email", nargs="+",

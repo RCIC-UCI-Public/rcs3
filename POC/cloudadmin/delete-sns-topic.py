@@ -19,7 +19,7 @@ aws=rcs3.read_aws_settings()
 usage="""Delete an SNS topic for email notifications related to a specific S3 bucket."""
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "owner",
-        help="user ID of ownser" )
+        help="user ID of owner" )
 p.add_argument( "host",
         help="hostname" )
 args = p.parse_args()

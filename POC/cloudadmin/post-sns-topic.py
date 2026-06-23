@@ -19,7 +19,7 @@ aws=rcs3.read_aws_settings()
 usage="""Post a message to SNS in regards to a specific S3 bucket.""" 
 p = argparse.ArgumentParser( description=usage )
 p.add_argument( "owner",
-        help="user ID of ownser" )
+        help="user ID of owner" )
 p.add_argument( "host",
         help="hostname" )
 p.add_argument( "-m", "--message", dest="message", default="default SNS message",
