@@ -58,37 +58,34 @@ def delete_alarms( alarms ):
     """Helper function which calls boto3 delete_alarms()"""
     if args.verbose:
         print( f"Deleting: {alarms}" )
-    cw_client.delete_alarms(
-       AlarmNames = alarms
-    )
+    try:
+        cw_client.delete_alarms(
+            AlarmNames = alarms
+        )
+    except:
+        print( f"Error deleting: {alarms}" )
 
 # composite alarms can only be deleted one at a time
 alarm_name=""
 test0 = alarm_prefix + r" "
 test1 = alarm_prefix + r"-"
-try:
-    for composite_alarm in response[ "CompositeAlarms" ]:
-        alarm_name = composite_alarm[ "AlarmName" ]
-        if alarm_name.startswith( test0 ) or alarm_name.startswith( test1 ):
-            delete_alarms( [ alarm_name ] )
-except:
-    print( f"Error deleting: {alarm_name}" )
+for composite_alarm in response[ "CompositeAlarms" ]:
+    alarm_name = composite_alarm[ "AlarmName" ]
+    if alarm_name.startswith( test0 ) or alarm_name.startswith( test1 ):
+        delete_alarms( [ alarm_name ] )
 
 # metric alarms can be deleted 100 at a time
 name_count = 0
 alarm_list = []
 print( f"{test0} {test1}" )
-try:
-    for metric_alarm in response[ "MetricAlarms" ]:
-        alarm_name = metric_alarm[ "AlarmName" ]
-        if alarm_name.startswith( test0 ) or alarm_name.startswith( test1 ):
-            alarm_list.append( alarm_name )
-            name_count += 1
-        if name_count == 100:
-            delete_alarms( alarm_list )
-            name_count = 0
-            alarm_list = []
-    if name_count > 0:
+for metric_alarm in response[ "MetricAlarms" ]:
+    alarm_name = metric_alarm[ "AlarmName" ]
+    if alarm_name.startswith( test0 ) or alarm_name.startswith( test1 ):
+        alarm_list.append( alarm_name )
+        name_count += 1
+    if name_count == 100:
         delete_alarms( alarm_list )
-except:
-    print( f"Error deleting: {alarm_list}" )
+        name_count = 0
+        alarm_list = []
+if name_count > 0:
+    delete_alarms( alarm_list )
