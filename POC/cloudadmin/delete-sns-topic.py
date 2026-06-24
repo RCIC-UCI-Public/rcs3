@@ -22,6 +22,8 @@ p.add_argument( "owner",
         help="user ID of owner" )
 p.add_argument( "host",
         help="hostname" )
+p.add_argument( "-v", "--verbose", action="store_true",
+        help="optional print statements for more detail" )
 args = p.parse_args()
 
 
@@ -41,7 +43,15 @@ else:
     sns_client = session.client( "sns" )
 
 
-topic_arn=f"arn:aws:sns:{region}:{account_id}:{args.host}-{args.host}-{aws['owner_notify']}"
+topic_arn="arn:aws:sns:{}:{}:{}-{}-{}".format(
+    sns_client.meta.region_name,
+    aws['accountid'],
+    args.owner,
+    args.host,
+    aws['owner_notify']
+)
+if args.verbose:
+    print( f"Deleting SNS topic: {topic_arn}" )
 try:
     response = sns_client.delete_topic(
         TopicArn=topic_arn
