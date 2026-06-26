@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 """ Create rclone.conf from a template file. Write to standard Output when called as program. Otherwise create RcloneConf Object """
 
 import argparse

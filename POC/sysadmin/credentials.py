@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/env python3
 """ Create credentials  from a template file. Write to standard Output when called as program. 
 Otherwise create Credentials Object """
 
